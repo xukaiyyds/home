@@ -1,0 +1,42 @@
+[
+  {
+    "icon": "Blog",
+    "name": "技术博客",
+    "link": "https://blog.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Image",
+    "name": "生活博客",
+    "link": "https://plog.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Code",
+    "name": "开发博客",
+    "link": "https://dev.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Brain",
+    "name": "ChatGPT",
+    "link": "https://gpt.xukaiyyds.cn/"
+  },
+  {
+    "icon": "CompactDisc",
+    "name": "网抑音乐",
+    "link": "https://music.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Dragon",
+    "name": "域名证书",
+    "link": "https://domains.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Eye",
+    "name": "站点监测",
+    "link": "https://status.xukaiyyds.cn/"
+  },
+  {
+    "icon": "LaptopCode",
+    "name": "管理面板",
+    "link": "https://admin.xukaiyyds.cn/"
+  }
+]
