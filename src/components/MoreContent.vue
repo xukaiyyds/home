@@ -1,5 +1,5 @@
 <template>
-  <div class="more-content">每一个不曾起舞的日子，都是对生命的辜负。</div>
+  <div class="more-content">每一个不曾起舞的日子，都是对生命的辜负。୧(๑•̀⌄•́๑)૭</div>
 </template>
 
 <style lang="scss" scoped>
