@@ -22,8 +22,8 @@
         </span>
         <!-- 站点备案 -->
         <span>
-          <!-- &amp; -->
-          <a v-if="siteIcp" href="https://beian.miit.gov.cn" target="_blank">
+          &amp;
+          <a v-if="siteIcp" href="https://icp.gov.moe/?keyword=20246633" target="_blank">
             {{ siteIcp }}
           </a>
         </span>
