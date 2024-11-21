@@ -15,9 +15,9 @@
     "link": "https://dev.xukaiyyds.cn/"
   },
   {
-    "icon": "Brain",
-    "name": "人工智障",
-    "link": "https://gpt.xukaiyyds.cn/"
+    "icon": "Bold",
+    "name": "个人博客",
+    "link": "https://i.xukaiyyds.cn/"
   },
   {
     "icon": "CompactDisc",
@@ -38,5 +38,10 @@
     "icon": "LaptopCode",
     "name": "管理面板",
     "link": "https://admin.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Cloud",
+    "name": "后台管理",
+    "link": "https://i.xukaiyyds.cn/studio"
   }
 ]
