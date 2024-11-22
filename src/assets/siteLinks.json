@@ -17,7 +17,7 @@
   {
     "icon": "Bold",
     "name": "个人博客",
-    "link": "https://i.xukaiyyds.cn/"
+    "link": "https://me.xukaiyyds.cn/"
   },
   {
     "icon": "CompactDisc",
@@ -41,7 +41,7 @@
   },
   {
     "icon": "Cloud",
-    "name": "后台管理",
-    "link": "https://i.xukaiyyds.cn/studio"
+    "name": "云工作室",
+    "link": "https://me.xukaiyyds.cn/studio"
   }
 ]

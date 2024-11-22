@@ -19,15 +19,15 @@
   },
   {
     "name": "WeChat",
-    "icon": "/images/icon/wechat.svg",
+    "icon": "/images/icon/wechat.png",
     "tip": "有什么事嘛",
-    "url": "/images/wechat.jpg"
+    "url": "https://blog.xukaiyyds.cn/img/other/wechat.jpg"
   },
   {
     "name": "QQ",
     "icon": "/images/icon/qq.png",
     "tip": "有什么事吗",
-    "url": "/images/TIM.png"
+    "url": "http://res.abeim.cn/api-qq?qq=3353212714"
   },
   {
     "name": "Email",
