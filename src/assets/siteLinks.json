@@ -15,14 +15,19 @@
     "link": "https://dev.xukaiyyds.cn/"
   },
   {
-    "icon": "Dragon",
-    "name": "域名证书",
-    "link": "https://domains.xukaiyyds.cn/"
+    "icon": "Book",
+    "name": "写作博客",
+    "link": "https://me.xukaiyyds.cn/blog"
   },
   {
     "icon": "CompactDisc",
     "name": "网抑音乐",
     "link": "https://music.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Dragon",
+    "name": "域名证书",
+    "link": "https://domains.xukaiyyds.cn/"
   },
   {
     "icon": "Eye",
