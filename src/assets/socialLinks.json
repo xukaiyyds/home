@@ -6,22 +6,22 @@
     "url": "https://github.com/xukaiyyds"
   },
   {
+    "name": "Gitee",
+    "icon": "/images/icon/gitee.png",
+    "tip": "去 Gitee 看看",
+    "url": "https://gitee.com/xukaiyyds"
+  },
+  {
     "name": "BiliBili",
     "icon": "/images/icon/bilibili.png",
     "tip": "你懂的",
     "url": "https://space.bilibili.com/2039366031"
   },
   {
-    "name": "Comment",
-    "icon": "/images/icon/comment.svg",
-    "tip": "留言墙",
-    "url": "https://me.xukaiyyds.cn/guestbook"
-  },
-  {
     "name": "WeChat",
     "icon": "/images/icon/wechat.svg",
     "tip": "交个朋友",
-    "url": "https://blog.xukaiyyds.cn/img/other/wechat.jpg"
+    "url": "https://wechat.xukaiyyds.cn/"
   },
   {
     "name": "QQ",
