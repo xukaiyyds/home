@@ -25,14 +25,9 @@
     "link": "https://music.xukaiyyds.cn/"
   },
   {
-    "icon": "LaptopCode",
-    "name": "开发项目",
-    "link": "https://me.xukaiyyds.cn/projects"
-  },
-  {
-    "icon": "Cloud",
-    "name": "云工作室",
-    "link": "https://me.xukaiyyds.cn/studio"
+    "icon": "Dragon",
+    "name": "域名证书",
+    "link": "https://domains.xukaiyyds.cn/"
   },
   {
     "icon": "Eye",
@@ -40,8 +35,13 @@
     "link": "https://status.xukaiyyds.cn/"
   },
   {
-    "icon": "Dragon",
-    "name": "域名证书",
-    "link": "https://domains.xukaiyyds.cn/"
+    "icon": "Cloud",
+    "name": "云工作室",
+    "link": "https://me.xukaiyyds.cn/studio"
+  },
+  {
+    "icon": "LaptopCode",
+    "name": "后台仪表盘",
+    "link": "https://me.xukaiyyds.cn/admin"
   }
 ]
