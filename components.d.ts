@@ -24,7 +24,6 @@ declare module '@vue/runtime-core' {
     Links: typeof import('./src/components/Links.vue')['default']
     Loading: typeof import('./src/components/Loading.vue')['default']
     Message: typeof import('./src/components/Message.vue')['default']
-    MoreContent: typeof import('./src/components/MoreContent.vue')['default']
     Music: typeof import('./src/components/Music.vue')['default']
     Player: typeof import('./src/components/Player.vue')['default']
     Set: typeof import('./src/components/Set.vue')['default']
