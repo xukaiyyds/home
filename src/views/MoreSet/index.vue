@@ -39,7 +39,6 @@ const closeShow = ref(false);
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   width: 40%;
-  height: 60%;
   background: rgb(255 255 255 / 40%);
   border-radius: 6px;
   padding: 40px;

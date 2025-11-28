@@ -40,7 +40,6 @@ const closeShow = ref(false);
 .box {
   flex: 1 0 0%;
   margin-left: 0.75rem;
-  height: 60%;
   max-width: 50%;
   position: relative;
   animation: fade 0.5s;
