@@ -10,7 +10,7 @@
         @click="store.setOpenState = false"
       />
     </transition>
-    <el-row :gutter="40">
+    <el-row>
       <el-col class="settings">
         <div class="title">
           <setting-two theme="filled" size="28" fill="#ffffff60" />
@@ -60,9 +60,7 @@ const closeShow = ref(false);
   }
 
   .el-row {
-    height: 100%;
-    display: flex;
-    justify-content: center;
+    // height: 100%;
 
     .settings {
       display: flex;

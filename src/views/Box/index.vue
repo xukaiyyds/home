@@ -76,7 +76,7 @@ const closeShow = ref(false);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px;
+    padding: 40px;
     width: 100%;
     height: 100%;
   }
