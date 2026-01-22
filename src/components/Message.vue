@@ -103,6 +103,10 @@ watch(
       // border-radius: 50%;
       width: 120px;
     }
+    .logo-img:hover {
+      transform: rotate(666turn);
+      transition: transform 59s 1s cubic-bezier(0.3, 0, 0.8, 1);
+    }
     .name {
       width: 100%;
       padding-left: 22px;
