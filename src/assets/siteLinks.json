@@ -5,14 +5,14 @@
     "link": "https://blog.xukaiyyds.cn/"
   },
   {
-    "icon": "Image",
-    "name": "生活博客",
-    "link": "https://plog.xukaiyyds.cn/"
-  },
-  {
     "icon": "Code",
     "name": "开发博客",
     "link": "https://dev.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Dragon",
+    "name": "域名证书",
+    "link": "https://domains.xukaiyyds.cn/"
   },
   {
     "icon": "Book",
@@ -20,14 +20,14 @@
     "link": "https://me.xukaiyyds.cn/blog"
   },
   {
-    "icon": "CompactDisc",
-    "name": "网抑音乐",
-    "link": "https://music.xukaiyyds.cn/"
+    "icon": "Image",
+    "name": "生活博客",
+    "link": "https://plog.xukaiyyds.cn/"
   },
   {
-    "icon": "Dragon",
-    "name": "域名证书",
-    "link": "https://domains.xukaiyyds.cn/"
+    "icon": "CompactDisc",
+    "name": "网抑音乐",
+    "link": "https://plog.xukaiyyds.cn/music/?id=5472593172&server=netease"
   },
   {
     "icon": "Eye",
