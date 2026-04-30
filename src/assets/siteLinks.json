@@ -1,20 +1,5 @@
 [
   {
-    "icon": "Blog",
-    "name": "技术博客",
-    "link": "https://blog.xukaiyyds.cn/"
-  },
-  {
-    "icon": "Code",
-    "name": "开发博客",
-    "link": "https://dev.xukaiyyds.cn/"
-  },
-  {
-    "icon": "Dragon",
-    "name": "域名证书",
-    "link": "https://domains.xukaiyyds.cn/"
-  },
-  {
     "icon": "Book",
     "name": "写作博客",
     "link": "https://me.xukaiyyds.cn/blog"
@@ -28,6 +13,21 @@
     "icon": "CompactDisc",
     "name": "网抑音乐",
     "link": "https://plog.xukaiyyds.cn/music/?id=5472593172&server=netease"
+  },
+  {
+    "icon": "Blog",
+    "name": "技术博客",
+    "link": "https://blog.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Code",
+    "name": "开发博客",
+    "link": "https://dev.xukaiyyds.cn/"
+  },
+  {
+    "icon": "Dragon",
+    "name": "域名证书",
+    "link": "https://domains.xukaiyyds.cn/"
   },
   {
     "icon": "Eye",
