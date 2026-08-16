@@ -53,18 +53,22 @@ export const getHitokoto = async () => {
  * 天气
  */
 
-// 获取高德地理位置信息
-export const getAdcode = async (key) => {
-  const res = await fetch(`https://restapi.amap.com/v3/ip?key=${key}`);
-  return await res.json();
+// 使用 CF Worker 代理地址
+const PROXY_BASE_URL = "https://weather.niuzhix.dpdns.org/weather";
+
+// 获取城市信息
+export const getXiaomiCityByGeo = async (longitude, latitude) => {
+  const url = `${PROXY_BASE_URL}/location/city/geo?longitude=${longitude}&latitude=${latitude}&locale=zh_cn`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data?.[0];
 };
 
-// 获取高德地理天气信息
-export const getWeather = async (key, city) => {
-  const res = await fetch(
-    `https://restapi.amap.com/v3/weather/weatherInfo?key=${key}&city=${city}`,
-  );
-  return await res.json();
+// 获取天气信息
+export const getXiaomiWeather = async (latitude, longitude, locationKey) => {
+  const url = `${PROXY_BASE_URL}/weather/all?latitude=${latitude}&longitude=${longitude}&locationKey=${encodeURIComponent(locationKey)}&days=15&appKey=weather20151024&sign=zUFJoAR2ZVrDy1vF3D07&isGlobal=false&locale=zh_cn`;
+  const response = await fetch(url);
+  return await response.json();
 };
 
 // 获取教书先生天气 API

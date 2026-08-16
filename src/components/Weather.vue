@@ -1,6 +1,6 @@
 <template>
-  <div class="weather" v-if="weatherData.adCode.city && weatherData.weather.weather">
-    <span>{{ weatherData.adCode.city }}&nbsp;</span>
+  <div class="weather" v-if="weatherData.city && weatherData.weather.weather">
+    <span>{{ weatherData.city }}&nbsp;</span>
     <span>{{ weatherData.weather.weather }}&nbsp;</span>
     <span>{{ weatherData.weather.temperature }}℃</span>
     <span class="sm-hidden">
@@ -13,23 +13,17 @@
     <span class="sm-hidden">{{ weatherData.weather.windpower }}&nbsp;级</span>
   </div>
   <div class="weather" v-else>
-    <span>天气数据获取失败</span>
+    <span>正在获取天气数据</span>
   </div>
 </template>
 
 <script setup>
-import { getAdcode, getWeather, getOtherWeather } from "@/api";
+import { getXiaomiWeather, getXiaomiCityByGeo } from "@/api";
 import { Error } from "@icon-park/vue-next";
-
-// 高德开发者 Key
-const mainKey = import.meta.env.VITE_WEATHER_KEY;
 
 // 天气数据
 const weatherData = reactive({
-  adCode: {
-    city: null, // 城市
-    adcode: null, // 城市编码
-  },
+  city: null, // 城市
   weather: {
     weather: null, // 天气现象
     temperature: null, // 实时气温
@@ -38,57 +32,63 @@ const weatherData = reactive({
   },
 });
 
-// 取出天气平均值
-const getTemperature = (min, max) => {
-  try {
-    // 计算平均值并四舍五入
-    const average = (Number(min) + Number(max)) / 2;
-    return Math.round(average);
-  } catch (error) {
-    console.error("计算温度出现错误：", error);
-    return "NaN";
-  }
+// 天气代码转文字
+const getWeatherText = (code) => {
+  const weatherMap = {
+    0: "晴", 1: "多云", 2: "阴", 3: "阵雨", 4: "雷阵雨",
+    5: "雷阵雨伴有冰雹", 6: "雨夹雪", 7: "小雨", 8: "中雨",
+    9: "大雨", 10: "暴雨", 13: "阵雪", 14: "小雪",
+    15: "中雪", 16: "大雪", 17: "暴雪", 18: "雾",
+    19: "冻雨", 20: "沙尘暴", 29: "浮尘", 30: "扬沙",
+    31: "强沙尘暴", 32: "霾"
+  };
+  return weatherMap[code] || "未知";
+};
+
+// 风向角度转文字
+const getWindDirection = (degree) => {
+  const directions = ["北", "东北", "东", "东南", "南", "西南", "西", "西北"];
+  const index = Math.round((degree % 360) / 45) % 8;
+  return directions[index];
 };
 
 // 获取天气数据
 const getWeatherData = async () => {
   try {
-    // 获取地理位置信息
-    if (!mainKey) {
-      console.log("未配置，使用备用天气接口");
-      const result = await getOtherWeather();
-      console.log(result);
-      const data = result.result;
-      weatherData.adCode = {
-        city: data.city.City || "未知地区",
-        // adcode: data.city.cityId,
-      };
-      weatherData.weather = {
-        weather: data.condition.day_weather,
-        temperature: getTemperature(data.condition.min_degree, data.condition.max_degree),
-        winddirection: data.condition.day_wind_direction,
-        windpower: data.condition.day_wind_power,
-      };
-    } else {
-      // 获取 Adcode
-      const adCode = await getAdcode(mainKey);
-      console.log(adCode);
-      if (adCode.infocode !== "10000") {
-        throw "地区查询失败";
-      }
-      weatherData.adCode = {
-        city: adCode.city,
-        adcode: adCode.adcode,
-      };
-      // 获取天气信息
-      const result = await getWeather(mainKey, weatherData.adCode.adcode);
-      weatherData.weather = {
-        weather: result.lives[0].weather,
-        temperature: result.lives[0].temperature,
-        winddirection: result.lives[0].winddirection,
-        windpower: result.lives[0].windpower,
-      };
+    // 获取定位（使用浏览器地理定位）
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+
+    const { latitude, longitude } = position.coords;
+
+    // 获取城市信息
+    const cityInfo = await getXiaomiCityByGeo(longitude, latitude);
+    if (!cityInfo || !cityInfo.locationKey) {
+      throw "城市信息获取失败";
     }
+
+    weatherData.city = cityInfo.name;
+
+    // 获取天气信息
+    const result = await getXiaomiWeather(latitude, longitude, cityInfo.locationKey);
+
+    if (!result.current) {
+      throw "天气数据获取失败";
+    }
+    const current = result.current;
+    const windDegree = parseFloat(current.wind?.direction?.value || 0);
+    const windSpeed = parseFloat(current.wind?.speed?.value || 0);
+
+    // 风速转风力等级（简化计算）
+    const windPower = Math.min(Math.ceil(windSpeed / 5), 12);
+
+    weatherData.weather = {
+      weather: getWeatherText(current.weather),
+      temperature: current.temperature?.value,
+      winddirection: getWindDirection(windDegree),
+      windpower: windPower,
+    };
   } catch (error) {
     console.error("天气信息获取失败:" + error);
     onError("天气信息获取失败");
