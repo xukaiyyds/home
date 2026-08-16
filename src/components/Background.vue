@@ -41,7 +41,7 @@ const changeBg = (type) => {
   if (type == 0) {
     bgUrl.value = `/images/background${bgRandom}.jpg`;
   } else if (type == 1) {
-    bgUrl.value = "https://api.dujin.org/bing/1920.php";
+    bgUrl.value = "https://api.xinyew.cn/api/bing";
   } else if (type == 2) {
     bgUrl.value = "https://tu.ltyuanfang.cn/api/fengjing.php";
   } else if (type == 3) {
