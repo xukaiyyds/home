@@ -13,6 +13,15 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="2">
         <div class="item">
+          <span class="text">雪花特效显示</span>
+          <el-switch
+            v-model="snowflakeShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
           <span class="text">建站日期显示</span>
           <el-switch
             v-model="siteStartShow"
@@ -93,6 +102,7 @@ import { storeToRefs } from "pinia";
 const store = mainStore();
 const {
   coverType,
+  snowflakeShow,
   siteStartShow,
   musicClick,
   playerLrcShow,

@@ -26,6 +26,7 @@
 <script setup>
 import { mainStore } from "@/store";
 import { Error } from "@icon-park/vue-next";
+import initSnowfall from "@/utils/snow";
 
 const store = mainStore();
 const bgUrl = ref(null);
@@ -87,9 +88,39 @@ watch(
   },
 );
 
+// 雪花特效
+const cleanup = ref(null)
+
+const toggleSnowfall = (show) => {
+  if (cleanup.value) {
+    cleanup.value()
+    cleanup.value = null
+  }
+
+  if (show) {
+    cleanup.value = initSnowfall()
+  }
+}
+
+watch(
+  () => store.snowflakeShow,
+  (newVal) => {
+    toggleSnowfall(newVal)
+  }
+)
+
+onUnmounted(() => {
+  if (cleanup.value) {
+    cleanup.value()
+    cleanup.value = null
+  }
+})
+
 onMounted(() => {
   // 加载壁纸
   changeBg(store.coverType);
+  // 加载雪花特效
+  toggleSnowfall(store.snowflakeShow)
 });
 
 onBeforeUnmount(() => {
