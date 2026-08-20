@@ -3,9 +3,11 @@
   <div class="message">
     <!-- Logo -->
     <div class="logo">
-      <a href="https://me.xukaiyyds.cn" target="_blank" title="xukai">
-        <img class="logo-img" :src="siteLogo" alt="logo" />
-      </a>
+      <el-tooltip content="xukai" placement="top" :show-arrow="false">
+        <a href="https://me.xukaiyyds.cn" target="_blank">
+          <img class="logo-img" :src="siteLogo" alt="logo" />
+        </a>
+      </el-tooltip>
       <div :class="{ name: true, 'text-hidden': true, long: siteUrl[0].length >= 6 }">
         <span class="bg">{{ siteUrl[0] }}</span>
         <span class="sm">.{{ siteUrl[1] }}</span>

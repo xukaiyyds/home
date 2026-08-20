@@ -4,8 +4,7 @@
     <div class="logo text-hidden" @click="store.mobileFuncState = !store.mobileFuncState">
       <!-- <span class="bg">{{ siteUrl[0] }}</span>
       <span class="sm">.{{ siteUrl[1] }}</span> -->
-      <span class="bg">open</span>
-      <span class="sm"> me</span>
+      <ExchangeAlt style="width: 2rem;" />
     </div>
     <!-- 功能区 -->
     <Func />
@@ -16,6 +15,7 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import {  ExchangeAlt } from "@vicons/fa";
 import Func from "@/views/Func/index.vue";
 import Link from "@/components/Links.vue";
 const store = mainStore();
@@ -44,7 +44,7 @@ const siteUrl = computed(() => {
     font-family: "Pacifico-Regular";
     font-size: 2.25rem;
     position: fixed;
-    top: 6%;
+    top: 10%;
     left: 0;
     text-align: center;
     transition: transform 0.3s;
