@@ -24,7 +24,7 @@ const initSnowfall = () => {
   resizeCanvas();
 
   const createSnowflakes = () => {
-    const snowflakeCount = 30; // 雪花数量
+    const snowflakeCount = 50; // 雪花数量
     for (let i = 0; i < snowflakeCount; i++) {
       snowflakes.push({
         x: Math.random() * canvas.width,
@@ -51,7 +51,7 @@ const initSnowfall = () => {
 
   const drawSnowflakes = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.beginPath();
     snowflakes.forEach((snowflake) => {
       ctx.moveTo(snowflake.x, snowflake.y);
