@@ -43,7 +43,7 @@
 <script setup>
 import { Icon } from "@vicons/utils";
 // 可前往 https://www.xicons.org 自行挑选并在此处引入
-import { Link, Blog, Image, Code, Book, CompactDisc, Dragon, Eye, Cloud, LaptopCode } from "@vicons/fa"; // 注意使用正确的类别
+import { Link, Book, Image, CompactDisc, Blog, Code, Dragon, Eye, Cloud, LaptopCode } from "@vicons/fa"; // 注意使用正确的类别
 import { mainStore } from "@/store";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination, Mousewheel } from "swiper/modules";
@@ -63,11 +63,11 @@ const siteLinksList = computed(() => {
 
 // 网站链接图标
 const siteIcon = {
-  Blog,
-  Image,
-  Code,
   Book,
+  Image,
   CompactDisc,
+  Blog,
+  Code,
   Dragon,
   Eye,
   Cloud,
@@ -76,7 +76,7 @@ const siteIcon = {
 
 // 链接跳转
 const jumpLink = (data) => {
-  if (data.name === "音乐" && store.musicClick) {
+  if (data.name === "网抑音乐" && store.musicClick) {
     if (typeof $openList === "function") $openList();
   } else {
     window.open(data.link, "_blank");

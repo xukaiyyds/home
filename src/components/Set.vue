@@ -22,15 +22,6 @@
           />
         </div>
         <div class="item">
-          <span class="text">音乐点击是否打开面板</span>
-          <el-switch
-            v-model="musicClick"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
           <span class="text">底栏歌词显示</span>
           <el-switch
             v-model="playerLrcShow"
@@ -79,9 +70,17 @@
           </el-radio-group>
         </div>
       </el-collapse-item>
-      <!-- <el-collapse-item title="其他设置" name="4">
-        <div>设置内容待增加</div>
-      </el-collapse-item> -->
+      <el-collapse-item title="其他设置" name="4">
+        <div class="item">
+          <span class="text">点击网抑音乐是否打开面板</span>
+          <el-switch
+            v-model="musicClick"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+      </el-collapse-item>
     </el-collapse>
   </div>
 </template>
