@@ -9,7 +9,7 @@
         </div>
       </el-col>
       <el-col :span="12">
-        <div class="right cards">
+        <div class="right cards" @click="changeBox">
           <div class="time">
             <div class="date">
               <span>{{ currentTime.year }}&nbsp;年&nbsp;</span>
@@ -36,6 +36,13 @@ import Hitokoto from "@/components/Hitokoto.vue";
 import Weather from "@/components/Weather.vue";
 
 const store = mainStore();
+
+// 切换右侧功能区
+const changeBox = () => {
+  if (store.getInnerWidth >= 721) {
+    store.boxOpenState = !store.boxOpenState;
+  }
+};
 
 // 当前时间
 const currentTime = ref({});
@@ -143,6 +150,9 @@ onBeforeUnmount(() => {
         text-overflow: ellipsis;
         overflow-x: hidden;
         white-space: nowrap;
+      }
+      @media (max-width: 720px) {
+        pointer-events: none;
       }
     }
   }
