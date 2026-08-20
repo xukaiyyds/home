@@ -13,13 +13,15 @@
     <span class="sm-hidden">{{ weatherData.weather.windpower }}&nbsp;级</span>
   </div>
   <div class="weather" v-else>
-    <span>正在获取天气数据</span>
+    <span>{{ weatherMsg }}</span>
   </div>
 </template>
 
 <script setup>
 import { getXiaomiWeather, getXiaomiCityByGeo } from "@/api";
 import { Error } from "@icon-park/vue-next";
+
+const weatherMsg = ref('正在获取天气数据');
 
 // 天气数据
 const weatherData = reactive({
@@ -91,7 +93,8 @@ const getWeatherData = async () => {
     };
   } catch (error) {
     console.error("天气信息获取失败:" + error);
-    onError("天气信息获取失败");
+    weatherMsg.value = '天气数据获取失败';
+    onError("定位失败，无法获取天气信息");
   }
 };
 
