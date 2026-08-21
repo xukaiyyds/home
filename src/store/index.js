@@ -7,6 +7,7 @@ export const mainStore = defineStore("main", {
       innerWidth: null, // 当前窗口宽度
       coverType: "0", // 壁纸种类
       themeType: "dark", // 主题颜色
+      darkstarShow: false, // 星空特效显示
       snowflakeShow: false, // 雪花特效显示
       siteStartShow: false, // 建站日期显示
       musicClick: false, // 音乐链接是否跳转
@@ -84,6 +85,7 @@ export const mainStore = defineStore("main", {
       "coverType",
       "musicVolume",
       "themeType",
+      "darkstarShow",
       "snowflakeShow",
       "siteStartShow",
       "musicClick",

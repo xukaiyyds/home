@@ -1,22 +1,10 @@
 <template>
   <div :class="store.backgroundShow ? 'cover show' : 'cover'">
-    <img
-      v-show="store.imgLoadStatus"
-      :src="bgUrl"
-      class="bg"
-      alt="cover"
-      @load="imgLoadComplete"
-      @error.once="imgLoadError"
-      @animationend="imgAnimationEnd"
-    />
+    <img v-show="store.imgLoadStatus" :src="bgUrl" class="bg" alt="cover" @load="imgLoadComplete"
+      @error.once="imgLoadError" @animationend="imgAnimationEnd" />
     <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
-      <a
-        v-if="store.backgroundShow && store.coverType != '3'"
-        class="down"
-        :href="bgUrl"
-        target="_blank"
-      >
+      <a v-if="store.backgroundShow && store.coverType != '3'" class="down" :href="bgUrl" target="_blank">
         下载壁纸
       </a>
     </Transition>
@@ -26,6 +14,7 @@
 <script setup>
 import { mainStore } from "@/store";
 import { Error } from "@icon-park/vue-next";
+import initUniverse from "@/utils/dark";
 import initSnowfall from "@/utils/snow";
 
 const store = mainStore();
@@ -88,32 +77,44 @@ watch(
   },
 );
 
-// 雪花特效
-const cleanup = ref(null)
+// 星空特效&雪花特效
+const cleanup = ref({
+  universe: null,   // 清理函数
+  snowfall: null,
+})
 
-const toggleSnowfall = (show) => {
-  if (cleanup.value) {
-    cleanup.value()
-    cleanup.value = null
+const toggleEffect = (type, show) => {
+  // 销毁旧特效
+  if (cleanup.value[type]) {
+    cleanup.value[type]()
+    cleanup.value[type] = null
   }
 
+  // 创建新特效
   if (show) {
-    cleanup.value = initSnowfall()
+    const initFn = type === 'snowfall' ? initSnowfall : initUniverse
+    cleanup.value[type] = initFn()
   }
 }
 
+// 监听 store 状态变化
+watch(
+  () => store.darkstarShow,
+  (val) => toggleEffect('universe', val)
+)
+
 watch(
   () => store.snowflakeShow,
-  (newVal) => {
-    toggleSnowfall(newVal)
-  }
+  (val) => toggleEffect('snowfall', val)
 )
 
 onUnmounted(() => {
-  if (cleanup.value) {
-    cleanup.value()
-    cleanup.value = null
-  }
+  Object.keys(cleanup.value).forEach((key) => {
+    if (cleanup.value[key]) {
+      cleanup.value[key]()
+      cleanup.value[key] = null
+    }
+  })
 })
 
 // 切换主题
@@ -134,8 +135,10 @@ onMounted(() => {
   changeBg(store.coverType);
   // 加载主题
   changeThemeType(store.themeType);
+  // 加载星空特效
+  toggleEffect('universe', store.darkstarShow);
   // 加载雪花特效
-  toggleSnowfall(store.snowflakeShow)
+  toggleEffect('snowfall', store.snowflakeShow);
 });
 
 onBeforeUnmount(() => {
@@ -172,6 +175,7 @@ onBeforeUnmount(() => {
     animation: fade-blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     animation-delay: 0.45s;
   }
+
   .gray {
     opacity: 1;
     position: absolute;
@@ -183,11 +187,13 @@ onBeforeUnmount(() => {
       radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%);
 
     transition: 1.5s;
+
     &.hidden {
       opacity: 0;
       transition: 1.5s;
     }
   }
+
   .down {
     font-size: 16px;
     color: white;
@@ -205,11 +211,13 @@ onBeforeUnmount(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+
     &:hover {
       text-decoration: none;
       transform: scale(1.05);
       background-color: var(--main-download-hover-background-color);
     }
+
     &:active {
       transform: scale(1);
     }

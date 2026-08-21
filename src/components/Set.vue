@@ -20,6 +20,15 @@
           </el-radio-group>
         </div>
         <div class="item">
+          <span class="text">星空特效显示</span>
+          <el-switch
+            v-model="darkstarShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
           <span class="text">雪花特效显示</span>
           <el-switch
             v-model="snowflakeShow"
@@ -110,6 +119,7 @@ const store = mainStore();
 const {
   coverType,
   themeType,
+  darkstarShow,
   snowflakeShow,
   siteStartShow,
   musicClick,
@@ -121,7 +131,7 @@ const {
 } = storeToRefs(store);
 
 // 默认选中项
-const activeName = ref("1");
+const activeName = ref("2");
 
 // 壁纸切换
 const radioChange = () => {
