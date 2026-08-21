@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #00000080;
+      background-color: var(--main-more-background-color);
       backdrop-filter: blur(20px);
       z-index: 2;
       animation: fade 0.5s;
@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
     left: calc(50% - 28px);
     width: 56px;
     height: 34px;
-    background: rgb(0 0 0 / 20%);
+    background: var(--main-cards-background-color);
     backdrop-filter: blur(10px);
     border-radius: 6px;
     transition: transform 0.3s;

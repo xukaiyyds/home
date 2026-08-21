@@ -146,7 +146,7 @@ watch(
 .music {
   width: 100%;
   height: 100%;
-  background: #00000040;
+  background: var(--main-cards-background-color);
   backdrop-filter: blur(10px);
   border-radius: 6px;
   padding: 20px;
@@ -256,7 +256,7 @@ watch(
   margin: auto;
   width: 100%;
   height: 100%;
-  background-color: #00000080;
+  background-color: var(--main-more-background-color);
   backdrop-filter: blur(20px);
   z-index: 1;
   .list {

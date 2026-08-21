@@ -13,6 +13,13 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="2">
         <div class="item">
+          <span class="text">主题模式切换</span>
+          <el-radio-group v-model="themeType" text-color="#FFFFFF">
+            <el-radio value="light" border>浅色模式</el-radio>
+            <el-radio value="dark" border>深色模式</el-radio>
+          </el-radio-group>
+        </div>
+        <div class="item">
           <span class="text">雪花特效显示</span>
           <el-switch
             v-model="snowflakeShow"
@@ -102,6 +109,7 @@ import { storeToRefs } from "pinia";
 const store = mainStore();
 const {
   coverType,
+  themeType,
   snowflakeShow,
   siteStartShow,
   musicClick,

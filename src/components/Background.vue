@@ -116,9 +116,24 @@ onUnmounted(() => {
   }
 })
 
+// 切换主题
+const changeThemeType = (val) => {
+  const htmlElement = document.querySelector("html");
+  const themeType = val === "dark" ? "dark" : "light";
+  htmlElement.setAttribute("theme", themeType);
+};
+
+// 监听颜色变化
+watch(
+  () => store.themeType,
+  (val) => changeThemeType(val),
+);
+
 onMounted(() => {
   // 加载壁纸
   changeBg(store.coverType);
+  // 加载主题
+  changeThemeType(store.themeType);
   // 加载雪花特效
   toggleSnowfall(store.snowflakeShow)
 });
@@ -184,15 +199,16 @@ onBeforeUnmount(() => {
     display: block;
     padding: 20px 26px;
     border-radius: 8px;
-    background-color: #00000030;
+    background-color: var(--main-download-background-color);
     width: 120px;
     height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     &:hover {
+      text-decoration: none;
       transform: scale(1.05);
-      background-color: #00000060;
+      background-color: var(--main-download-hover-background-color);
     }
     &:active {
       transform: scale(1);

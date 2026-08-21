@@ -110,7 +110,7 @@ const siteUrl = computed(() => {
   }
   &.blur {
     backdrop-filter: blur(10px);
-    background: rgb(0 0 0 / 25%);
+    background: var(--main-footer-background-color);
     font-size: 16px;
   }
   .fade-enter-active,
