@@ -1,5 +1,5 @@
 import { h } from "vue";
-import { SpaCandle } from "@icon-park/vue-next";
+import { Like, SpaCandle } from "@icon-park/vue-next";
 import dayjs from "dayjs";
 
 // 时钟
@@ -92,6 +92,7 @@ export const helloInit = () => {
   ElMessage({
     dangerouslyUseHTMLString: true,
     message: `<strong>${hello}</strong> 欢迎来到我的主页`,
+    icon: h(Like, { theme: "filled", fill: "#efefef" }),
   });
 };
 
