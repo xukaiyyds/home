@@ -167,7 +167,7 @@ const dialogFormVisible = ref(false);
 const customCoverUrl = ref("");
 
 const setCustomCover = () => {
-  const url = customCoverUrl.value.trim();
+  const url = customCoverUrl.value;
 
   if (identifyInput(url) !== "url") {
     ElMessage({
@@ -180,19 +180,20 @@ const setCustomCover = () => {
     return;
   }
 
-  const isChanged = url !== store.backgroundCustom;
+  coverType.value = 6;
 
-  if (isChanged) {
-    coverType.value = 6;
+  if (url !== store.backgroundCustom) {
     store.backgroundCustom = url;
     store.bgUrl = url;
     ElMessage({
-      message: "已切换为自定义壁纸",
+      message: "自定义壁纸更换成功",
       icon: h(SuccessPicture, {
         theme: "filled",
         fill: "#efefef",
       }),
     });
+  } else {
+    store.bgUrl = store.backgroundCustom;
   }
 
   dialogFormVisible.value = false;
