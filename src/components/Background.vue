@@ -1,10 +1,10 @@
 <template>
   <div :class="store.backgroundShow ? 'cover show' : 'cover'">
-    <img v-show="store.imgLoadStatus" :src="bgUrl" class="bg" alt="cover" @load="imgLoadComplete"
+    <img v-show="store.imgLoadStatus" :src="store.bgUrl" class="bg" alt="cover" @load="imgLoadComplete"
       @error.once="imgLoadError" @animationend="imgAnimationEnd" />
     <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
-      <a v-if="store.backgroundShow && ['1', '2', '3'].includes(store.coverType)" class="down" :href="bgUrl" target="_blank">
+      <a v-if="store.backgroundShow && [1, 2, 3].includes(store.coverType)" class="down" :href="store.bgUrl" target="_blank">
         下载壁纸
       </a>
     </Transition>
@@ -18,7 +18,6 @@ import initUniverse from "@/utils/dark";
 import initSnowfall from "@/utils/snow";
 
 const store = mainStore();
-const bgUrl = ref(null);
 const imgTimeout = ref(null);
 const emit = defineEmits(["loadComplete"]);
 
@@ -30,17 +29,19 @@ const bgRandoms = Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0')
 // 更换壁纸链接
 const changeBg = (type) => {
   if (type == 0) {
-    bgUrl.value = `/images/background${bgRandom}.jpg`;
+    store.bgUrl = `/images/background${bgRandom}.jpg`;
   } else if (type == 1) {
-    bgUrl.value = "https://api.xinyew.cn/api/bing";
+    store.bgUrl = "https://api.xinyew.cn/api/bing";
   } else if (type == 2) {
-    bgUrl.value = `https://plog.xukaiyyds.cn/img/wallpaper/淡雅/${bgRandoms}.jpg`;
+    store.bgUrl = `https://plog.xukaiyyds.cn/img/wallpaper/淡雅/${bgRandoms}.jpg`;
   } else if (type == 3) {
-    bgUrl.value = `https://plog.xukaiyyds.cn/img/wallpaper/星空/${bgRandoms}.jpg`;
+    store.bgUrl = `https://plog.xukaiyyds.cn/img/wallpaper/星空/${bgRandoms}.jpg`;
   } else if (type == 4) {
-    bgUrl.value = "https://tu.ltyuanfang.cn/api/fengjing.php";
+    store.bgUrl = "https://tu.ltyuanfang.cn/api/fengjing.php";
   } else if (type == 5) {
-    bgUrl.value = "https://t.alcy.cc/ycy";
+    store.bgUrl = "https://t.alcy.cc/ycy";
+  } else if (type == 6) {
+    store.bgUrl = store.backgroundCustom;
   }
 };
 
@@ -71,7 +72,7 @@ const imgLoadError = () => {
       fill: "#efefef",
     }),
   });
-  bgUrl.value = `/images/background${bgRandom}.jpg`;
+  store.bgUrl = `/images/background${bgRandom}.jpg`;
 };
 
 // 监听壁纸切换

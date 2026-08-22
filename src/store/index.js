@@ -5,7 +5,9 @@ export const mainStore = defineStore("main", {
     return {
       imgLoadStatus: false, // 壁纸加载状态
       innerWidth: null, // 当前窗口宽度
-      coverType: "0", // 壁纸种类
+      coverType: 0, // 壁纸种类
+      bgUrl: "", // 壁纸URL
+      backgroundCustom: "", // 壁纸自定义
       themeType: "dark", // 主题颜色
       darkstarShow: false, // 星空特效显示
       snowflakeShow: false, // 雪花特效显示
@@ -83,6 +85,8 @@ export const mainStore = defineStore("main", {
     storage: window.localStorage,
     paths: [
       "coverType",
+      "bgUrl",
+      "backgroundCustom",
       "musicVolume",
       "themeType",
       "darkstarShow",
