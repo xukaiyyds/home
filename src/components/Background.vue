@@ -4,7 +4,7 @@
       @error.once="imgLoadError" @animationend="imgAnimationEnd" />
     <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
-      <a v-if="store.backgroundShow && store.coverType == '1'" class="down" :href="bgUrl" target="_blank">
+      <a v-if="store.backgroundShow && ['1', '2', '3'].includes(store.coverType)" class="down" :href="bgUrl" target="_blank">
         下载壁纸
       </a>
     </Transition>
@@ -25,6 +25,7 @@ const emit = defineEmits(["loadComplete"]);
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
 const bgRandom = Math.floor(Math.random() * 4 + 1);
+const bgRandoms = Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0');
 
 // 更换壁纸链接
 const changeBg = (type) => {
@@ -33,8 +34,12 @@ const changeBg = (type) => {
   } else if (type == 1) {
     bgUrl.value = "https://api.xinyew.cn/api/bing";
   } else if (type == 2) {
-    bgUrl.value = "https://tu.ltyuanfang.cn/api/fengjing.php";
+    bgUrl.value = `https://plog.xukaiyyds.cn/img/wallpaper/淡雅/${bgRandoms}.jpg`;
   } else if (type == 3) {
+    bgUrl.value = `https://plog.xukaiyyds.cn/img/wallpaper/星空/${bgRandoms}.jpg`;
+  } else if (type == 4) {
+    bgUrl.value = "https://tu.ltyuanfang.cn/api/fengjing.php";
+  } else if (type == 5) {
     bgUrl.value = "https://t.alcy.cc/ycy";
   }
 };
