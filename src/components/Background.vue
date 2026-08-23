@@ -1,8 +1,8 @@
 <template>
   <div :class="store.backgroundShow ? 'cover show' : 'cover'">
-    <img v-show="store.imgLoadStatus" :src="store.bgUrl" class="bg" alt="cover" @load="imgLoadComplete"
+    <img v-show="store.imgLoadStatus" :src="store.bgUrl" class="bg" :style="{ '--blur': store.backgroundBlur + 'px' }" alt="cover" @load="imgLoadComplete"
       @error.once="imgLoadError" @animationend="imgAnimationEnd" />
-    <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
+    <div v-if="store.showBackgroundGray" :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
       <a v-if="store.backgroundShow && [1, 2, 3].includes(store.coverType)" class="down" :href="store.bgUrl" target="_blank">
         下载壁纸
@@ -64,7 +64,7 @@ const imgAnimationEnd = () => {
 
 // 图片显示失败
 const imgLoadError = () => {
-  console.error("壁纸加载失败：", bgUrl.value);
+  console.error("壁纸加载失败：", store.bgUrl);
   ElMessage({
     message: "壁纸加载失败，已临时切换回默认",
     icon: h(Error, {
@@ -136,6 +136,20 @@ watch(
   (val) => changeThemeType(val),
 );
 
+// 监听壁纸模糊变化
+watch(
+  () => store.backgroundShow,
+  (newVal) => {
+    if (newVal) {
+      store.savedBackgroundBlur = store.backgroundBlur;
+      store.backgroundBlur = 0;
+    } else {
+      store.backgroundBlur = store.savedBackgroundBlur;
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
   // 加载壁纸
   changeBg(store.coverType);
@@ -149,6 +163,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearTimeout(imgTimeout.value);
+  if (store.backgroundShow) {
+    store.backgroundBlur = store.savedBackgroundBlur;
+  }
 });
 </script>
 
@@ -174,7 +191,7 @@ onBeforeUnmount(() => {
     height: 100%;
     object-fit: cover;
     backface-visibility: hidden;
-    filter: blur(20px) brightness(0.3);
+    filter: blur(var(--blur)) brightness(0.3);
     transition:
       filter 0.3s,
       transform 0.3s;

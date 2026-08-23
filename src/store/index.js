@@ -9,6 +9,9 @@ export const mainStore = defineStore("main", {
       bgUrl: "", // 壁纸URL
       backgroundCustom: "", // 壁纸自定义
       themeType: "dark", // 主题颜色
+      backgroundBlur: 0, // 壁纸模糊
+      savedBackgroundBlur: 0, // 已保存壁纸模糊
+      showBackgroundGray: true, // 壁纸遮罩显示
       darkstarShow: false, // 星空特效显示
       snowflakeShow: false, // 雪花特效显示
       siteStartShow: false, // 建站日期显示
@@ -89,6 +92,9 @@ export const mainStore = defineStore("main", {
       "backgroundCustom",
       "musicVolume",
       "themeType",
+      "backgroundBlur",
+      "savedBackgroundBlur",
+      "showBackgroundGray",
       "darkstarShow",
       "snowflakeShow",
       "siteStartShow",

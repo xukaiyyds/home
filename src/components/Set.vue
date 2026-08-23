@@ -76,6 +76,14 @@
           </el-radio-group>
         </div>
         <div class="item">
+          <span class="text">壁纸模糊程度</span>
+          <el-slider v-model="backgroundBlur" :min="0" :max="20" :step="5" show-stops :show-tooltip="false" />
+        </div>
+        <div class="item">
+          <span class="text">壁纸遮罩显示</span>
+          <el-switch v-model="showBackgroundGray" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+        </div>
+        <div class="item">
           <span class="text">星空特效显示</span>
           <el-switch v-model="darkstarShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
         </div>
@@ -137,6 +145,8 @@ const {
   bgUrl,
   backgroundCustom,
   themeType,
+  backgroundBlur,
+  showBackgroundGray,
   darkstarShow,
   snowflakeShow,
   siteStartShow,
@@ -149,7 +159,7 @@ const {
 } = storeToRefs(store);
 
 // 默认选中项
-const activeName = ref("1");
+const activeName = ref("2");
 
 // 壁纸切换
 const radioChange = () => {
@@ -242,6 +252,18 @@ onMounted(() => {
 
       .btn-links {
         margin-right: 7px;
+      }
+
+      .el-slider {
+        flex-basis: 70%
+      }
+
+      .el-slider__bar {
+        background-color: #ffffff30;
+      }
+
+      .el-slider__button {
+        border: none;
       }
 
       .el-dialog {

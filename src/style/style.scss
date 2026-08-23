@@ -175,7 +175,7 @@ a:hover {
     transform: scale(1.6);
   }
   to {
-    filter: blur(0) brightness(1);
+    filter: blur(var(--blur)) brightness(1);
     transform: scale(1);
   }
 }
