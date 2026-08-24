@@ -1,14 +1,8 @@
 <template>
   <div class="set" @mouseenter="closeShow = true" @mouseleave="closeShow = false" @click.stop>
     <transition name="el-fade-in-linear">
-      <close-one
-        class="close"
-        theme="filled"
-        size="28"
-        fill="#ffffff60"
-        v-show="closeShow"
-        @click="store.searchOpenState = false"
-      />
+      <close-one class="close" theme="filled" size="28" fill="#ffffff60" v-show="closeShow"
+        @click="store.searchOpenState = false" />
     </transition>
     <el-row>
       <el-col class="search">
@@ -18,21 +12,24 @@
         </div>
         <el-card class="shortcut">
           <template #header>
-            <div class="card-header">
-              <!-- 搜索框 -->
-              <el-input class="input" v-model="input" size="large" autocomplete="false" placeholder="请输入搜索内容" clearable>
-                <template #prepend>
-                    <el-select v-model="select" size="large" placeholder="Select" style="width: 115px;">
-                      <el-option label="Restaurant" value="1" />
-                      <el-option label="Order No." value="2" />
-                      <el-option label="Tel" value="3" />
-                    </el-select>
-                </template>
-                <template #append>
-                    <el-button :icon="Search" />
-                </template>
-              </el-input>
-            </div>
+            <!-- 搜索框 -->
+            <el-input v-model="keyword" size="large" autocomplete="false" placeholder="请输入搜索内容" clearable
+              ref="searchInput" @keydown.enter.prevent="handleSearch">
+              <template #prepend>
+                <!-- 切换搜索引擎 -->
+                <el-select v-model="searchEngine" class="engine-select" size="large" placeholder="Select"
+                  :teleported="false">
+                  <el-option v-for="engine in searchEngineList" :label="engine.name" :key="engine.key"
+                    :value="engine.key">
+                    <span class="option-icon">{{ engine.icon }}</span>
+                    {{ engine.name }}
+                  </el-option>
+                </el-select>
+              </template>
+              <template #append>
+                <el-button @click="handleSearch" :icon="Search" />
+              </template>
+            </el-input>
           </template>
           <div class="upnote">
             <div v-for="item in upData.new" :key="item" class="uptext">
@@ -52,12 +49,55 @@
 
 <script setup>
 import { CloseOne, SettingTwo, Search, GithubOne, AddOne, Bug } from "@icon-park/vue-next";
-import { mainStore } from "@/store";
+import { mainStore, searchEngineList } from "@/store";
+import { storeToRefs } from 'pinia';
+
 const store = mainStore();
 const closeShow = ref(false);
 
-const select = ref("");
-const input = ref("");
+const { searchEngine } = storeToRefs(store);
+
+// 组件本地状态
+const keyword = ref('');
+const searchInput = ref(null);
+
+// 当前搜索引擎完整对象
+const getcurrentEngine = computed(() => store.getCurrentEngine);
+
+// 辅助函数：检测是否为网址或邮箱
+const isUrl = (str) => /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(str);
+const isEmail = (str) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+
+// 执行搜索
+const handleSearch = () => {
+  const text = keyword.value.trim();
+  if (!text) {
+    ElMessage({
+      message: "请输入搜索内容",
+      grouping: true,
+      duration: 2000,
+    });
+    return;
+  }
+
+  let url = '';
+  if (isUrl(text)) {
+    // 直接访问网址
+    url = text.startsWith('http') ? text : `https://${text}`;
+  } else if (isEmail(text)) {
+    // 发送邮件
+    url = `mailto:${text}`;
+  } else {
+    // 使用搜索引擎搜索
+    const engine = searchEngineList.find(e => e.key === searchEngine.value) || searchEngineList[0];
+    url = engine.searchUrl + encodeURIComponent(text);
+  }
+
+  // 在新窗口打开
+  window.open(url, '_blank');
+  // 清空输入框
+  keyword.value = '';
+};
 
 const upData = reactive({
   new: [
@@ -105,9 +145,9 @@ const upData = reactive({
 
     .search {
       height: 100%;
-    //   padding-left: 40px;
-    //   padding-right: 40px;
-    //   padding-bottom: 20px;
+      //   padding-left: 40px;
+      //   padding-right: 40px;
+      //   padding-bottom: 20px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -130,11 +170,18 @@ const upData = reactive({
         margin-top: 30px;
         height: 100%;
 
+        // 下拉菜单
+        .engine-select {
+          width: 115px;
+        }
+
+        // 搜索框
         :deep(.el-input) {
           --el-input-text-color: #FFFFFF;
           --el-input-bg-color: rgba(255, 255, 255, 0.1);
           --el-input-placeholder-color: #CFD3DC;
           backdrop-filter: blur(10px);
+
           .el-input-group__prepend,
           .el-input-group__append {
             background-color: rgba(255, 255, 255, 0.2);

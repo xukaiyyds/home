@@ -125,6 +125,10 @@ onMounted(() => {
       return;
     }
     if (e.code == "Space") {
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.isContentEditable)) {
+        return;
+      }
       changePlayState();
     }
   });

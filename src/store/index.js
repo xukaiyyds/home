@@ -1,5 +1,14 @@
 import { defineStore } from "pinia";
 
+// 定义搜索引擎列表
+export const searchEngineList = [
+    { key: 'baidu', name: '百度', icon: '🔍', searchUrl: 'https://www.baidu.com/s?wd=' },
+    { key: 'bing', name: 'Bing', icon: '💡', searchUrl: 'https://www.bing.com/search?q=' },
+    { key: 'google', name: 'Google', icon: '🌐', searchUrl: 'https://www.google.com/search?q=' },
+    { key: 'github', name: 'GitHub', icon: '🐙', searchUrl: 'https://github.com/search?q=' },
+    { key: 'bilibili', name: 'B站', icon: '📺', searchUrl: 'https://search.bilibili.com/all?keyword=' },
+];
+
 export const mainStore = defineStore("main", {
   state: () => {
     return {
@@ -15,6 +24,7 @@ export const mainStore = defineStore("main", {
       darkstarShow: false, // 星空特效显示
       snowflakeShow: false, // 雪花特效显示
       siteStartShow: false, // 建站日期显示
+      searchEngine: "baidu", // 搜索引擎
       musicClick: false, // 音乐链接是否跳转
       musicIsOk: false, // 音乐是否加载完成
       musicVolume: 0, // 音乐音量
@@ -51,6 +61,10 @@ export const mainStore = defineStore("main", {
     getInnerWidth(state) {
       return state.innerWidth;
     },
+    // 获取当前搜索引擎
+    getCurrentEngine: (state) => {
+      return searchEngineList.find(engine => engine.key === state.searchEngine) || searchEngineList[0];
+    },
   },
   actions: {
     // 更改当前页面宽度
@@ -82,6 +96,12 @@ export const mainStore = defineStore("main", {
     setImgLoadStatus(value) {
       this.imgLoadStatus = value;
     },
+    // 更改搜索引擎
+    setSearchEngine(engineKey) {
+      if (searchEngineList.some(engine => engine.key === engineKey)) {
+        this.searchEngine = engineKey;
+      }
+    },
   },
   persist: {
     key: "data",
@@ -98,6 +118,7 @@ export const mainStore = defineStore("main", {
       "darkstarShow",
       "snowflakeShow",
       "siteStartShow",
+      "searchEngine",
       "musicClick",
       "playerLrcShow",
       "footerBlur",
