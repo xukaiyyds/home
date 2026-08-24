@@ -247,7 +247,7 @@ onMounted(() => {
 
       .btn-right {
         float: right;
-        margin-top: 40px;
+        margin-top: 30px;
       }
 
       .btn-links {
@@ -271,7 +271,10 @@ onMounted(() => {
       }
 
       .el-input__wrapper {
-        background-color: var(--main-more-background-color);
+        --el-input-text-color: #FFFFFF;
+        --el-input-bg-color: var(--main-input-background-color);
+        --el-input-placeholder-color: var(--main-input-placeholder-color);
+        --el-input-focus-border-color: #67C23A;
       }
 
       .el-collapse-item__content {

@@ -133,7 +133,7 @@ const upData = reactive({
         :deep(.el-input) {
           --el-input-text-color: #FFFFFF;
           --el-input-bg-color: rgba(255, 255, 255, 0.1);
-          --el-input-placeholder-color: #909399;
+          --el-input-placeholder-color: #CFD3DC;
           backdrop-filter: blur(10px);
           .el-input-group__prepend,
           .el-input-group__append {
