@@ -4,9 +4,7 @@
     <!-- Logo -->
     <div class="logo">
       <el-tooltip content="xukai" placement="top" :show-arrow="false">
-        <a href="https://me.xukaiyyds.cn" target="_blank">
-          <img class="logo-img" :src="siteLogo" alt="logo" />
-        </a>
+        <img class="logo-img" :src="siteLogo" alt="logo" @click="jumpTo(config.me)" />
       </el-tooltip>
       <div :class="{ name: true, 'text-hidden': true, long: siteUrl[0].length >= 6 }">
         <span class="bg">{{ siteUrl[0] }}</span>
@@ -38,10 +36,17 @@ import { Icon } from "@vicons/utils";
 import { QuoteLeft, QuoteRight } from "@vicons/fa";
 import { Error } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
+import config from "@/../package.json";
 const store = mainStore();
 
 // 主页站点logo
 const siteLogo = import.meta.env.VITE_SITE_MAIN_LOGO;
+
+// 点击站点logo跳转到其他网站
+const jumpTo = (url) => {
+  window.open(url);
+};
+
 // 站点链接
 const siteUrl = computed(() => {
   // const url = import.meta.env.VITE_SITE_URL;

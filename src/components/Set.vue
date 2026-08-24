@@ -21,7 +21,7 @@
         <el-dialog v-model="dialogFormVisible" title="自定义壁纸" :modal="false" align-center fullscreen>
           <el-form @submit.prevent>
             <el-form-item label="图片链接">
-              <el-input v-model="customCoverUrl" @keyup.enter="setCustomCover" autocomplete="off"
+              <el-input v-model="customCoverUrl" @keyup.enter="setCustomCover" size="small" autocomplete="off"
                 placeholder="如：https://plog.xukaiyyds.cn/img/wallpaper/动漫/01.jpg" />
             </el-form-item>
             <el-form-item label="壁纸网站">
@@ -159,7 +159,7 @@ const {
 } = storeToRefs(store);
 
 // 默认选中项
-const activeName = ref("2");
+const activeName = ref("1");
 
 // 壁纸切换
 const radioChange = () => {

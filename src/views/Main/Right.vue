@@ -21,17 +21,17 @@ import Link from "@/components/Links.vue";
 const store = mainStore();
 
 // 站点链接
-const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
-  // if (!url) return "imsyy.top".split(".");
-  if (!url) return "xukaiyyds.cn".split(".");
-  // 判断协议前缀
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    const urlFormat = url.replace(/^(https?:\/\/)/, "");
-    return urlFormat.split(".");
-  }
-  return url.split(".");
-});
+// const siteUrl = computed(() => {
+//   const url = import.meta.env.VITE_SITE_URL;
+//   // if (!url) return "imsyy.top".split(".");
+//   if (!url) return "xukaiyyds.cn".split(".");
+//   // 判断协议前缀
+//   if (url.startsWith("http://") || url.startsWith("https://")) {
+//     const urlFormat = url.replace(/^(https?:\/\/)/, "");
+//     return urlFormat.split(".");
+//   }
+//   return url.split(".");
+// });
 </script>
 
 <style lang="scss" scoped>

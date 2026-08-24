@@ -20,6 +20,16 @@
         @click="store.setOpenState = true"
       />
     </transition>
+    <transition name="el-fade-in-linear">
+      <Search
+        class="search"
+        theme="filled"
+        size="28"
+        fill="#ffffff60"
+        v-show="closeShow"
+        @click="store.searchOpenState = true"
+      />
+    </transition>
     <div class="content">
       <!-- 可在此处自定义任意内容 -->
       <TimeCapsule />
@@ -28,7 +38,7 @@
 </template>
 
 <script setup>
-import { CloseOne, SettingTwo } from "@icon-park/vue-next";
+import { CloseOne, SettingTwo, Search } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import TimeCapsule from "@/components/TimeCapsule.vue";
 
@@ -49,7 +59,8 @@ const closeShow = ref(false);
   }
 
   .close,
-  .setting {
+  .setting,
+  .search {
     position: absolute;
     top: 14px;
     right: 14px;
@@ -70,6 +81,10 @@ const closeShow = ref(false);
 
   .setting {
     right: 56px;
+  }
+
+  .search {
+    right: 98px;
   }
 
   .content {

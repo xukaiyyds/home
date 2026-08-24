@@ -15,6 +15,9 @@
         <section class="more" v-show="store.setOpenState" @click="store.setOpenState = false">
           <MoreSet />
         </section>
+        <section class="more" v-show="store.searchOpenState" @click="store.searchOpenState = false">
+          <SearchInp />
+        </section>
       </div>
       <!-- 移动端菜单按钮 -->
       <Icon
@@ -45,6 +48,7 @@ import Background from "@/components/Background.vue";
 import Footer from "@/components/Footer.vue";
 import Box from "@/views/Box/index.vue";
 import MoreSet from "@/views/MoreSet/index.vue";
+import SearchInp from "@/views/Search/SearchInp.vue";
 import cursorInit from "@/utils/cursor.js";
 import config from "@/../package.json";
 
@@ -72,6 +76,7 @@ watch(
     if (value < 721) {
       store.boxOpenState = false;
       store.setOpenState = false;
+      store.searchOpenState = false;
     }
   },
 );
