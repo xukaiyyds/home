@@ -1,0 +1,114 @@
+[
+    {
+        "label": "搜索",
+        "options": [
+            {
+                "key": "baidu",
+                "name": "百度",
+                "icon": "Seo",
+                "searchUrl": "https://www.baidu.com/s?wd="
+            },
+            {
+                "key": "bing",
+                "name": "必应",
+                "icon": "Seo",
+                "searchUrl": "https://www.bing.com/search?q="
+            },
+            {
+                "key": "google",
+                "name": "谷歌",
+                "icon": "Google",
+                "searchUrl": "https://www.google.com/search?q="
+            },
+            {
+                "key": "yandex",
+                "name": "Yandex",
+                "icon": "World",
+                "searchUrl": "https://yandex.com/search/?text="
+            },
+            {
+                "key": "sogou",
+                "name": "搜狗",
+                "icon": "Seo",
+                "searchUrl": "https://www.sogou.com/sogou?query="
+            },
+            {
+                "key": "360",
+                "name": "360",
+                "icon": "Seo",
+                "searchUrl": "https://www.so.com/s?q="
+            },
+            {
+                "key": "douyin",
+                "name": "抖音",
+                "icon": "Tiktok",
+                "searchUrl": "https://www.douyin.com/search/"
+            },
+            {
+                "key": "bilibili",
+                "name": "B站",
+                "icon": "Search",
+                "searchUrl": "https://search.bilibili.com/all?keyword="
+            },
+            {
+                "key": "zhihu",
+                "name": "知乎",
+                "icon": "Search",
+                "searchUrl": "https://www.zhihu.com/search?q="
+            },
+            {
+                "key": "weibo",
+                "name": "微博",
+                "icon": "Weibo",
+                "searchUrl": "https://s.weibo.com/weibo?q="
+            },
+            {
+                "key": "github",
+                "name": "GitHub",
+                "icon": "Github",
+                "searchUrl": "https://github.com/search?q="
+            }
+        ]
+    },
+    {
+        "label": "翻译",
+        "options": [
+            {
+                "key": "baidu-fanyi",
+                "name": "百度",
+                "icon": "Translation",
+                "searchUrl": "https://fanyi.baidu.com/#en/zh/"
+            },
+            {
+                "key": "bing-fanyi",
+                "name": "必应",
+                "icon": "Translation",
+                "searchUrl": "https://www.bing.com/translator?text="
+            },
+            {
+                "key": "google-fanyi",
+                "name": "谷歌",
+                "icon": "Google",
+                "searchUrl": "https://translate.google.com/?text="
+            },
+            {
+                "key": "yandex-fanyi",
+                "name": "Yandex",
+                "icon": "World",
+                "searchUrl": "https://translate.yandex.com/?text="
+            },
+            {
+                "key": "sogou-fanyi",
+                "name": "搜狗",
+                "icon": "Translation",
+                "searchUrl": "https://fanyi.sogou.com/text?keyword="
+            },
+            {
+                "key": "360-fanyi",
+                "name": "360",
+                "icon": "Translation",
+                "searchUrl": "https://fanyi.so.com/#"
+            }
+        ]
+    }
+]

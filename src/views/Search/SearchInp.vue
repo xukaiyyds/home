@@ -13,17 +13,26 @@
         <el-card class="shortcut">
           <template #header>
             <!-- 搜索框 -->
-            <el-input v-model="keyword" size="large" autocomplete="false" placeholder="请输入搜索内容" clearable
-              ref="searchInput" @keydown.enter.prevent="handleSearch">
+            <el-input v-model="keyword" ref="searchInput" size="large" autocomplete="false" placeholder="想搜点什么"
+              @keydown.enter.prevent="handleSearch" clearable>
               <template #prepend>
                 <!-- 切换搜索引擎 -->
-                <el-select v-model="searchEngine" class="engine-select" size="large" placeholder="Select"
-                  :teleported="false">
-                  <el-option v-for="engine in searchEngineList" :label="engine.name" :key="engine.key"
-                    :value="engine.key">
-                    <span class="option-icon">{{ engine.icon }}</span>
-                    {{ engine.name }}
-                  </el-option>
+                <el-select v-model="searchEngine" class="engine-select" size="large" placeholder="搜索引擎"
+                  :teleported="false" popper-class="engine-popper" filterable default-first-option
+                  no-match-text="没有匹配的数据" fit-input-width clearable>
+                  <template #prefix>
+                    <component v-if="currentGroupIcon" :is="currentGroupIcon" class="icon-prefix" theme="outline"
+                      size="16" fill="#ffffff" />
+                  </template>
+                  <el-option-group v-for="group in searchEngineList" :key="group.label" :label="group.label">
+                    <el-option v-for="engine in group.options" :label="engine.name" :key="engine.key"
+                      :value="engine.key">
+                      <span class="option-icon">
+                        <component :is="iconMap[engine.icon]" theme="outline" size="16" fill="#909399" />
+                      </span>
+                      <span class="option-text">{{ engine.name }}</span>
+                    </el-option>
+                  </el-option-group>
                 </el-select>
               </template>
               <template #append>
@@ -48,9 +57,29 @@
 </template>
 
 <script setup>
-import { CloseOne, SettingTwo, Search, GithubOne, AddOne, Bug } from "@icon-park/vue-next";
-import { mainStore, searchEngineList } from "@/store";
+import { CloseOne, SettingTwo, Search, Seo, Find, World, Translate, Translation, Tiktok, Weibo, Google, Github, AddOne, Bug } from "@icon-park/vue-next";
+import { mainStore } from "@/store";
 import { storeToRefs } from 'pinia';
+import searchEngineList from "@/assets/searchEngineList.json";
+
+const iconMap = {
+  Search,
+  Seo,
+  Find,
+  World,
+  Translate,
+  Translation,
+  Tiktok,
+  Weibo,
+  Google,
+  Github,
+};
+
+// 分组图标映射
+const groupIconMap = {
+  '搜索': Find,
+  '翻译': Translate,
+};
 
 const store = mainStore();
 const closeShow = ref(false);
@@ -60,6 +89,35 @@ const { searchEngine } = storeToRefs(store);
 // 组件本地状态
 const keyword = ref('');
 const searchInput = ref(null);
+
+// 展平所有引擎
+const allEngines = computed(() => searchEngineList.flatMap(group => group.options));
+
+// 当前选中的引擎对象
+const currentEngine = computed(() => {
+  return allEngines.value.find(engine => engine.key === searchEngine.value) || allEngines.value[0];
+});
+
+// 根据引擎 key 查找所属分组 label
+const getGroupLabelByEngineKey = (key) => {
+  for (const group of searchEngineList) {
+    if (group.options.some(engine => engine.key === key)) {
+      return group.label;
+    }
+  }
+  return null;
+};
+
+// 当前分组对应的图标
+const currentGroupIcon = computed(() => {
+  const groupLabel = getGroupLabelByEngineKey(searchEngine.value);
+  return groupIconMap[groupLabel] || Find; // 默认显示
+});
+
+// 当前引擎对应的图标
+const currentEngineIcon = computed(() => {
+  return currentEngine.value ? iconMap[currentEngine.value.icon] : null;
+});
 
 // 当前搜索引擎完整对象
 const getcurrentEngine = computed(() => store.getCurrentEngine);
@@ -88,9 +146,7 @@ const handleSearch = () => {
     // 发送邮件
     url = `mailto:${text}`;
   } else {
-    // 使用搜索引擎搜索
-    const engine = searchEngineList.find(e => e.key === searchEngine.value) || searchEngineList[0];
-    url = engine.searchUrl + encodeURIComponent(text);
+    url = currentEngine.value.searchUrl + encodeURIComponent(text);
   }
 
   // 在新窗口打开
@@ -172,19 +228,47 @@ const upData = reactive({
 
         // 下拉菜单
         .engine-select {
-          width: 115px;
+          width: 130px;
+
+          .icon-prefix {
+            display: inline-flex;
+            align-items: center;
+          }
+
+          .option-icon {
+            vertical-align: middle;
+          }
+
+          .option-text {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 4px;
+            color: #909399;
+          }
+        }
+
+        :deep(.engine-select) {
+          --el-select-multiple-input-color: #FFFFFF;
+
+          .el-popper__arrow::before {
+            background: var(--main-input-background-color);
+          }
+        }
+
+        :global(.engine-popper) {
+          background: var(--main-input-background-color);
         }
 
         // 搜索框
         :deep(.el-input) {
           --el-input-text-color: #FFFFFF;
-          --el-input-bg-color: rgba(255, 255, 255, 0.1);
+          --el-input-bg-color: var(--main-more-background-color);
           --el-input-placeholder-color: #CFD3DC;
           backdrop-filter: blur(10px);
 
           .el-input-group__prepend,
           .el-input-group__append {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: var(--main-cards-background-color);
           }
         }
 

@@ -1,13 +1,5 @@
 import { defineStore } from "pinia";
-
-// 定义搜索引擎列表
-export const searchEngineList = [
-    { key: 'baidu', name: '百度', icon: '🔍', searchUrl: 'https://www.baidu.com/s?wd=' },
-    { key: 'bing', name: 'Bing', icon: '💡', searchUrl: 'https://www.bing.com/search?q=' },
-    { key: 'google', name: 'Google', icon: '🌐', searchUrl: 'https://www.google.com/search?q=' },
-    { key: 'github', name: 'GitHub', icon: '🐙', searchUrl: 'https://github.com/search?q=' },
-    { key: 'bilibili', name: 'B站', icon: '📺', searchUrl: 'https://search.bilibili.com/all?keyword=' },
-];
+import searchEngineList from "@/assets/searchEngineList.json";
 
 export const mainStore = defineStore("main", {
   state: () => {
@@ -63,8 +55,9 @@ export const mainStore = defineStore("main", {
     },
     // 获取当前搜索引擎
     getCurrentEngine: (state) => {
-      return searchEngineList.find(engine => engine.key === state.searchEngine) || searchEngineList[0];
-    },
+      const allEngines = searchEngineList.flatMap(group => group.options);
+      return allEngines.find(engine => engine.key === state.searchEngine) || allEngines[0];
+    }
   },
   actions: {
     // 更改当前页面宽度
