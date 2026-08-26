@@ -119,6 +119,31 @@ const changeMusicIndex = (type) => {
 };
 
 onMounted(() => {
+  // alt+m键事件
+  window.addEventListener('keydown', (event) => {
+    if (event.altKey && event.key.toLowerCase() === 'm') {
+      event.preventDefault();
+      if (musicListShow.value) {
+        closeMusicList();
+        if(store.messageShow) {
+          ElMessage({
+            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
+            grouping: true,
+          });
+        }
+      } else {
+        openMusicList();
+        if(store.messageShow) {
+          ElMessage({
+            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
+            grouping: true,
+          });
+        }
+
+      }
+    }
+  });
+
   // 空格键事件
   window.addEventListener("keydown", (e) => {
     if (!store.musicIsOk) {
@@ -138,7 +163,7 @@ onMounted(() => {
 
 // 监听音量变化
 watch(
-  () => volumeNum.value,
+  () => musicListShow,
   (value) => {
     store.musicVolume = value;
     playerRef.value.changeVolume(store.musicVolume);

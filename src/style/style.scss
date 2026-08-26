@@ -131,6 +131,12 @@ a:hover {
   border: 1px solid transparent !important;
 }
 
+// MessageBox 样式
+.el-message-box {
+  background: #ffffff60 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
 // 卡片样式
 .el-card {
   border-radius: 8px !important;

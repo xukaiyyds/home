@@ -12,10 +12,10 @@
           <MainRight v-show="!store.boxOpenState" />
           <Box v-show="store.boxOpenState" />
         </section>
-        <section class="more" v-show="store.setOpenState" @click="store.setOpenState = false">
+        <section class="more more-set" v-show="store.setOpenState" @click="store.setOpenState = false">
           <MoreSet />
         </section>
-        <section class="more" v-show="store.searchOpenState" @click="store.searchOpenState = false">
+        <section class="more more-search" v-show="store.searchOpenState" @click="store.searchOpenState = false">
           <SearchInp />
         </section>
       </div>
@@ -70,28 +70,55 @@ const loadComplete = () => {
 };
 
 // 监听宽度变化
+const monitorWidthChanges = (value) => {
+  if (value < 721) {
+    store.boxOpenState = false;
+    store.setOpenState = false;
+    store.searchOpenState = false;
+  }
+};
+
 watch(
   () => store.innerWidth,
-  (value) => {
-    if (value < 721) {
-      store.boxOpenState = false;
-      store.setOpenState = false;
-      store.searchOpenState = false;
-    }
-  },
+  (value) => monitorWidthChanges(value),
 );
 
 onMounted(() => {
   // 自定义鼠标
   cursorInit();
 
-  // 屏蔽右键
+  // 全局键盘事件
+  window.addEventListener('keydown', (event) => {
+    if (event.altKey && event.key.toLowerCase() === 's') {
+      event.preventDefault();
+      store.searchOpenState = !store.searchOpenState;
+      if(store.messageShow) {
+        ElMessage({
+          message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
+          grouping: true,
+        });
+      }
+    }
+  });
+
+  // 鼠标右键事件
   document.oncontextmenu = () => {
-    ElMessage({
-      message: "为了浏览体验，本站禁用右键",
-      grouping: true,
-      duration: 2000,
-    });
+    monitorWidthChanges(store.innerWidth) // 窗口宽度
+    if(store.innerWidth < 721) {
+      ElMessage({
+        message: "为了浏览体验，已禁用右键",
+        grouping: true,
+        duration: 2000,
+      });
+    } else {
+      store.setOpenState = !store.setOpenState;
+      if(store.messageShow) {
+        ElMessage({
+          message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
+          grouping: true,
+        });
+      }
+    }
     return false;
   };
 
@@ -99,10 +126,12 @@ onMounted(() => {
   window.addEventListener("mousedown", (event) => {
     if (event.button == 1) {
       store.backgroundShow = !store.backgroundShow;
-      ElMessage({
-        message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
-        grouping: true,
-      });
+      if(store.messageShow) {
+        ElMessage({
+          message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
+          grouping: true,
+        });
+      }
     }
   });
 
@@ -164,8 +193,13 @@ onBeforeUnmount(() => {
       height: 100%;
       background-color: var(--main-more-background-color);
       backdrop-filter: blur(20px);
-      z-index: 2;
       animation: fade 0.5s;
+    }
+    .more-set {
+      z-index: 3;
+    }
+    .more-search {
+      z-index: 2;
     }
     @media (max-width: 1200px) {
       padding: 0 2vw;

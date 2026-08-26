@@ -27,6 +27,13 @@
             {{ siteIcp }}
           </a>
         </span>
+        <!-- 查看帮助 -->
+        <span>
+          &amp;
+          <a @click="open">
+            查看快捷键
+          </a>
+        </span>
       </div>
       <div v-else class="lrc">
         <Transition name="fade" mode="out-in">
@@ -42,7 +49,7 @@
 </template>
 
 <script setup>
-import { MusicOne } from "@icon-park/vue-next";
+import { MusicOne, KeyboardOne } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
 
@@ -67,6 +74,18 @@ const siteUrl = computed(() => {
   }
   return url;
 });
+
+const open = () => {
+  ElMessageBox.alert('Alt + S（打开全网搜索界面）<br>Alt + M（打开音乐列表界面）<br>鼠标右键（打开全局设置菜单）<br>鼠标中键（开启壁纸展示状态）', '本站快捷键', {
+    dangerouslyUseHTMLString: true,
+    modal: true,
+    closeOnClickModal: true,
+    closeOnPressEscape: true,
+    showConfirmButton: false,
+    center: true,
+    icon: markRaw(KeyboardOne),
+  })
+}
 </script>
 
 <style lang="scss" scoped>

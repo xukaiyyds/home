@@ -76,7 +76,7 @@ const siteIcon = {
 
 // 链接跳转
 const jumpLink = (data) => {
-  if (data.name === "网抑音乐" && store.musicClick) {
+  if (store.musicClick) {
     if (typeof $openList === "function") $openList();
   } else {
     window.open(data.link, "_blank");

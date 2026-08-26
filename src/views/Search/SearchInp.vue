@@ -13,11 +13,11 @@
         <el-card class="shortcut">
           <template #header>
             <!-- 搜索框 -->
-            <el-input v-model="keyword" ref="searchInput" size="large" autocomplete="false" placeholder="想搜点什么"
+            <el-input ref="searchInput" v-model="keyword" size="large" autocomplete="false" placeholder="想搜点什么"
               @keydown.enter.prevent="handleSearch" clearable>
               <template #prepend>
                 <!-- 切换搜索引擎 -->
-                <el-select v-model="searchEngine" class="engine-select" size="large" placeholder="搜索引擎"
+                <el-select ref="selectRef" v-model="searchEngine" class="engine-select" size="large" placeholder="搜索引擎"
                   :teleported="false" popper-class="engine-popper" filterable default-first-option
                   no-match-text="没有匹配的数据" fit-input-width clearable>
                   <template #prefix>
@@ -36,19 +36,19 @@
                 </el-select>
               </template>
               <template #append>
-                <el-button @click="handleSearch" class="search-btn" :icon="Search">搜索一下</el-button>
+                <el-button @click="handleSearch" class="search-btn" size="large" :icon="Search"></el-button>
               </template>
             </el-input>
           </template>
           <div class="upnote">
-            <div v-for="item in upData.new" :key="item" class="uptext">
+            <!-- <div v-for="item in upData.new" :key="item" class="uptext">
               <add-one theme="outline" size="22" />
               {{ item }}
             </div>
             <div v-for="item in upData.fix" :key="item" class="uptext">
               <bug theme="outline" size="22" />
               {{ item }}
-            </div>
+            </div> -->
           </div>
         </el-card>
       </el-col>
@@ -61,6 +61,13 @@ import { CloseOne, SettingTwo, Search, Seo, Find, World, Translate, Translation,
 import { mainStore } from "@/store";
 import { storeToRefs } from 'pinia';
 import searchEngineList from "@/assets/searchEngineList.json";
+
+const store = mainStore();
+const closeShow = ref(false);
+const keyword = ref('');
+const selectRef = ref(null);
+const searchInput = ref(null);
+const { searchEngine } = storeToRefs(store);
 
 const iconMap = {
   Search,
@@ -83,14 +90,18 @@ const groupIconMap = {
   '翻译': Translate,
 };
 
-const store = mainStore();
-const closeShow = ref(false);
-
-const { searchEngine } = storeToRefs(store);
-
-// 组件本地状态
-const keyword = ref('');
-const searchInput = ref(null);
+// 监听搜索界面打开状态
+watch(
+  () => store.searchOpenState,
+  (newVal) => {
+    if (newVal) {
+      nextTick(() => {
+        selectRef.value?.focus();
+        selectRef.value?.toggleMenu();
+      });
+    }
+  }
+);
 
 // 展平所有引擎
 const allEngines = computed(() => searchEngineList.flatMap(group => group.options));
@@ -154,7 +165,9 @@ const handleSearch = () => {
   // 在新窗口打开
   window.open(url, '_blank');
   // 清空输入框
-  keyword.value = '';
+  if(store.clearContent) {
+    keyword.value = '';
+  }
 };
 
 const upData = reactive({
@@ -276,7 +289,16 @@ const upData = reactive({
 
         // 搜索按钮
         .search-btn {
-          width: 150px;
+          width: 100px;
+          transition: 0.3s;
+
+          &:hover {
+            transform: scale(1.2);
+          }
+
+          &:active {
+            transform: scale(1);
+          }
         }
 
         :deep(.el-card__body) {

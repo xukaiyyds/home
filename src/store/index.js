@@ -17,6 +17,8 @@ export const mainStore = defineStore("main", {
       snowflakeShow: false, // 雪花特效显示
       siteStartShow: false, // 建站日期显示
       searchEngine: "Baidu", // 搜索引擎
+      clearContent: true, // 清空输入框
+      messageShow: true, // 操作消息显示
       musicClick: false, // 音乐链接是否跳转
       musicIsOk: false, // 音乐是否加载完成
       musicVolume: 0, // 音乐音量
@@ -26,6 +28,7 @@ export const mainStore = defineStore("main", {
       mobileOpenState: false, // 移动端开启状态
       mobileFuncState: false, // 移动端功能区开启状态
       setOpenState: false, // 设置页面开启状态
+      searchOpenState: false, // 搜索页面开启状态
       playerState: false, // 当前播放状态
       playerTitle: null, // 当前播放歌曲名
       playerArtist: null, // 当前播放歌手名
@@ -112,6 +115,8 @@ export const mainStore = defineStore("main", {
       "snowflakeShow",
       "siteStartShow",
       "searchEngine",
+      "clearContent",
+      "messageShow",
       "musicClick",
       "playerLrcShow",
       "footerBlur",

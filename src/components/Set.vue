@@ -128,6 +128,14 @@
           <span class="text">点击网抑音乐是否打开面板</span>
           <el-switch v-model="musicClick" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
         </div>
+        <div class="item">
+          <span class="text">搜索后是否清空输入框内容</span>
+          <el-switch v-model="clearContent" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+        </div>
+        <div class="item">
+          <span class="text">按下快捷键后是否弹出消息</span>
+          <el-switch v-model="messageShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+        </div>
       </el-collapse-item>
     </el-collapse>
   </div>
@@ -150,6 +158,8 @@ const {
   darkstarShow,
   snowflakeShow,
   siteStartShow,
+  clearContent,
+  messageShow,
   musicClick,
   playerLrcShow,
   footerBlur,
