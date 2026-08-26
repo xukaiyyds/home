@@ -25,7 +25,7 @@
                       size="16" fill="#ffffff" />
                   </template>
                   <el-option-group v-for="group in searchEngineList" :key="group.label" :label="group.label">
-                    <el-option v-for="engine in group.options" :label="engine.name" :key="engine.key"
+                    <el-option v-for="engine in group.options" :label="`${engine.name} ${engine.key}`" :key="engine.key"
                       :value="engine.key">
                       <span class="option-icon">
                         <component :is="iconMap[engine.icon]" theme="outline" size="16" fill="#909399" />
@@ -36,7 +36,7 @@
                 </el-select>
               </template>
               <template #append>
-                <el-button @click="handleSearch" :icon="Search" />
+                <el-button @click="handleSearch" class="search-btn" :icon="Search">搜索一下</el-button>
               </template>
             </el-input>
           </template>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { CloseOne, SettingTwo, Search, Seo, Find, World, Translate, Translation, Tiktok, Weibo, Google, Github, AddOne, Bug } from "@icon-park/vue-next";
+import { CloseOne, SettingTwo, Search, Seo, Find, World, Translate, Translation, Tiktok, Weibo, Taobao, Google, Duck, Github, AddOne, Bug } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { storeToRefs } from 'pinia';
 import searchEngineList from "@/assets/searchEngineList.json";
@@ -71,7 +71,9 @@ const iconMap = {
   Translation,
   Tiktok,
   Weibo,
+  Taobao,
   Google,
+  Duck,
   Github,
 };
 
@@ -228,7 +230,7 @@ const upData = reactive({
 
         // 下拉菜单
         .engine-select {
-          width: 130px;
+          width: 200px;
 
           .icon-prefix {
             display: inline-flex;
@@ -270,6 +272,11 @@ const upData = reactive({
           .el-input-group__append {
             background-color: var(--main-cards-background-color);
           }
+        }
+
+        // 搜索按钮
+        .search-btn {
+          width: 150px;
         }
 
         :deep(.el-card__body) {

@@ -16,7 +16,7 @@ export const mainStore = defineStore("main", {
       darkstarShow: false, // 星空特效显示
       snowflakeShow: false, // 雪花特效显示
       siteStartShow: false, // 建站日期显示
-      searchEngine: "baidu", // 搜索引擎
+      searchEngine: "Baidu", // 搜索引擎
       musicClick: false, // 音乐链接是否跳转
       musicIsOk: false, // 音乐是否加载完成
       musicVolume: 0, // 音乐音量
