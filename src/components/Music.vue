@@ -123,6 +123,7 @@ onMounted(() => {
   window.addEventListener('keydown', (event) => {
     if (event.altKey && event.key.toLowerCase() === 'm') {
       event.preventDefault();
+      store.boxOpenState = false;
       if (musicListShow.value) {
         closeMusicList();
         if(store.messageShow) {
@@ -139,7 +140,6 @@ onMounted(() => {
             grouping: true,
           });
         }
-
       }
     }
   });

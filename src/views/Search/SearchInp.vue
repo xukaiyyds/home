@@ -17,9 +17,9 @@
               @keydown.enter.prevent="handleSearch" clearable>
               <template #prepend>
                 <!-- 切换搜索引擎 -->
-                <el-select ref="selectRef" v-model="searchEngine" class="engine-select" size="large" placeholder="搜索引擎"
-                  :teleported="false" popper-class="engine-popper" filterable default-first-option
-                  no-match-text="没有匹配的数据" fit-input-width clearable>
+                <el-select ref="selectRef" v-model="searchEngine" @change="handleSelectChange" class="engine-select"
+                  size="large" placeholder="搜索引擎" :teleported="false" popper-class="engine-popper" filterable
+                  default-first-option no-match-text="没有匹配的数据" fit-input-width clearable>
                   <template #prefix>
                     <component v-if="currentGroupIcon" :is="currentGroupIcon" class="icon-prefix" theme="outline"
                       size="16" fill="#ffffff" />
@@ -103,6 +103,13 @@ watch(
   }
 );
 
+// 选中搜索引擎后，焦点移到输入框内
+const handleSelectChange = (val) => {
+  nextTick(() => {
+    searchInput.value?.focus();
+  });
+};
+
 // 展平所有引擎
 const allEngines = computed(() => searchEngineList.flatMap(group => group.options));
 
@@ -165,7 +172,7 @@ const handleSearch = () => {
   // 在新窗口打开
   window.open(url, '_blank');
   // 清空输入框
-  if(store.clearContent) {
+  if (store.clearContent) {
     keyword.value = '';
   }
 };

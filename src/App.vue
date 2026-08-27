@@ -89,6 +89,19 @@ onMounted(() => {
 
   // 全局键盘事件
   window.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      store.boxOpenState = !store.boxOpenState;
+      if(store.messageShow) {
+        ElMessage({
+          message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
+          grouping: true,
+        });
+      }
+    }
+  });
+
+  window.addEventListener('keydown', (event) => {
     if (event.altKey && event.key.toLowerCase() === 's') {
       event.preventDefault();
       store.searchOpenState = !store.searchOpenState;
