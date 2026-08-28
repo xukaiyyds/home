@@ -90,13 +90,18 @@ onMounted(() => {
   // 全局键盘事件
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Tab') {
-      event.preventDefault();
-      store.boxOpenState = !store.boxOpenState;
-      if(store.messageShow) {
-        ElMessage({
-          message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
-          grouping: true,
-        });
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.isContentEditable)) {
+        return;
+      } else {
+        event.preventDefault();
+        store.boxOpenState = !store.boxOpenState;
+        if(store.messageShow) {
+          ElMessage({
+            message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
+            grouping: true,
+          });
+        }
       }
     }
   });
@@ -116,6 +121,12 @@ onMounted(() => {
 
   // 鼠标右键事件
   document.oncontextmenu = () => {
+    // 判断是否点击在捷径链接上
+    const target = event.target;
+    const isShortcutItem = target.closest('.shortcut-item-wrapper') || target.closest('.shortcut-item');
+    if (isShortcutItem) {
+      return true;
+    }
     monitorWidthChanges(store.innerWidth) // 窗口宽度
     if(store.innerWidth < 721) {
       ElMessage({

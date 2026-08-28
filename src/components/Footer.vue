@@ -76,7 +76,7 @@ const siteUrl = computed(() => {
 });
 
 const open = () => {
-  ElMessageBox.alert('空格（播放/暂停网抑音乐）<br>Tab（切换到时光胶囊界面）<br>Alt + S（打开全网搜索界面）<br>Alt + M（打开音乐列表界面）<br>鼠标右键（打开全局设置菜单）<br>鼠标中键（开启壁纸展示状态）<br>鼠标滚轮（左右滑动网站列表）', '本站快捷键', {
+  ElMessageBox.alert('空格\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（播放/暂停网抑音乐）<br>Tab\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭时光胶囊）<br>Alt + M\u00A0\u00A0\u00A0\u00A0（打开/关闭音乐列表）<br>Alt + S\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭全网搜索）<br>鼠标滚轮（滑动网站/捷径列表）<br>鼠标中键（开启/退出壁纸展示）<br>鼠标右键（打开/关闭全局设置）<br>右键捷径链接（修改/删除捷径）', '本站快捷键', {
     dangerouslyUseHTMLString: true,
     modal: true,
     closeOnClickModal: true,

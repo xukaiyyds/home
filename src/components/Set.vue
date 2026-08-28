@@ -276,10 +276,6 @@ onMounted(() => {
         border: none;
       }
 
-      .el-dialog {
-        --el-dialog-bg-color: var(--body-background-color);
-      }
-
       .el-input__wrapper {
         --el-input-text-color: #FFFFFF;
         --el-input-bg-color: var(--main-input-background-color);

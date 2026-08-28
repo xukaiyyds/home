@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import searchEngineList from "@/assets/searchEngineList.json";
+import defaultShortCut from "@/assets/defaultShortCut.json";
 
 export const mainStore = defineStore("main", {
   state: () => {
@@ -38,6 +39,7 @@ export const mainStore = defineStore("main", {
       playerAutoplay: false, // 是否自动播放
       playerLoop: "all", // 循环播放 "all", "one", "none"
       playerOrder: "list", // 循环顺序 "list", "random"
+      shortcutData: defaultShortCut, // 捷径数据
     };
   },
   getters: {
@@ -98,6 +100,10 @@ export const mainStore = defineStore("main", {
         this.searchEngine = engineKey;
       }
     },
+    // 更改捷径数据
+    setShortcutData(value) {
+      this.shortcutData = value;
+    },
   },
   persist: {
     key: "data",
@@ -115,6 +121,7 @@ export const mainStore = defineStore("main", {
       "snowflakeShow",
       "siteStartShow",
       "searchEngine",
+      "shortcutData",
       "clearContent",
       "messageShow",
       "musicClick",

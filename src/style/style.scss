@@ -107,6 +107,15 @@ a:hover {
   }
 }
 
+// 对话框样式
+.el-dialog {
+  --el-dialog-bg-color: var(--body-background-color) !important;
+
+  .el-input__count-inner {
+    background-color: transparent !important;
+  }
+}
+
 // 进度条样式
 .el-progress-bar {
   .el-progress-bar__outer {
@@ -135,6 +144,13 @@ a:hover {
 .el-message-box {
   background: #ffffff60 !important;
   backdrop-filter: blur(10px) !important;
+  .cancel-deletion {
+    background-color: #909399 !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(166, 169, 173) !important;
+    }
+  }
 }
 
 // 卡片样式
@@ -149,6 +165,7 @@ a:hover {
     border-bottom: 1px solid transparent !important;
   }
   .el-card__body {
+    height: 100% !important;
     padding: 0 !important;
     background-color: #ffffff10 !important;
   }
