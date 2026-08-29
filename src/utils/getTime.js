@@ -1,6 +1,7 @@
 import { h } from "vue";
-import { SpaCandle } from "@icon-park/vue-next";
+import { Calendar } from "@icon-park/vue-next";
 import dayjs from "dayjs";
+import { Lunar } from 'lunar-javascript';
 
 // 时钟
 export const getCurrentTime = () => {
@@ -95,29 +96,72 @@ export const helloInit = () => {
   });
 };
 
-// 默哀模式
-const anniversaries = {
-  4.4: "清明节",
-  5.12: "汶川大地震纪念日",
-  7.7: "中国人民抗日战争纪念日",
-  9.18: "九·一八事变纪念日",
-  12.13: "南京大屠杀死难者国家公祭日",
+// 节日提醒
+const solarAnniversaries = {
+  '1.1': '元旦',
+  '2.14': '情人节',
+  '3.8': '妇女节',
+  '4.1': '愚人节',
+  '5.1': '劳动节',
+  '5.4': '青年节',
+  '6.1': '儿童节',
+  '10.1': '国庆节',
+  '12.24': '平安夜',
+  '12.25': '圣诞节',
 };
+
+const lunarAnniversaries = {
+  '1-1': '春节',
+  '1-15': '元宵节',
+  '2-2': '龙抬头',
+  '5-5': '端午节',
+  '7-7': '七夕节',
+  '8-15': '中秋节',
+  '9-9': '重阳节',
+  '12-8': '腊八节',
+  '12-23': '小年',
+  '12-30': '除夕',
+};
+
+const showFestivalMessage = (name) => {
+  ElMessage({
+    message: `今天是${name}`,
+    duration: 5000,
+    icon: h(Calendar, { theme: 'filled', fill: '#efefef' }),
+  });
+};
+
 export const checkDays = () => {
-  const myDate = new Date();
-  const mon = myDate.getMonth() + 1;
-  const date = myDate.getDate();
-  const key = `${mon}.${date}`;
-  if (Object.prototype.hasOwnProperty.call(anniversaries, key)) {
-    console.log(`今天是${anniversaries[key]}`);
-    const gray = document.createElement("style");
-    gray.innerHTML = "html{filter: grayscale(100%)}";
-    document.head.appendChild(gray);
-    ElMessage({
-      message: `今天是${anniversaries[key]}`,
-      duration: 14000,
-      icon: h(SpaCandle, { theme: "filled", fill: "#efefef" }),
-    });
+  const now = dayjs();
+
+  // 检查公历节日
+  const solarKey = now.format('M.D');
+  if (solarAnniversaries[solarKey]) {
+    showFestivalMessage(solarAnniversaries[solarKey]);
+  }
+
+  // 检查农历节日
+  try {
+    const lunar = Lunar.fromDate(now.toDate());
+    const lunarMonth = lunar.getMonth();
+    const lunarDay = lunar.getDay();
+
+    // 特殊处理除夕（腊月廿九或三十，且明天是正月初一）
+    const tomorrow = dayjs().add(1, 'day');
+    const lunarTomorrow = Lunar.fromDate(tomorrow.toDate());
+    const isNewYearEve = (lunarMonth === 12 && (lunarDay === 29 || lunarDay === 30)) &&
+      lunarTomorrow.getMonth() === 1 && lunarTomorrow.getDay() === 1;
+
+    let lunarKey = `${lunarMonth}-${lunarDay}`;
+    if (isNewYearEve) {
+      lunarKey = '12-30';
+    }
+
+    if (lunarAnniversaries[lunarKey]) {
+      showFestivalMessage(lunarAnniversaries[lunarKey]);
+    }
+  } catch (e) {
+    console.warn('农历转换失败:', e);
   }
 };
 

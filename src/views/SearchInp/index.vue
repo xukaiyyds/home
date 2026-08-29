@@ -12,8 +12,8 @@
       <el-card class="nav">
         <template #header>
           <!-- 搜索框 -->
-          <el-input ref="searchInput" v-model="keyword" size="large" autocomplete="false" placeholder="想搜点什么"
-            @keydown.enter.prevent="handleSearch" clearable>
+          <el-input ref="searchInput" v-model="keyword" class="input-search" size="large" autocomplete="false"
+            placeholder="想搜点什么" @keydown.enter.prevent="handleSearch" clearable>
             <template #prepend>
               <!-- 切换搜索引擎 -->
               <el-select ref="selectRef" v-model="searchEngine" @change="handleSelectChange" class="engine-select"
@@ -178,9 +178,10 @@ const handleSearch = () => {
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   width: 80%;
-  background: rgb(255 255 255 / 40%);
+  background: #ffffff60;
   border-radius: 6px;
   padding: 40px;
+  box-shadow: var(--main-box-shadow);
 
   .close {
     position: absolute;
@@ -255,17 +256,9 @@ const handleSearch = () => {
       }
 
       // 搜索框
-      :deep(.el-input) {
-        --el-input-text-color: #FFFFFF;
-        --el-input-bg-color: var(--main-more-background-color);
-        --el-input-placeholder-color: #CFD3DC;
-        backdrop-filter: blur(10px);
-        z-index: 999;
-
-        .el-input-group__prepend,
-        .el-input-group__append {
-          background-color: var(--main-cards-background-color);
-        }
+      .input-search {
+        --el-input-placeholder-color: rgba(255, 255, 255, 0.4);
+        --el-input-focus-border-color: #eeeeee;
       }
 
       // 搜索按钮

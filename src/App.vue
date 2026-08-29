@@ -48,7 +48,7 @@ import Background from "@/components/Background.vue";
 import Footer from "@/components/Footer.vue";
 import Box from "@/views/Box/index.vue";
 import MoreSet from "@/views/MoreSet/index.vue";
-import SearchInp from "@/views/Search/SearchInp.vue";
+import SearchInp from "@/views/SearchInp/index.vue";
 import cursorInit from "@/utils/cursor.js";
 import config from "@/../package.json";
 
@@ -64,7 +64,7 @@ const loadComplete = () => {
   nextTick(() => {
     // 欢迎提示
     helloInit();
-    // 默哀模式
+    // 节日提醒
     checkDays();
   });
 };
@@ -100,6 +100,7 @@ onMounted(() => {
           ElMessage({
             message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
             grouping: true,
+            duration: 2000,
           });
         }
       }
@@ -114,7 +115,14 @@ onMounted(() => {
         ElMessage({
           message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
           grouping: true,
+          duration: 2000,
         });
+        if(store.searchOpenState) {
+          ElMessage({
+            message: "右键链接可编辑或删除捷径哦",
+            grouping: true,
+          });
+        }
       }
     }
   });
@@ -140,6 +148,7 @@ onMounted(() => {
         ElMessage({
           message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
           grouping: true,
+          duration: 2000,
         });
       }
     }
@@ -154,6 +163,7 @@ onMounted(() => {
         ElMessage({
           message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
           grouping: true,
+          duration: 2000,
         });
       }
     }

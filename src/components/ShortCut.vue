@@ -1,14 +1,14 @@
 <template>
   <div class="links" @click="closeContextMenu">
     <div class="line">
-      <Icon size="20">
+      <Icon size="16">
         <Link />
       </Icon>
       <span class="title">捷径列表</span>
       <div class="action-buttons">
         <el-input v-model="searchKeyword" placeholder="搜索捷径..." size="small" :prefix-icon="Search" class="search-input"
           clearable />
-        <el-button type="primary" size="small" @click="openAddModal">
+        <el-button size="small" @click="openAddModal">
           <span>
             <Icon size="14">
               <Plus />
@@ -16,7 +16,7 @@
           </span>
           <span class="buttons-text">添加</span>
         </el-button>
-        <el-button type="primary" size="small" @click="downloadHtmlFile">
+        <el-button size="small" @click="downloadHtmlFile">
           <span>
             <Icon size="12">
               <Download />
@@ -24,7 +24,7 @@
           </span>
           <span class="buttons-text">下载</span>
         </el-button>
-        <el-button type="primary" size="small" @click="triggerFileInput">
+        <el-button size="small" @click="triggerFileInput">
           <span>
             <Icon size="12">
               <Upload />
@@ -55,7 +55,7 @@
     <!-- 空状态 -->
     <div v-else class="not-shortcut">
       <span class="tip">{{ searchKeyword ? '未找到匹配的捷径' : '暂无捷径，去添加吧' }}</span>
-      <el-button type="primary" @click="openAddModal">
+      <el-button @click="openAddModal">
         <span>
           <Icon size="14">
             <Plus />
@@ -98,7 +98,7 @@
           <el-input-number v-model="formData.id" disabled :controls="false" style="width: 100%" />
         </el-form-item> -->
         <el-form-item label="捷径名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入捷径名称" maxlength="7" show-word-limit clearable />
+          <el-input v-model="formData.name" placeholder="请输入捷径名称" maxlength="10" show-word-limit clearable />
         </el-form-item>
         <el-form-item label="站点链接" prop="url">
           <el-input v-model="formData.url" placeholder="请输入站点链接" clearable />
@@ -317,9 +317,9 @@ const downloadHtmlFile = () => {
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; img-src data: *; object-src 'none'"></meta>
 <TITLE>Bookmarks</TITLE>
-<H1>SNav导航文件</H1>
+<H1>XKの主页导航文件</H1>
 <DL><p>
-    <DT><H3 ADD_DATE="1716991740" LAST_MODIFIED="1716991740">SNav导航文件</H3>
+    <DT><H3 ADD_DATE="1716991740" LAST_MODIFIED="1716991740">XKの主页导航文件</H3>
     <DL><p>
         ${innerStr}
     </DL><p>
@@ -328,7 +328,7 @@ const downloadHtmlFile = () => {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'SNav导航文件.html'
+  a.download = 'XKの主页.html'
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -382,15 +382,14 @@ onBeforeUnmount(() => {
 .links {
   .line {
     margin: 0.5rem 0.25rem 1rem;
-    font-size: 1rem;
     display: flex;
     align-items: center;
     animation: fade 0.5s;
 
     .title {
       margin-left: 8px;
-      font-size: 1.15rem;
-      text-shadow: 0 0 5px #00000050;
+      font-size: 1rem;
+      text-shadow: 0 0 5px #00000025;
       flex: 1;
     }
 
@@ -404,45 +403,33 @@ onBeforeUnmount(() => {
         margin-right: 10px;
 
         :deep(.el-input__wrapper) {
-          background: var(--main-more-background-color);
-          backdrop-filter: blur(10px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-          transition: all 0.3s;
-
-          &:hover,
-          &.is-focus {
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
-          }
+          --el-input-focus-border-color: #eeeeee;
 
           .el-input__inner {
-            color: #fff;
-            font-size: 12px;
+            font-size: 10px;
 
             &::placeholder {
               color: rgba(255, 255, 255, 0.4);
             }
           }
 
-          .el-input__prefix {
-            color: rgba(255, 255, 255, 0.4);
-          }
-
           .el-input__prefix-inner {
             font-size: 10px;
-          }
-
-          .el-input__suffix .el-input__clear {
-            color: rgba(255, 255, 255, 0.4);
-
-            &:hover {
-              color: #fff;
-            }
           }
         }
       }
 
       .el-button {
         padding: 6px 12px;
+        background-color: var(--main-button-background-color);
+
+        &:hover {
+          background-color: var(--main-button-hover-background-color);
+        }
+
+        &:active {
+          border-color: #fff;
+        }
 
         .buttons-text {
           margin-left: 2px;
@@ -493,23 +480,19 @@ onBeforeUnmount(() => {
     height: 250px;
 
     .shortcut-item-wrapper {
-      padding: 0 10px;
       margin-bottom: 20px;
       height: 70px;
 
       .shortcut-item {
         height: 100%;
-        width: 100%;
         display: flex;
         align-items: center;
         flex-direction: row;
         justify-content: center;
-        padding: 0 10px;
-        animation: fade 0.5s;
+        border-radius: 6px;
         background-color: var(--main-cards-background-color);
-        backdrop-filter: blur(10px);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--main-box-shadow);
+        animation: fade 0.5s;
 
         &:hover {
           transform: scale(1.02);
@@ -522,7 +505,6 @@ onBeforeUnmount(() => {
         }
 
         .name {
-          font-size: 1rem;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -536,17 +518,25 @@ onBeforeUnmount(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 0;
+    height: 270px;
 
     .tip {
       margin-bottom: 20px;
-      font-size: 1.25rem;
-      color: #E5EAF3;
-      text-shadow: 0 0 5px #00000030;
+      font-size: 16px;
+      letter-spacing: 2px;
+      color: #CFD3DC;
     }
 
-    .buttons-text {
-      margin-left: 4px;
+    .el-button {
+      background-color: var(--main-button-background-color);
+
+      &:hover {
+        background-color: var(--main-button-hover-background-color);
+      }
+
+      .buttons-text {
+        margin-left: 4px;
+      }
     }
   }
 }

@@ -228,7 +228,7 @@ onBeforeUnmount(() => {
     display: block;
     padding: 20px 26px;
     border-radius: 8px;
-    background-color: var(--main-download-background-color);
+    background-color: var(--main-button-background-color);
     width: 120px;
     height: 30px;
     display: flex;
@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
     &:hover {
       text-decoration: none;
       transform: scale(1.05);
-      background-color: var(--main-download-hover-background-color);
+      background-color: var(--main-button-hover-background-color);
     }
 
     &:active {

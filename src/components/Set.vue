@@ -77,7 +77,7 @@
         </div>
         <div class="item">
           <span class="text">壁纸模糊程度</span>
-          <el-slider v-model="backgroundBlur" :min="0" :max="20" :step="5" show-stops :show-tooltip="false" />
+          <el-slider v-model="backgroundBlur" :min="0" :max="10" :step="5" show-stops :show-tooltip="false" />
         </div>
         <div class="item">
           <span class="text">壁纸遮罩显示</span>
@@ -277,9 +277,7 @@ onMounted(() => {
       }
 
       .el-input__wrapper {
-        --el-input-text-color: #FFFFFF;
         --el-input-bg-color: var(--main-input-background-color);
-        --el-input-placeholder-color: var(--main-input-placeholder-color);
         --el-input-focus-border-color: #67C23A;
       }
 

@@ -1,7 +1,7 @@
 <template>
   <!-- 音乐控制面板 -->
   <div
-    class="music"
+    class="music cards"
     @mouseenter="volumeShow = true"
     @mouseleave="volumeShow = false"
     v-show="store.musicOpenState"
@@ -119,7 +119,7 @@ const changeMusicIndex = (type) => {
 };
 
 onMounted(() => {
-  // alt+m键事件
+  // Alt+M键事件
   window.addEventListener('keydown', (event) => {
     if (event.altKey && event.key.toLowerCase() === 'm') {
       event.preventDefault();
@@ -130,6 +130,7 @@ onMounted(() => {
           ElMessage({
             message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
             grouping: true,
+            duration: 2000,
           });
         }
       } else {
@@ -138,6 +139,7 @@ onMounted(() => {
           ElMessage({
             message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
             grouping: true,
+            duration: 2000,
           });
         }
       }
@@ -175,9 +177,6 @@ watch(
 .music {
   width: 100%;
   height: 100%;
-  background: var(--main-cards-background-color);
-  backdrop-filter: blur(10px);
-  border-radius: 6px;
   padding: 20px;
   display: flex;
   justify-content: space-between;
@@ -297,7 +296,8 @@ watch(
     left: calc(50% - 320px);
     width: 640px;
     height: 600px;
-    background-color: #ffffff66;
+    background: #ffffff60;
+    box-shadow: var(--main-box-shadow);
     border-radius: 6px;
     z-index: 999;
     @media (max-width: 720px) {

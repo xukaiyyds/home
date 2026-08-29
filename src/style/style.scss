@@ -13,8 +13,6 @@ html,
 body {
   width: 100%;
   height: 100%;
-  // width: 100dvh;
-  // height: 100dvh;
   margin: 0;
   padding: 0;
   background-color: var(--body-background-color);
@@ -71,6 +69,7 @@ a:hover {
   border-radius: 6px;
   background-color: var(--main-cards-background-color);
   backdrop-filter: blur(10px);
+  box-shadow: var(--main-box-shadow);
   transform: scale(1);
   transition:
     backdrop-filter 0.3s,
@@ -104,6 +103,17 @@ a:hover {
   }
   .el-message__content {
     white-space: nowrap;
+  }
+}
+
+// 输入框样式
+.el-input {
+  --el-input-bg-color: var(--main-cards-background-color) !important;
+  --el-input-text-color: #FFFFFF !important;
+
+  .el-input-group__prepend,
+  .el-input-group__append {
+    background-color: var(--main-cards-background-color) !important;
   }
 }
 
@@ -253,5 +263,5 @@ scrollbar {
 ::-webkit-scrollbar-thumb,
 scrollbar-thumb {
   border-radius: 10px;
-  background-color: var(--main-scrollbar-background-color);
+  background-color: #ffffff40;
 }
