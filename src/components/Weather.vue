@@ -21,7 +21,7 @@
 import { getXiaomiWeather, getXiaomiCityByGeo } from "@/api";
 import { Error } from "@icon-park/vue-next";
 
-const weatherMsg = ref('正在获取天气数据');
+const weatherMsg = ref("正在获取天气数据");
 
 // 天气数据
 const weatherData = reactive({
@@ -37,12 +37,29 @@ const weatherData = reactive({
 // 天气代码转文字
 const getWeatherText = (code) => {
   const weatherMap = {
-    0: "晴", 1: "多云", 2: "阴", 3: "阵雨", 4: "雷阵雨",
-    5: "雷阵雨伴有冰雹", 6: "雨夹雪", 7: "小雨", 8: "中雨",
-    9: "大雨", 10: "暴雨", 13: "阵雪", 14: "小雪",
-    15: "中雪", 16: "大雪", 17: "暴雪", 18: "雾",
-    19: "冻雨", 20: "沙尘暴", 29: "浮尘", 30: "扬沙",
-    31: "强沙尘暴", 32: "霾"
+    0: "晴",
+    1: "多云",
+    2: "阴",
+    3: "阵雨",
+    4: "雷阵雨",
+    5: "雷阵雨伴有冰雹",
+    6: "雨夹雪",
+    7: "小雨",
+    8: "中雨",
+    9: "大雨",
+    10: "暴雨",
+    13: "阵雪",
+    14: "小雪",
+    15: "中雪",
+    16: "大雪",
+    17: "暴雪",
+    18: "雾",
+    19: "冻雨",
+    20: "沙尘暴",
+    29: "浮尘",
+    30: "扬沙",
+    31: "强沙尘暴",
+    32: "霾",
   };
   return weatherMap[code] || "未知";
 };
@@ -93,7 +110,7 @@ const getWeatherData = async () => {
     };
   } catch (error) {
     console.error("天气信息获取失败:" + error);
-    weatherMsg.value = '天气数据获取失败';
+    weatherMsg.value = "天气数据获取失败";
     onError("定位失败，无法获取天气信息");
   }
 };

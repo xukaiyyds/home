@@ -3,6 +3,12 @@
         "label": "搜索",
         "options": [
             {
+                "key": "MitaAI",
+                "name": "秘塔AI",
+                "icon": "Robot",
+                "searchUrl": "https://metaso.cn/?s=itab1&q="
+            },
+            {
                 "key": "Baidu",
                 "name": "百度",
                 "icon": "Seo",
@@ -61,6 +67,12 @@
                 "name": "知乎",
                 "icon": "Search",
                 "searchUrl": "https://www.zhihu.com/search?q="
+            },
+            {
+                "key": "Toutiao",
+                "name": "今日头条",
+                "icon": "Jinritoutiao",
+                "searchUrl": "https://so.toutiao.com/search?dvpf=pc&keyword="
             },
             {
                 "key": "Weibo",

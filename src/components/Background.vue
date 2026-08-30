@@ -1,10 +1,23 @@
 <template>
   <div :class="store.backgroundShow ? 'cover show' : 'cover'">
-    <img v-show="store.imgLoadStatus" :src="store.bgUrl" class="bg" :style="{ '--blur': store.backgroundBlur + 'px' }" alt="cover" @load="imgLoadComplete"
-      @error.once="imgLoadError" @animationend="imgAnimationEnd" />
+    <img
+      v-show="store.imgLoadStatus"
+      :src="store.bgUrl"
+      class="bg"
+      :style="{ '--blur': store.backgroundBlur + 'px' }"
+      alt="cover"
+      @load="imgLoadComplete"
+      @error.once="imgLoadError"
+      @animationend="imgAnimationEnd"
+    />
     <div v-if="store.showBackgroundGray" :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
-      <a v-if="store.backgroundShow && [1, 2, 3].includes(store.coverType)" class="down" :href="store.bgUrl" target="_blank">
+      <a
+        v-if="store.backgroundShow && [1, 2, 3].includes(store.coverType)"
+        class="down"
+        :href="store.bgUrl"
+        target="_blank"
+      >
         下载壁纸
       </a>
     </Transition>
@@ -24,7 +37,9 @@ const emit = defineEmits(["loadComplete"]);
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
 const bgRandom = Math.floor(Math.random() * 4 + 1);
-const bgRandoms = Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0');
+const bgRandoms = Math.floor(Math.random() * 12 + 1)
+  .toString()
+  .padStart(2, "0");
 
 // 更换壁纸链接
 const changeBg = (type) => {
@@ -85,43 +100,43 @@ watch(
 
 // 星空特效&雪花特效
 const cleanup = ref({
-  universe: null,   // 清理函数
+  universe: null, // 清理函数
   snowfall: null,
-})
+});
 
 const toggleEffect = (type, show) => {
   // 销毁旧特效
   if (cleanup.value[type]) {
-    cleanup.value[type]()
-    cleanup.value[type] = null
+    cleanup.value[type]();
+    cleanup.value[type] = null;
   }
 
   // 创建新特效
   if (show) {
-    const initFn = type === 'snowfall' ? initSnowfall : initUniverse
-    cleanup.value[type] = initFn()
+    const initFn = type === "snowfall" ? initSnowfall : initUniverse;
+    cleanup.value[type] = initFn();
   }
-}
+};
 
 // 监听 store 状态变化
 watch(
   () => store.darkstarShow,
-  (val) => toggleEffect('universe', val)
-)
+  (val) => toggleEffect("universe", val),
+);
 
 watch(
   () => store.snowflakeShow,
-  (val) => toggleEffect('snowfall', val)
-)
+  (val) => toggleEffect("snowfall", val),
+);
 
 onUnmounted(() => {
   Object.keys(cleanup.value).forEach((key) => {
     if (cleanup.value[key]) {
-      cleanup.value[key]()
-      cleanup.value[key] = null
+      cleanup.value[key]();
+      cleanup.value[key] = null;
     }
-  })
-})
+  });
+});
 
 // 切换主题
 const changeThemeType = (val) => {
@@ -147,7 +162,7 @@ watch(
       store.backgroundBlur = store.savedBackgroundBlur;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(() => {
@@ -156,9 +171,9 @@ onMounted(() => {
   // 加载主题
   changeThemeType(store.themeType);
   // 加载星空特效
-  toggleEffect('universe', store.darkstarShow);
+  toggleEffect("universe", store.darkstarShow);
   // 加载雪花特效
-  toggleEffect('snowfall', store.snowflakeShow);
+  toggleEffect("snowfall", store.snowflakeShow);
 });
 
 onBeforeUnmount(() => {

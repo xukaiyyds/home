@@ -15,18 +15,8 @@
     "url": "https://www.doubao.com/chat/"
   },
   {
-    "id": 3,
-    "name": "图片",
-    "url": "https://www.pexels.com/zh-cn/"
-  },
-  {
     "id": 4,
-    "name": "翻译",
+    "name": "DeepL翻译",
     "url": "https://www.deepl.com/zh/translator"
-  },
-  {
-    "id": 5,
-    "name": "微信读书",
-    "url": "https://weread.qq.com/"
   }
 ]

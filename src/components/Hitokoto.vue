@@ -82,6 +82,7 @@ onMounted(() => {
   height: 100%;
   padding: 20px;
   animation: fade 0.5s;
+
   .open-music {
     width: 100%;
     position: absolute;
@@ -93,21 +94,25 @@ onMounted(() => {
     background: var(--main-open-music-background-color);
     padding: 4px 0;
     border-radius: 8px 8px 0 0;
+
     .i-icon {
       width: 18px;
       height: 18px;
       display: block;
       margin-right: 8px;
     }
+
     span {
       font-size: 0.95rem;
     }
   }
+
   .content {
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+
     .text {
       font-size: 1.1rem;
       word-break: break-all;
@@ -117,6 +122,7 @@ onMounted(() => {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
     }
+
     .from {
       margin-top: 10px;
       font-weight: bold;

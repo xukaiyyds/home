@@ -7,7 +7,6 @@ const initSnowfall = () => {
   const ctx = canvas.getContext('2d');
   const snowflakes = [];
   let animationFrameId = null;
-  let intervalId = null;
 
   const resizeCanvas = () => {
     canvas.width = window.innerWidth;

@@ -120,13 +120,13 @@ const changeMusicIndex = (type) => {
 
 onMounted(() => {
   // Alt+M键事件
-  window.addEventListener('keydown', (event) => {
-    if (event.altKey && event.key.toLowerCase() === 'm') {
+  window.addEventListener("keydown", (event) => {
+    if (event.altKey && event.key.toLowerCase() === "m") {
       event.preventDefault();
       store.boxOpenState = false;
       if (musicListShow.value) {
         closeMusicList();
-        if(store.messageShow) {
+        if (store.messageShow) {
           ElMessage({
             message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
             grouping: true,
@@ -135,7 +135,7 @@ onMounted(() => {
         }
       } else {
         openMusicList();
-        if(store.messageShow) {
+        if (store.messageShow) {
           ElMessage({
             message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
             grouping: true,
@@ -153,7 +153,7 @@ onMounted(() => {
     }
     if (e.code == "Space") {
       const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.isContentEditable)) {
+      if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
         return;
       }
       changePlayState();
@@ -183,10 +183,12 @@ watch(
   align-items: center;
   flex-direction: column;
   animation: fade 0.5s;
+
   .btns {
     display: flex;
     align-items: center;
     margin-bottom: 6px;
+
     span {
       background: #ffffff26;
       padding: 2px 8px;
@@ -195,25 +197,30 @@ watch(
       text-overflow: ellipsis;
       overflow-x: hidden;
       white-space: nowrap;
+
       &:hover {
         background: #ffffff4d;
       }
     }
   }
+
   .control {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
     width: 100%;
+
     .state {
       transition: opacity 0.1s;
+
       .i-icon {
         width: 50px;
         height: 50px;
         display: block;
       }
     }
+
     .i-icon {
       width: 36px;
       height: 36px;
@@ -223,14 +230,17 @@ watch(
       justify-content: center;
       border-radius: 6px;
       transform: scale(1);
+
       &:hover {
         background: #ffffff33;
       }
+
       &:active {
         transform: scale(0.95);
       }
     }
   }
+
   .menu {
     height: 26px;
     width: 100%;
@@ -239,6 +249,7 @@ watch(
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     .name {
       width: 100%;
       text-align: center;
@@ -247,6 +258,7 @@ watch(
       white-space: nowrap;
       animation: fade 0.3s;
     }
+
     .volume {
       width: 100%;
       padding: 0 12px;
@@ -254,20 +266,25 @@ watch(
       align-items: center;
       flex-direction: row;
       animation: fade 0.3s;
+
       .icon {
         margin-right: 12px;
+
         span {
           width: 24px;
           height: 24px;
           display: block;
         }
       }
+
       :deep(*) {
         transition: none;
       }
+
       :deep(.el-slider__button) {
         transition: 0.3s;
       }
+
       .el-slider {
         margin-right: 12px;
         --el-slider-main-bg-color: #efefef;
@@ -277,6 +294,7 @@ watch(
     }
   }
 }
+
 .music-list {
   position: fixed;
   top: 0;
@@ -287,6 +305,7 @@ watch(
   background-color: var(--main-more-background-color);
   backdrop-filter: blur(20px);
   z-index: 1;
+
   .list {
     position: absolute;
     display: flex;
@@ -300,10 +319,12 @@ watch(
     box-shadow: var(--main-box-shadow);
     border-radius: 6px;
     z-index: 999;
+
     @media (max-width: 720px) {
       left: calc(50% - 45%);
       width: 90%;
     }
+
     .close {
       position: absolute;
       top: 12px;
@@ -311,9 +332,11 @@ watch(
       width: 28px;
       height: 28px;
       display: block;
+
       &:hover {
         transform: scale(1.2);
       }
+
       &:active {
         transform: scale(0.95);
       }
@@ -325,14 +348,17 @@ watch(
 .zoom-enter-active {
   animation: zoom 0.4s ease-in-out;
 }
+
 .zoom-leave-active {
   animation: zoom 0.3s ease-in-out reverse;
 }
+
 @keyframes zoom {
   0% {
     opacity: 0;
     transform: scale(0) translateY(-600px);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);

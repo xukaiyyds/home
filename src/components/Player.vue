@@ -205,27 +205,34 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList });
   width: 80%;
   border-radius: 6px;
   font-family: "HarmonyOS_Regular", sans-serif !important;
+
   :deep(.aplayer-body) {
     background-color: transparent;
+
     .aplayer-pic {
       display: none;
     }
+
     .aplayer-info {
       margin-left: 0;
       background-color: #ffffff40;
       border-color: transparent !important;
+
       .aplayer-music {
         flex-grow: initial;
         margin-bottom: 2px;
         overflow: initial;
+
         .aplayer-title {
           font-size: 16px;
           margin-right: 6px;
         }
+
         .aplayer-author {
           color: #efefef;
         }
       }
+
       .aplayer-lrc {
         text-align: left;
         margin: 7px 0 6px 6px;
@@ -242,41 +249,51 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList });
           hsla(0deg, 0%, 100%, 0.6) 90%,
           hsla(0deg, 0%, 100%, 0)
         );
+
         &::before,
         &::after {
           display: none;
         }
+
         p {
           color: #efefef;
         }
+
         .aplayer-lrc-current {
           font-size: 0.95rem;
           margin-bottom: 4px !important;
         }
       }
+
       .aplayer-controller {
         display: none;
       }
     }
   }
+
   :deep(.aplayer-list) {
     margin-top: 6px;
     height: v-bind(listHeight);
     background-color: transparent;
+
     ol {
       &::-webkit-scrollbar-track {
         background-color: transparent;
       }
+
       li {
         border-color: transparent;
+
         &.aplayer-list-light {
           background: #ffffff40;
           border-radius: 6px;
         }
+
         &:hover {
           background: #ffffff26 !important;
           border-radius: 6px !important;
         }
+
         .aplayer-list-index,
         .aplayer-list-author {
           color: #efefef;

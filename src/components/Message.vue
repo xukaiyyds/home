@@ -49,8 +49,6 @@ const jumpTo = (url) => {
 
 // 站点链接
 const siteUrl = computed(() => {
-  // const url = import.meta.env.VITE_SITE_URL;
-  // if (!url) return "imsyy.top".split(".");
   const url = "yyds.cn";
   if (!url) return "yyds.cn".split(".");
   // 判断协议前缀
@@ -106,14 +104,16 @@ watch(
     align-items: center;
     animation: fade 0.5s;
     max-width: 460px;
+
     .logo-img {
-      // border-radius: 50%;
       width: 120px;
     }
+
     .logo-img:hover {
       transform: rotate(666turn);
       transition: transform 59s 1s cubic-bezier(0.3, 0, 0.8, 1);
     }
+
     .name {
       width: 100%;
       padding-left: 22px;
@@ -127,17 +127,21 @@ watch(
       .sm {
         margin-left: 6px;
         font-size: 2rem;
+
         @media (min-width: 721px) and (max-width: 789px) {
           display: none;
         }
       }
     }
+
     @media (max-width: 768px) {
       .logo-img {
         width: 100px;
       }
+
       .name {
         height: 128px;
+
         .bg {
           font-size: 4.5rem;
         }
@@ -176,33 +180,11 @@ watch(
         align-self: flex-end;
       }
     }
+
     @media (max-width: 720px) {
       max-width: 100%;
       pointer-events: none;
     }
   }
-  // @media (max-width: 390px) {
-  //   .logo {
-  //     flex-direction: column;
-  //     .logo-img {
-  //       display: none;
-  //     }
-  //     .name {
-  //       margin-left: 0;
-  //       height: auto;
-  //       transform: none;
-  //       text-align: center;
-  //       .bg {
-  //         font-size: 3.5rem;
-  //       }
-  //       .sm {
-  //         font-size: 1.4rem;
-  //       }
-  //     }
-  //   }
-  //   .description {
-  //     margin-top: 2.5rem;
-  //   }
-  // }
 }
 </style>

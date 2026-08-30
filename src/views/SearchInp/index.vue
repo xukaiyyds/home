@@ -1,8 +1,14 @@
 <template>
   <div class="set" @mouseenter="closeShow = true" @mouseleave="closeShow = false" @click.stop>
     <transition name="el-fade-in-linear">
-      <close-one class="close" theme="filled" size="28" fill="#ffffff60" v-show="closeShow"
-        @click="store.searchOpenState = false" />
+      <close-one
+        class="close"
+        theme="filled"
+        size="28"
+        fill="#ffffff60"
+        v-show="closeShow"
+        @click="store.searchOpenState = false"
+      />
     </transition>
     <div class="search">
       <div class="title">
@@ -12,22 +18,61 @@
       <el-card class="nav">
         <template #header>
           <!-- 搜索框 -->
-          <el-input ref="searchInput" v-model="keyword" class="input-search" size="large" autocomplete="false"
-            placeholder="想搜点什么" @keydown.enter.prevent="handleSearch" clearable>
+          <el-input
+            ref="searchInput"
+            v-model="keyword"
+            class="input-search"
+            size="large"
+            autocomplete="false"
+            placeholder="想搜点什么"
+            @keydown.enter.prevent="handleSearch"
+            clearable
+          >
             <template #prepend>
               <!-- 切换搜索引擎 -->
-              <el-select ref="selectRef" v-model="searchEngine" @change="handleSelectChange" class="engine-select"
-                size="large" placeholder="搜索引擎" :teleported="false" popper-class="engine-popper" filterable
-                default-first-option no-match-text="没有匹配的数据" fit-input-width clearable>
+              <el-select
+                ref="selectRef"
+                v-model="searchEngine"
+                @change="handleSelectChange"
+                class="engine-select"
+                size="large"
+                placeholder="搜索引擎"
+                :teleported="false"
+                popper-class="engine-popper"
+                filterable
+                default-first-option
+                no-match-text="没有匹配的数据"
+                fit-input-width
+                clearable
+              >
                 <template #prefix>
-                  <component v-if="currentGroupIcon" :is="currentGroupIcon" class="icon-prefix" theme="outline"
-                    size="16" fill="#ffffff" />
+                  <component
+                    v-if="currentGroupIcon"
+                    :is="currentGroupIcon"
+                    class="icon-prefix"
+                    theme="outline"
+                    size="16"
+                    fill="#ffffff"
+                  />
                 </template>
-                <el-option-group v-for="group in searchEngineList" :key="group.label" :label="group.label">
-                  <el-option v-for="engine in group.options" :label="`${engine.name} ${engine.key}`" :key="engine.key"
-                    :value="engine.key">
+                <el-option-group
+                  v-for="group in searchEngineList"
+                  :key="group.label"
+                  :label="group.label"
+                >
+                  <el-option
+                    v-for="engine in group.options"
+                    :label="`${engine.name} ${engine.key}`"
+                    :key="engine.key"
+                    :value="engine.key"
+                  >
                     <span class="option-icon">
-                      <component :is="iconMap[engine.icon]" theme="outline" size="16" fill="#909399" />
+                      <component
+                        :is="iconMap[engine.icon]"
+                        theme="outline"
+                        size="16"
+                        fill="#909399"
+                      />
                     </span>
                     <span class="option-text">{{ engine.name }}</span>
                   </el-option>
@@ -35,7 +80,12 @@
               </el-select>
             </template>
             <template #append>
-              <el-button @click="handleSearch" class="search-btn" size="large" :icon="Search"></el-button>
+              <el-button
+                @click="handleSearch"
+                class="search-btn"
+                size="large"
+                :icon="Search"
+              ></el-button>
             </template>
           </el-input>
         </template>
@@ -49,16 +99,32 @@
 </template>
 
 <script setup>
-import { CloseOne, SettingTwo, Search, Seo, Find, World, Translate, Translation, Tiktok, Weibo, Taobao, Google, Duck, Github, AddOne, Bug } from "@icon-park/vue-next";
+import {
+  CloseOne,
+  Search,
+  Seo,
+  Find,
+  World,
+  Robot,
+  Translate,
+  Translation,
+  Tiktok,
+  Jinritoutiao,
+  Weibo,
+  Taobao,
+  Google,
+  Duck,
+  Github,
+} from "@icon-park/vue-next";
 import { mainStore } from "@/store";
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from "pinia";
 import ShortCut from "@/components/ShortCut.vue";
 import searchEngineList from "@/assets/searchEngineList.json";
-import identifyInput from '@/utils/identifyInput'
+import identifyInput from "@/utils/identifyInput";
 
 const store = mainStore();
 const closeShow = ref(false);
-const keyword = ref('');
+const keyword = ref("");
 const selectRef = ref(null);
 const searchInput = ref(null);
 const { searchEngine } = storeToRefs(store);
@@ -68,9 +134,11 @@ const iconMap = {
   Seo,
   Find,
   World,
+  Robot,
   Translate,
   Translation,
   Tiktok,
+  Jinritoutiao,
   Weibo,
   Taobao,
   Google,
@@ -80,8 +148,8 @@ const iconMap = {
 
 // 分组图标映射
 const groupIconMap = {
-  '搜索': Find,
-  '翻译': Translate,
+  搜索: Find,
+  翻译: Translate,
 };
 
 // 监听搜索界面打开状态
@@ -94,7 +162,7 @@ watch(
         selectRef.value?.toggleMenu();
       });
     }
-  }
+  },
 );
 
 // 选中搜索引擎后，焦点移到输入框内
@@ -105,17 +173,19 @@ const handleSelectChange = (val) => {
 };
 
 // 展平所有引擎
-const allEngines = computed(() => searchEngineList.flatMap(group => group.options));
+const allEngines = computed(() => searchEngineList.flatMap((group) => group.options));
 
 // 当前选中的引擎对象
 const currentEngine = computed(() => {
-  return allEngines.value.find(engine => engine.key === searchEngine.value) || allEngines.value[0];
+  return (
+    allEngines.value.find((engine) => engine.key === searchEngine.value) || allEngines.value[0]
+  );
 });
 
 // 根据引擎 key 查找所属分组 label
 const getGroupLabelByEngineKey = (key) => {
   for (const group of searchEngineList) {
-    if (group.options.some(engine => engine.key === key)) {
+    if (group.options.some((engine) => engine.key === key)) {
       return group.label;
     }
   }
@@ -127,14 +197,6 @@ const currentGroupIcon = computed(() => {
   const groupLabel = getGroupLabelByEngineKey(searchEngine.value);
   return groupIconMap[groupLabel] || Find; // 默认显示
 });
-
-// 当前引擎对应的图标
-const currentEngineIcon = computed(() => {
-  return currentEngine.value ? iconMap[currentEngine.value.icon] : null;
-});
-
-// 当前搜索引擎完整对象
-const getcurrentEngine = computed(() => store.getCurrentEngine);
 
 // 执行搜索
 const handleSearch = () => {
@@ -148,12 +210,12 @@ const handleSearch = () => {
     return;
   }
 
-  let url = '';
+  let url = "";
   const inputType = identifyInput(text);
-  if (inputType === 'url') {
+  if (inputType === "url") {
     // 直接访问网址
-    url = text.startsWith('http') ? text : `https://${text}`;
-  } else if (inputType === 'email') {
+    url = text.startsWith("http") ? text : `https://${text}`;
+  } else if (inputType === "email") {
     // 发送邮件
     url = `mailto:${text}`;
   } else {
@@ -162,10 +224,10 @@ const handleSearch = () => {
   }
 
   // 在新窗口打开
-  window.open(url, '_blank');
+  window.open(url, "_blank");
   // 清空输入框
   if (store.clearContent) {
-    keyword.value = '';
+    keyword.value = "";
   }
 };
 </script>
@@ -244,7 +306,7 @@ const handleSearch = () => {
       }
 
       :deep(.engine-select) {
-        --el-select-multiple-input-color: #FFFFFF;
+        --el-select-multiple-input-color: #ffffff;
 
         .el-popper__arrow::before {
           background: var(--main-input-background-color);

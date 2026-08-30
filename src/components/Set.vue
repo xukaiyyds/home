@@ -18,11 +18,22 @@
             {{ coverType === 6 ? "已开启自定义" : "自定义壁纸" }}
           </el-button>
         </div>
-        <el-dialog v-model="dialogFormVisible" title="自定义壁纸" :modal="false" align-center fullscreen>
+        <el-dialog
+          v-model="dialogFormVisible"
+          title="自定义壁纸"
+          :modal="false"
+          align-center
+          fullscreen
+        >
           <el-form @submit.prevent>
             <el-form-item label="图片链接">
-              <el-input v-model="customCoverUrl" @keyup.enter="setCustomCover" size="small" autocomplete="off"
-                placeholder="如：https://plog.xukaiyyds.cn/img/wallpaper/动漫/01.jpg" />
+              <el-input
+                v-model="customCoverUrl"
+                @keyup.enter="setCustomCover"
+                size="small"
+                autocomplete="off"
+                placeholder="如：https://plog.xukaiyyds.cn/img/wallpaper/动漫/01.jpg"
+              />
             </el-form-item>
             <el-form-item label="壁纸网站">
               <a class="btn-links" href="https://www.bizhihui.com" target="_blank">
@@ -58,7 +69,12 @@
               </a>
             </el-form-item>
             <el-form-item label="使用方法">
-              <el-text class="mx-1" type="success">1. 在各大高清壁纸网站中（Wallhaven 需翻墙访问），选好心仪的壁纸后下载下来。<br>2. 将下载好的壁纸上传到你的图床工具网站中。<br>3. 将上传好的图片链接复制到此处即可。<br>4. 或者直接从我收藏的壁纸库里挑选心仪的壁纸，选好后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text>
+              <el-text class="mx-1" type="success"
+                >1. 在各大高清壁纸网站中（Wallhaven 需翻墙访问），选好心仪的壁纸后下载下来。<br />2.
+                将下载好的壁纸上传到你的图床工具网站中。<br />3.
+                将上传好的图片链接复制到此处即可。<br />4.
+                或者直接从我收藏的壁纸库里挑选心仪的壁纸，选好后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text
+              >
             </el-form-item>
             <el-form-item class="btn-right">
               <el-button type="info" @click="dialogFormVisible = false">返回</el-button>
@@ -77,42 +93,90 @@
         </div>
         <div class="item">
           <span class="text">壁纸模糊程度</span>
-          <el-slider v-model="backgroundBlur" :min="0" :max="10" :step="5" show-stops :show-tooltip="false" />
+          <el-slider
+            v-model="backgroundBlur"
+            :min="0"
+            :max="10"
+            :step="5"
+            show-stops
+            :show-tooltip="false"
+          />
         </div>
         <div class="item">
           <span class="text">壁纸遮罩显示</span>
-          <el-switch v-model="showBackgroundGray" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="showBackgroundGray"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">星空特效显示</span>
-          <el-switch v-model="darkstarShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="darkstarShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">雪花特效显示</span>
-          <el-switch v-model="snowflakeShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="snowflakeShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">建站日期显示</span>
-          <el-switch v-model="siteStartShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="siteStartShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">底栏歌词显示</span>
-          <el-switch v-model="playerLrcShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="playerLrcShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">底栏背景模糊</span>
-          <el-switch v-model="footerBlur" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="footerBlur"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
       </el-collapse-item>
       <el-collapse-item title="播放器配置" name="3">
         <div class="item">
           <span class="text">自动播放</span>
-          <el-switch v-model="playerAutoplay" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="playerAutoplay"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">随机播放</span>
-          <el-switch v-model="playerOrder" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall"
-            active-value="random" inactive-value="list" />
+          <el-switch
+            v-model="playerOrder"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+            active-value="random"
+            inactive-value="list"
+          />
         </div>
         <div class="item">
           <span class="text">循环模式</span>
@@ -126,15 +190,30 @@
       <el-collapse-item title="其他设置" name="4">
         <div class="item">
           <span class="text">点击网抑音乐是否打开面板</span>
-          <el-switch v-model="musicClick" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="musicClick"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">搜索后是否清空输入框内容</span>
-          <el-switch v-model="clearContent" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="clearContent"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">按下快捷键后是否弹出消息</span>
-          <el-switch v-model="messageShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
+          <el-switch
+            v-model="messageShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
       </el-collapse-item>
     </el-collapse>
@@ -150,8 +229,6 @@ import identifyInput from "@/utils/identifyInput";
 const store = mainStore();
 const {
   coverType,
-  bgUrl,
-  backgroundCustom,
   themeType,
   backgroundBlur,
   showBackgroundGray,
@@ -265,7 +342,7 @@ onMounted(() => {
       }
 
       .el-slider {
-        flex-basis: 70%
+        flex-basis: 70%;
       }
 
       .el-slider__bar {
@@ -278,7 +355,7 @@ onMounted(() => {
 
       .el-input__wrapper {
         --el-input-bg-color: var(--main-input-background-color);
-        --el-input-focus-border-color: #67C23A;
+        --el-input-focus-border-color: #67c23a;
       }
 
       .el-collapse-item__content {
@@ -337,7 +414,7 @@ onMounted(() => {
                 border-color: #fff !important;
               }
 
-              &+.el-radio__label {
+              & + .el-radio__label {
                 color: #fff !important;
               }
             }

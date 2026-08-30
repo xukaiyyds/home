@@ -12,10 +12,18 @@
           <MainRight v-show="!store.boxOpenState" />
           <Box v-show="store.boxOpenState" />
         </section>
-        <section class="more more-set" v-show="store.setOpenState" @click="store.setOpenState = false">
+        <section
+          class="more more-set"
+          v-show="store.setOpenState"
+          @click="store.setOpenState = false"
+        >
           <MoreSet />
         </section>
-        <section class="more more-search" v-show="store.searchOpenState" @click="store.searchOpenState = false">
+        <section
+          class="more more-search"
+          v-show="store.searchOpenState"
+          @click="store.searchOpenState = false"
+        >
           <SearchInp />
         </section>
       </div>
@@ -88,15 +96,15 @@ onMounted(() => {
   cursorInit();
 
   // 全局键盘事件
-  window.addEventListener('keydown', (event) => {
-    if (event.key === 'Tab') {
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Tab") {
       const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.isContentEditable)) {
+      if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
         return;
       } else {
         event.preventDefault();
         store.boxOpenState = !store.boxOpenState;
-        if(store.messageShow) {
+        if (store.messageShow) {
           ElMessage({
             message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
             grouping: true,
@@ -107,17 +115,17 @@ onMounted(() => {
     }
   });
 
-  window.addEventListener('keydown', (event) => {
-    if (event.altKey && event.key.toLowerCase() === 's') {
+  window.addEventListener("keydown", (event) => {
+    if (event.altKey && event.key.toLowerCase() === "s") {
       event.preventDefault();
       store.searchOpenState = !store.searchOpenState;
-      if(store.messageShow) {
+      if (store.messageShow) {
         ElMessage({
           message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
           grouping: true,
           duration: 2000,
         });
-        if(store.searchOpenState) {
+        if (store.searchOpenState) {
           ElMessage({
             message: "右键链接可编辑或删除捷径哦",
             grouping: true,
@@ -131,12 +139,13 @@ onMounted(() => {
   document.oncontextmenu = () => {
     // 判断是否点击在捷径链接上
     const target = event.target;
-    const isShortcutItem = target.closest('.shortcut-item-wrapper') || target.closest('.shortcut-item');
+    const isShortcutItem =
+      target.closest(".shortcut-item-wrapper") || target.closest(".shortcut-item");
     if (isShortcutItem) {
       return true;
     }
-    monitorWidthChanges(store.innerWidth) // 窗口宽度
-    if(store.innerWidth < 721) {
+    monitorWidthChanges(store.innerWidth); // 窗口宽度
+    if (store.innerWidth < 721) {
       ElMessage({
         message: "为了浏览体验，已禁用右键",
         grouping: true,
@@ -144,7 +153,7 @@ onMounted(() => {
       });
     } else {
       store.setOpenState = !store.setOpenState;
-      if(store.messageShow) {
+      if (store.messageShow) {
         ElMessage({
           message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
           grouping: true,
@@ -159,7 +168,7 @@ onMounted(() => {
   window.addEventListener("mousedown", (event) => {
     if (event.button == 1) {
       store.backgroundShow = !store.backgroundShow;
-      if(store.messageShow) {
+      if (store.messageShow) {
         ElMessage({
           message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
           grouping: true,
@@ -276,19 +285,23 @@ onBeforeUnmount(() => {
         // w 1201px ~ max
         padding-left: 0.7vw;
         padding-right: 0.25vw;
-        @media (max-width: 1200px) { // w 1101px ~ 1280px
+        @media (max-width: 1200px) {
+          // w 1101px ~ 1280px
           padding-left: 2.3vw;
           padding-right: 1.75vw;
         }
-        @media (max-width: 1100px) { // w 993px ~ 1100px
+        @media (max-width: 1100px) {
+          // w 993px ~ 1100px
           padding-left: 2vw;
           padding-right: calc(2vw - 6px);
         }
-        @media (max-width: 992px) { // w 901px ~ 992px
+        @media (max-width: 992px) {
+          // w 901px ~ 992px
           padding-left: 2.3vw;
           padding-right: 1.7vw;
         }
-        @media (max-width: 900px) { // w 391px ~ 900px
+        @media (max-width: 900px) {
+          // w 391px ~ 900px
           padding-left: 2vw;
           padding-right: calc(2vw - 6px);
         }
