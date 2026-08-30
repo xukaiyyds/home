@@ -1,7 +1,54 @@
 <template>
   <div class="setting">
     <el-collapse class="collapse" v-model="activeName" accordion>
-      <el-collapse-item title="个性壁纸" name="1">
+      <el-collapse-item title="基础设置" name="1">
+        <div class="item">
+          <span class="text">是否在首页显示捷径列表</span>
+          <el-switch
+            v-model="shortcutHome"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">完成搜索后是否清空输入框内容</span>
+          <el-switch
+            v-model="clearContent"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">点击网抑音乐是否打开音乐列表</span>
+          <el-switch
+            v-model="musicClick"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">按下快捷键后是否弹出提示消息</span>
+          <el-switch
+            v-model="messageShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">是否在时光胶囊下显示建站日期</span>
+          <el-switch
+            v-model="siteStartShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="个性壁纸" name="2">
         <div class="bg-set">
           <el-radio-group v-model="coverType" text-color="#ffffff" @change="radioChange">
             <el-radio :value="0" size="large" border>默认壁纸</el-radio>
@@ -83,7 +130,7 @@
           </el-form>
         </el-dialog>
       </el-collapse-item>
-      <el-collapse-item title="个性化调整" name="2">
+      <el-collapse-item title="主题与背景" name="3">
         <div class="item">
           <span class="text">主题模式切换</span>
           <el-radio-group v-model="themeType" text-color="#FFFFFF">
@@ -92,7 +139,7 @@
           </el-radio-group>
         </div>
         <div class="item">
-          <span class="text">壁纸模糊程度</span>
+          <span class="text">背景模糊程度</span>
           <el-slider
             v-model="backgroundBlur"
             :min="0"
@@ -103,7 +150,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">壁纸遮罩显示</span>
+          <span class="text">显示背景遮罩</span>
           <el-switch
             v-model="showBackgroundGray"
             inline-prompt
@@ -112,7 +159,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">星空特效显示</span>
+          <span class="text">显示星空特效</span>
           <el-switch
             v-model="darkstarShow"
             inline-prompt
@@ -121,7 +168,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">雪花特效显示</span>
+          <span class="text">显示雪花特效</span>
           <el-switch
             v-model="snowflakeShow"
             inline-prompt
@@ -129,15 +176,8 @@
             :inactive-icon="CloseSmall"
           />
         </div>
-        <div class="item">
-          <span class="text">建站日期显示</span>
-          <el-switch
-            v-model="siteStartShow"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
+      </el-collapse-item>
+      <el-collapse-item title="个性化调整" name="4">
         <div class="item">
           <span class="text">底栏歌词显示</span>
           <el-switch
@@ -157,7 +197,7 @@
           />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="播放器配置" name="3">
+      <el-collapse-item title="播放器配置" name="5">
         <div class="item">
           <span class="text">自动播放</span>
           <el-switch
@@ -187,35 +227,7 @@
           </el-radio-group>
         </div>
       </el-collapse-item>
-      <el-collapse-item title="其他设置" name="4">
-        <div class="item">
-          <span class="text">点击网抑音乐是否打开面板</span>
-          <el-switch
-            v-model="musicClick"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
-          <span class="text">搜索后是否清空输入框内容</span>
-          <el-switch
-            v-model="clearContent"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
-          <span class="text">按下快捷键后是否弹出消息</span>
-          <el-switch
-            v-model="messageShow"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-      </el-collapse-item>
+      <el-collapse-item title="其他设置" name="6">重置、备份与恢复（待开发）</el-collapse-item>
     </el-collapse>
   </div>
 </template>
@@ -243,10 +255,11 @@ const {
   playerAutoplay,
   playerOrder,
   playerLoop,
+  shortcutHome,
 } = storeToRefs(store);
 
 // 默认选中项
-const activeName = ref("1");
+const activeName = ref("2");
 
 // 壁纸切换
 const radioChange = () => {

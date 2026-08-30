@@ -96,7 +96,6 @@
     <Teleport to="body">
       <div
         v-if="contextMenuVisible"
-        ref="contextMenuRef"
         class="custom-context-menu"
         :style="{
           left: contextMenuX + 'px',
@@ -303,7 +302,6 @@ const jumpLink = (url) => {
 const contextMenuVisible = ref(false);
 const contextMenuX = ref(0);
 const contextMenuY = ref(0);
-const contextMenuRef = ref(null);
 let contextItem = null;
 
 const openContextMenu = (event, item) => {

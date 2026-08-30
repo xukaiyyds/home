@@ -2,46 +2,46 @@
   {
     "icon": "Book",
     "name": "写作博客",
-    "link": "https://me.xukaiyyds.cn/blog"
+    "url": "https://me.xukaiyyds.cn/blog"
   },
   {
     "icon": "Image",
     "name": "生活博客",
-    "link": "https://plog.xukaiyyds.cn/"
+    "url": "https://plog.xukaiyyds.cn/"
   },
   {
     "icon": "CompactDisc",
     "name": "网抑音乐",
-    "link": "https://plog.xukaiyyds.cn/music/?id=5472593172&server=netease"
+    "url": "https://plog.xukaiyyds.cn/music/?id=5472593172&server=netease"
   },
   {
     "icon": "Blog",
     "name": "技术博客",
-    "link": "https://blog.xukaiyyds.cn/"
+    "url": "https://blog.xukaiyyds.cn/"
   },
   {
     "icon": "Code",
     "name": "开发博客",
-    "link": "https://dev.xukaiyyds.cn/"
+    "url": "https://dev.xukaiyyds.cn/"
   },
   {
     "icon": "Dragon",
     "name": "域名证书",
-    "link": "https://domains.xukaiyyds.cn/"
+    "url": "https://domains.xukaiyyds.cn/"
   },
   {
     "icon": "Eye",
     "name": "站点监测",
-    "link": "https://status.xukaiyyds.cn/"
+    "url": "https://status.xukaiyyds.cn/"
   },
   {
     "icon": "Cloud",
     "name": "云工作室",
-    "link": "https://me.xukaiyyds.cn/studio"
+    "url": "https://me.xukaiyyds.cn/studio"
   },
   {
     "icon": "LaptopCode",
     "name": "后台仪表盘",
-    "link": "https://me.xukaiyyds.cn/admin"
+    "url": "https://me.xukaiyyds.cn/admin"
   }
 ]

@@ -4,7 +4,7 @@
       <Icon size="20">
         <Link />
       </Icon>
-      <span class="title">网站列表</span>
+      <span class="title">{{ store.shortcutHome ? "捷径列表" : "网站列表" }}</span>
     </div>
     <!-- 网站列表 -->
     <Swiper
@@ -19,18 +19,20 @@
       }"
       :mousewheel="true"
     >
-      <SwiperSlide v-for="site in siteLinksList" :key="site">
+      <SwiperSlide v-for="(page, pageIndex) in pagedLinks" :key="pageIndex">
         <el-row class="link-all" :gutter="20">
-          <el-col v-for="(item, index) in site" :span="8" :key="item">
+          <el-col v-for="item in page" :key="item.id || item.name" :span="8">
             <div
               class="item cards"
-              :style="index < 3 ? 'margin-bottom: 20px' : null"
+              :style="pageIndex < 3 ? 'margin-bottom: 20px' : null"
               @click="jumpLink(item)"
             >
               <Icon size="26">
-                <component :is="siteIcon[item.icon]" />
+                <component :is="siteIcon[item.icon] || siteIcon.Compass" />
               </Icon>
-              <span class="name text-hidden">{{ item.name }}</span>
+              <div class="item-content">
+                <span class="name text-hidden">{{ item.name }}</span>
+              </div>
             </div>
           </el-col>
         </el-row>
@@ -54,20 +56,21 @@ import {
   Eye,
   Cloud,
   LaptopCode,
+  Compass,
 } from "@vicons/fa"; // 注意使用正确的类别
 import { mainStore } from "@/store";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination, Mousewheel } from "swiper/modules";
-import siteLinks from "@/assets/siteLinks.json";
 
 const store = mainStore();
 
-// 计算网站链接
-const siteLinksList = computed(() => {
+const siteLinks = computed(() => store.siteLinks);
+
+// 分页（每页6个）
+const pagedLinks = computed(() => {
   const result = [];
-  for (let i = 0; i < siteLinks.length; i += 6) {
-    const subArr = siteLinks.slice(i, i + 6);
-    result.push(subArr);
+  for (let i = 0; i < siteLinks.value.length; i += 6) {
+    result.push(siteLinks.value.slice(i, i + 6));
   }
   return result;
 });
@@ -83,6 +86,7 @@ const siteIcon = {
   Eye,
   Cloud,
   LaptopCode,
+  Compass,
 };
 
 // 链接跳转
@@ -90,13 +94,9 @@ const jumpLink = (data) => {
   if (store.musicClick) {
     if (typeof $openList === "function") $openList();
   } else {
-    window.open(data.link, "_blank");
+    window.open(data.url, "_blank");
   }
 };
-
-onMounted(() => {
-  console.log(siteLinks);
-});
 </script>
 
 <style lang="scss" scoped>

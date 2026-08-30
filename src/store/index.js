@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import searchEngineList from "@/assets/searchEngineList.json";
 import defaultShortCut from "@/assets/defaultShortCut.json";
+import defaultSiteLinks from "@/assets/siteLinks.json";
 
 export const mainStore = defineStore("main", {
   state: () => {
@@ -39,6 +40,7 @@ export const mainStore = defineStore("main", {
       playerAutoplay: false, // 是否自动播放
       playerLoop: "all", // 循环播放 "all", "one", "none"
       playerOrder: "list", // 循环顺序 "list", "random"
+      shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
     };
   },
@@ -62,7 +64,11 @@ export const mainStore = defineStore("main", {
     getCurrentEngine: (state) => {
       const allEngines = searchEngineList.flatMap(group => group.options);
       return allEngines.find(engine => engine.key === state.searchEngine) || allEngines[0];
-    }
+    },
+    // 获取网站链接
+    siteLinks: (state) => {
+        return state.shortcutHome ? state.shortcutData : defaultSiteLinks;
+    },
   },
   actions: {
     // 更改当前页面宽度
@@ -121,6 +127,7 @@ export const mainStore = defineStore("main", {
       "snowflakeShow",
       "siteStartShow",
       "searchEngine",
+      "shortcutHome",
       "shortcutData",
       "clearContent",
       "messageShow",

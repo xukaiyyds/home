@@ -1,21 +1,37 @@
 [
   {
     "id": 0,
+    "name": "Kimi AI",
+    "url": "https://www.kimi.com/"
+  },
+  {
+    "id": 1,
+    "name": "智谱清言",
+    "url": "https://chatglm.cn/"
+  },
+  {
+    "id": 2,
     "name": "DeepSeek",
     "url": "https://chat.deepseek.com/"
   },
   {
-    "id": 1,
-    "name": "千问",
-    "url": "https://www.qianwen.com/chat"
-  },
-  {
-    "id": 2,
+    "id": 3,
     "name": "豆包",
     "url": "https://www.doubao.com/chat/"
   },
   {
     "id": 4,
+    "name": "千问",
+    "url": "https://www.qianwen.com/chat"
+  },
+  {
+    "id": 5,
+    "name": "文心",
+    "url": "https://wenxin.baidu.com/"
+  },
+
+  {
+    "id": 6,
     "name": "DeepL翻译",
     "url": "https://www.deepl.com/zh/translator"
   }
