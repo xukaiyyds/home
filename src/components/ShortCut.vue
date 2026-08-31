@@ -272,6 +272,7 @@ const confirmDelete = (item) => {
     `确认删除 “<el-text style="color:#E6A23C">${item.name}</el-text>” 捷径？此操作无法恢复！`,
     "删除捷径",
     {
+      confirmButtonClass: "warning",
       cancelButtonClass: "cancel-deletion",
       dangerouslyUseHTMLString: true,
       confirmButtonText: "删除",
@@ -453,7 +454,7 @@ onBeforeUnmount(() => {
           --el-input-focus-border-color: #eeeeee;
 
           .el-input__inner {
-            font-size: 10px;
+            font-size: 11px;
 
             &::placeholder {
               color: rgba(255, 255, 255, 0.4);
@@ -579,6 +580,10 @@ onBeforeUnmount(() => {
 
       &:hover {
         background-color: var(--main-button-hover-background-color);
+      }
+
+      &:active {
+        border-color: #fff;
       }
 
       .buttons-text {

@@ -161,6 +161,27 @@ a:hover {
       background-color: rgb(166, 169, 173) !important;
     }
   }
+  .success {
+    background-color: #67c23a !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(133, 206, 97) !important;
+    }
+  }
+  .warning {
+    background-color: #e6a23c !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(235, 181, 99) !important;
+    }
+  }
+  .danger {
+    background-color: #f56c6c !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(247, 137, 137) !important;
+    }
+  }
 }
 
 // 卡片样式

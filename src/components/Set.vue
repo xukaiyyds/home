@@ -117,10 +117,10 @@
             </el-form-item>
             <el-form-item label="使用方法">
               <el-text class="mx-1" type="success"
-                >1. 在各大高清壁纸网站中（Wallhaven 需翻墙访问），选好心仪的壁纸后下载下来。<br />2.
+                >1. 在各大高清壁纸网站中选好心仪的壁纸，然后下载下来。 <br />2.
                 将下载好的壁纸上传到你的图床工具网站中。<br />3.
                 将上传好的图片链接复制到此处即可。<br />4.
-                或者直接从我收藏的壁纸库里挑选心仪的壁纸，选好后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text
+                或者直接从我收藏的壁纸库里挑选心仪的壁纸，然后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text
               >
             </el-form-item>
             <el-form-item class="btn-right">
@@ -227,7 +227,27 @@
           </el-radio-group>
         </div>
       </el-collapse-item>
-      <el-collapse-item title="其他设置" name="6">重置、备份与恢复（待开发）</el-collapse-item>
+      <el-collapse-item title="备份与恢复" name="6">
+        <div class="item">
+          <span class="text">重置站点为默认状态</span>
+          <el-button @click="resetSite" class="danger" size="small">重置</el-button>
+        </div>
+        <div class="item">
+          <span class="text">将站点配置与捷径数据进行备份</span>
+          <el-button @click="backupSite" class="warning" size="small">备份</el-button>
+        </div>
+        <div class="item">
+          <span class="text">将备份的站点配置与捷径数据进行恢复</span>
+          <input
+            ref="recoverRef"
+            type="file"
+            style="display: none"
+            accept=".json"
+            @change="recoverSite"
+          />
+          <el-button @click="recoverRef?.click()" class="success" size="small">恢复</el-button>
+        </div>
+      </el-collapse-item>
     </el-collapse>
   </div>
 </template>
@@ -309,6 +329,92 @@ const setCustomCover = () => {
   dialogFormVisible.value = false;
 };
 
+// 站点重置
+const resetSite = () => {
+  ElMessageBox.confirm("重置后你的捷径数据以及自定义设置都将丢失！请提前做好备份", "站点重置", {
+    confirmButtonClass: "danger",
+    cancelButtonClass: "cancel-deletion",
+    confirmButtonText: "重置",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    localStorage.clear();
+    ElMessage.success("站点重置成功，即将刷新");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  });
+};
+
+// 站点备份
+const backupSite = () => {
+  try {
+    const date = new Date();
+    const dateString = date.toISOString().replace(/[:.]/g, "-");
+    const fileName = `Site_Backup_${dateString}.json`;
+    const jsonData = JSON.stringify(store.$state);
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    // 备份完成
+    ElMessage.success("站点备份成功");
+  } catch (error) {
+    console.error("站点备份失败：", error);
+    ElMessage.error("站点备份失败");
+  }
+};
+
+// 站点恢复
+const recoverRef = ref(null);
+const recoverSite = async (event) => {
+  try {
+    const fileInput = event.target;
+    if (!fileInput?.files.length) {
+      ElMessage.error("请选择要恢复的备份文件");
+      return false;
+    }
+    const file = fileInput.files[0];
+    const jsonData = await file.text();
+    const data = JSON.parse(jsonData);
+    // 恢复数据
+    ElMessageBox.confirm(
+      "确认使用该恢复文件？你现有的捷径数据以及自定义设置都将被覆盖！",
+      "站点恢复",
+      {
+        confirmButtonClass: "success",
+        cancelButtonClass: "cancel-deletion",
+        confirmButtonText: "恢复",
+        cancelButtonText: "取消",
+        type: "warning",
+      },
+    )
+      .then(() => {
+        const isSuccess = store.recoverSiteData(data);
+        if (isSuccess) {
+          ElMessage.success("站点恢复成功，即将刷新");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          ElMessage.error("站点数据恢复失败，请重试");
+        }
+      })
+      .catch(() => {
+        recoverRef.value.value = null;
+      });
+  } catch (error) {
+    console.error("站点数据恢复失败：", error);
+    ElMessage.error("站点数据恢复失败，请重试");
+  }
+};
+
 onMounted(() => {
   // 检测是否存在自定义壁纸
   if (store.backgroundCustom) customCoverUrl.value = store.backgroundCustom;
@@ -347,7 +453,8 @@ onMounted(() => {
 
       .btn-right {
         float: right;
-        margin-top: 30px;
+        margin-top: 50px;
+        margin-right: 10px;
       }
 
       .btn-links {
@@ -394,6 +501,35 @@ onMounted(() => {
               &:last-child {
                 margin-right: 0;
               }
+            }
+          }
+
+          .el-button {
+            margin: 4px 0;
+            background-color: #ffffff26;
+          }
+          .danger {
+            &:hover {
+              background-color: rgb(247, 137, 137);
+            }
+            &:active {
+              border-color: #f56c6c;
+            }
+          }
+          .warning {
+            &:hover {
+              background-color: rgb(235, 181, 99);
+            }
+            &:active {
+              border-color: #e6a23c;
+            }
+          }
+          .success {
+            &:hover {
+              background-color: rgb(133, 206, 97);
+            }
+            &:active {
+              border-color: #67c23a;
             }
           }
         }

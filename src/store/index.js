@@ -62,12 +62,12 @@ export const mainStore = defineStore("main", {
     },
     // 获取当前搜索引擎
     getCurrentEngine: (state) => {
-      const allEngines = searchEngineList.flatMap(group => group.options);
-      return allEngines.find(engine => engine.key === state.searchEngine) || allEngines[0];
+      const allEngines = searchEngineList.flatMap((group) => group.options);
+      return allEngines.find((engine) => engine.key === state.searchEngine) || allEngines[0];
     },
     // 获取网站链接
     siteLinks: (state) => {
-        return state.shortcutHome ? state.shortcutData : defaultSiteLinks;
+      return state.shortcutHome ? state.shortcutData : defaultSiteLinks;
     },
   },
   actions: {
@@ -102,13 +102,30 @@ export const mainStore = defineStore("main", {
     },
     // 更改搜索引擎
     setSearchEngine(engineKey) {
-      if (searchEngineList.some(engine => engine.key === engineKey)) {
+      if (searchEngineList.some((engine) => engine.key === engineKey)) {
         this.searchEngine = engineKey;
       }
     },
     // 更改捷径数据
     setShortcutData(value) {
       this.shortcutData = value;
+    },
+    // 恢复数据
+    recoverSiteData(data) {
+      let isSuccess = false;
+      try {
+        for (const key in data) {
+          if (Object.hasOwnProperty.call(data, key)) {
+            const item = data[key];
+            this[key] = item;
+          }
+        }
+        isSuccess = true;
+      } catch (error) {
+        console.error("站点数据恢复时处理失败：", error);
+        isSuccess = false;
+      }
+      return isSuccess;
     },
   },
   persist: {
