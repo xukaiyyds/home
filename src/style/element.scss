@@ -1,0 +1,112 @@
+// 弹窗样式
+.el-message {
+  --el-message-bg-color: var(--main-cards-background-color) !important;
+  --el-message-text-color: #efefef !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 25px !important;
+  border-color: transparent !important;
+
+  .el-message__badge {
+    display: none;
+  }
+  .el-message__content {
+    white-space: nowrap;
+  }
+}
+
+// 输入框样式
+.el-input {
+  --el-input-bg-color: var(--main-cards-background-color) !important;
+  --el-input-text-color: #ffffff !important;
+
+  .el-input-group__prepend,
+  .el-input-group__append {
+    background-color: var(--main-cards-background-color) !important;
+  }
+}
+
+// 对话框样式
+.el-dialog {
+  --el-dialog-bg-color: var(--body-background-color) !important;
+
+  .el-input__count-inner {
+    background-color: transparent !important;
+  }
+}
+
+// 进度条样式
+.el-progress-bar {
+  .el-progress-bar__outer {
+    border-radius: 6px;
+    background-color: #00000020;
+    .el-progress-bar__inner {
+      background-color: #efefef;
+      border-radius: 6px;
+      text-align: center;
+      font-family: "UnidreamLED";
+      span {
+        color: #564d59;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Tooltip 样式
+.el-popper.is-dark {
+  background: #ffffff60 !important;
+  border: 1px solid transparent !important;
+}
+
+// MessageBox 样式
+.el-message-box {
+  background: #ffffff60 !important;
+  backdrop-filter: blur(10px) !important;
+  .cancel-deletion {
+    background-color: #909399 !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(166, 169, 173) !important;
+    }
+  }
+  .success {
+    background-color: #67c23a !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(133, 206, 97) !important;
+    }
+  }
+  .warning {
+    background-color: #e6a23c !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(235, 181, 99) !important;
+    }
+  }
+  .danger {
+    background-color: #f56c6c !important;
+    border: none !important;
+    &:hover {
+      background-color: rgb(247, 137, 137) !important;
+    }
+  }
+}
+
+// 卡片样式
+.el-card {
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  .el-card__header {
+    font-weight: bold;
+    padding: 16px 20px !important;
+    background-color: #ffffff30 !important;
+    border-bottom: 1px solid transparent !important;
+  }
+  .el-card__body {
+    height: 100% !important;
+    padding: 0 !important;
+    background-color: #ffffff10 !important;
+  }
+}
