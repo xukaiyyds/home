@@ -29,9 +29,9 @@ importers:
       live2d-render:
         specifier: ^0.0.9
         version: 0.0.9
-      lunar-javascript:
-        specifier: ^1.7.7
-        version: 1.7.7
+      lunar-calendar:
+        specifier: ^0.1.4
+        version: 0.1.4
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(vue@3.4.24)
@@ -1794,8 +1794,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  lunar-javascript@1.7.7:
-    resolution: {integrity: sha512-u/KYiwPIBo/0bT+WWfU7qO1d+aqeB90Tuy4ErXenr2Gam0QcWeezUvtiOIyXR7HbVnW2I1DKfU0NBvzMZhbVQw==}
+  lunar-calendar@0.1.4:
+    resolution: {integrity: sha512-5r87vbg5yg56z/jkf3A+Ur+ZggUTiJw1VATT9P7RELQgWcTNhfJ+OLkNYroSna6r65bMqyaAgapo9vRN40L75A==}
 
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
@@ -4384,7 +4384,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lunar-javascript@1.7.7: {}
+  lunar-calendar@0.1.4: {}
 
   magic-string@0.25.9:
     dependencies:

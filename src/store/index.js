@@ -20,6 +20,8 @@ export const mainStore = defineStore("main", {
       siteStartShow: false, // 建站日期显示
       searchEngine: "Baidu", // 搜索引擎
       clearContent: true, // 清空输入框
+      showLunar: false, // 显示农历
+      use12HourFormat: false, // 12小时制
       messageShow: true, // 操作消息显示
       musicClick: false, // 音乐链接是否跳转
       musicIsOk: false, // 音乐是否加载完成
@@ -40,6 +42,8 @@ export const mainStore = defineStore("main", {
       playerAutoplay: false, // 是否自动播放
       playerLoop: "all", // 循环播放 "all", "one", "none"
       playerOrder: "list", // 循环顺序 "list", "random"
+      playerSwitchId: "", // 切换歌单
+      playerTypeId: "", // 歌单ID
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
       live2dShow: true, // 是否显示live2d模型
@@ -150,6 +154,8 @@ export const mainStore = defineStore("main", {
       "shortcutHome",
       "shortcutData",
       "clearContent",
+      "showLunar",
+      "use12HourFormat",
       "messageShow",
       "musicClick",
       "playerLrcShow",
@@ -157,6 +163,8 @@ export const mainStore = defineStore("main", {
       "playerAutoplay",
       "playerLoop",
       "playerOrder",
+      "playerSwitchId",
+      "playerTypeId",
       "live2dShow",
       "modelType",
       "modelPath",

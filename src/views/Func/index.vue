@@ -19,6 +19,7 @@
             </div>
             <div class="text">
               <span> {{ currentTime.hour }}:{{ currentTime.minute }}:{{ currentTime.second }}</span>
+              <span v-if="store.use12HourFormat" class="amPm">{{ currentTime.amPm }}</span>
             </div>
           </div>
           <Weather />
@@ -53,7 +54,7 @@ const playerHasId = import.meta.env.VITE_SONG_ID;
 
 // 更新时间
 const updateTimeData = () => {
-  currentTime.value = getCurrentTime();
+  currentTime.value = getCurrentTime(store.use12HourFormat);
 };
 
 onMounted(() => {
@@ -133,6 +134,11 @@ onBeforeUnmount(() => {
           font-size: 3.25rem;
           letter-spacing: 2px;
           font-family: "UnidreamLED";
+          .amPm {
+            font-size: 1rem;
+            opacity: 0.6;
+            margin-left: 6px;
+          }
         }
         @media (min-width: 1201px) and (max-width: 1280px) {
           font-size: 1rem;

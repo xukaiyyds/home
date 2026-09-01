@@ -13,13 +13,23 @@
     <span class="sm-hidden">{{ weatherData.weather.windpower }}&nbsp;级</span>
   </div>
   <div class="weather" v-else>
-    <span>{{ weatherMsg }}</span>
+    <template v-if="store.showLunar">
+      <span>{{ lunarInfo.year }}年 {{ lunarInfo.month }}{{ lunarInfo.day }}</span>
+    </template>
+    <template v-else>
+      <span>{{ weatherMsg }}</span>
+    </template>
   </div>
 </template>
 
 <script setup>
 import { getXiaomiWeather, getXiaomiCityByGeo } from "@/api";
 import { Error } from "@icon-park/vue-next";
+import { getLunarDate } from "@/utils/getTime.js";
+import { mainStore } from "@/store";
+const store = mainStore();
+
+const lunarInfo = getLunarDate();
 
 const weatherMsg = ref("正在获取天气数据");
 
@@ -111,7 +121,9 @@ const getWeatherData = async () => {
   } catch (error) {
     console.error("天气信息获取失败:" + error);
     weatherMsg.value = "天气数据获取失败";
-    onError("定位失败，无法获取天气信息");
+    if (!store.showLunar) {
+      onError("定位失败，无法获取天气信息");
+    }
   }
 };
 

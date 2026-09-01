@@ -3,7 +3,16 @@
     <el-collapse class="collapse" v-model="activeName" accordion>
       <el-collapse-item title="基础设置" name="1">
         <div class="item">
-          <span class="text">是否在首页显示捷径列表</span>
+          <span class="text">使用十二小时制时间</span>
+          <el-switch
+            v-model="use12HourFormat"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">在首页显示捷径列表</span>
           <el-switch
             v-model="shortcutHome"
             inline-prompt
@@ -12,7 +21,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">完成搜索后是否清空输入框内容</span>
+          <span class="text">完成搜索后清空输入框内容</span>
           <el-switch
             v-model="clearContent"
             inline-prompt
@@ -21,7 +30,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">点击网抑音乐是否打开音乐列表</span>
+          <span class="text">点击网抑音乐打开音乐列表</span>
           <el-switch
             v-model="musicClick"
             inline-prompt
@@ -30,7 +39,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">按下快捷键后是否弹出提示消息</span>
+          <span class="text">按下快捷键后弹出提示消息</span>
           <el-switch
             v-model="messageShow"
             inline-prompt
@@ -39,7 +48,16 @@
           />
         </div>
         <div class="item">
-          <span class="text">是否在时光胶囊下显示建站日期</span>
+          <span class="text">在天气获取失败时显示农历</span>
+          <el-switch
+            v-model="showLunar"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">在时光胶囊下显示建站日期</span>
           <el-switch
             v-model="siteStartShow"
             inline-prompt
@@ -244,6 +262,15 @@
             <el-radio value="none" border>不循环</el-radio>
           </el-radio-group>
         </div>
+        <div class="item">
+          <span class="text">切换歌单</span>
+          <el-radio-group v-model="playerSwitchId" size="small" text-color="#FFFFFF">
+            <el-radio :value="0" border>默认</el-radio>
+            <el-radio :value="1" border>民谣</el-radio>
+            <el-radio :value="2" border>欧美</el-radio>
+            <!-- <el-radio value="5059661515" border>周杰伦</el-radio> -->
+          </el-radio-group>
+        </div>
       </el-collapse-item>
       <el-collapse-item title="备份与恢复" name="6">
         <div class="item">
@@ -251,11 +278,11 @@
           <el-button @click="resetSite" class="danger" size="small">重置</el-button>
         </div>
         <div class="item">
-          <span class="text">将站点配置与捷径数据进行备份</span>
+          <span class="text">将捷径数据与站点配置进行备份</span>
           <el-button @click="backupSite" class="warning" size="small">备份</el-button>
         </div>
         <div class="item">
-          <span class="text">将备份的站点配置与捷径数据进行恢复</span>
+          <span class="text">将备份好的捷径数据与站点配置进行恢复</span>
           <input
             ref="recoverRef"
             type="file"
@@ -286,6 +313,8 @@ const {
   snowflakeShow,
   siteStartShow,
   clearContent,
+  showLunar,
+  use12HourFormat,
   messageShow,
   musicClick,
   playerLrcShow,
@@ -293,6 +322,7 @@ const {
   playerAutoplay,
   playerOrder,
   playerLoop,
+  playerSwitchId,
   shortcutHome,
   live2dShow,
   modelType,
@@ -351,13 +381,17 @@ const setCustomCover = () => {
 
 // 站点重置
 const resetSite = () => {
-  ElMessageBox.confirm("重置后你的捷径数据以及自定义设置都将丢失！请提前做好备份", "站点重置", {
-    confirmButtonClass: "danger",
-    cancelButtonClass: "cancel-deletion",
-    confirmButtonText: "重置",
-    cancelButtonText: "取消",
-    type: "warning",
-  }).then(() => {
+  ElMessageBox.confirm(
+    "重置后你的捷径数据和站点配置都将丢失！请确保你已经提前做好了备份",
+    "站点重置",
+    {
+      confirmButtonClass: "danger",
+      cancelButtonClass: "cancel-deletion",
+      confirmButtonText: "重置",
+      cancelButtonText: "取消",
+      type: "warning",
+    },
+  ).then(() => {
     localStorage.clear();
     ElMessage.success("站点重置成功，即将刷新");
     setTimeout(() => {

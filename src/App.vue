@@ -165,30 +165,38 @@ onMounted(() => {
   });
 
   // 鼠标右键事件
-  document.oncontextmenu = () => {
+  document.oncontextmenu = (event) => {
     // 判断是否点击在捷径链接上
     const target = event.target;
     const isShortcutItem =
-      target.closest(".shortcut-item-wrapper") || target.closest(".shortcut-item");
+      target.closest?.(".shortcut-item-wrapper") || target.closest?.(".shortcut-item");
+
     if (isShortcutItem) {
       return true;
     }
-    monitorWidthChanges(store.innerWidth); // 窗口宽度
+
+    if (typeof monitorWidthChanges === "function") {
+      monitorWidthChanges(store.innerWidth);
+    }
+
+    // 移动端禁用右键
     if (store.innerWidth < 721) {
       ElMessage({
         message: "为了浏览体验，已禁用右键",
         grouping: true,
         duration: 2000,
       });
-    } else {
-      store.setOpenState = !store.setOpenState;
-      if (store.messageShow) {
-        ElMessage({
-          message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
-          grouping: true,
-          duration: 2000,
-        });
-      }
+      return false;
+    }
+
+    // 切换全局设置面板
+    store.setOpenState = !store.setOpenState;
+    if (store.messageShow) {
+      ElMessage({
+        message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
+        grouping: true,
+        duration: 2000,
+      });
     }
     return false;
   };
