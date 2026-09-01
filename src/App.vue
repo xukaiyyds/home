@@ -96,16 +96,17 @@ watch(
 // 初始化Live2D
 const initLive2D = async (type) => {
   // 根据 type 设置入口文件
+  const basePath = import.meta.env.MODE === "production" ? "" : ".";
   if (type === "Mao") {
-    store.modelPath = "./live2d/Mao/Mao.model3.json";
+    store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
   } else if (type === "Hiyori") {
-    store.modelPath = "./live2d/Hiyori/Hiyori.model3.json";
+    store.modelPath = `${basePath}/live2d/Hiyori/Hiyori.model3.json`;
   } else if (type === "Wanko") {
-    store.modelPath = "./live2d/Wanko/Wanko.model3.json";
+    store.modelPath = `${basePath}/live2d/Wanko/Wanko.model3.json`;
   } else if (type === "Mark") {
-    store.modelPath = "./live2d/Mark/Mark.model3.json";
+    store.modelPath = `${basePath}/live2d/Mark/Mark.model3.json`;
   } else {
-    store.modelPath = "./live2d/Mao/Mao.model3.json";
+    store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
   }
 
   await live2d.initializeLive2D({
