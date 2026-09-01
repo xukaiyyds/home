@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import "@/style/theme.scss";
 import "@/style/style.scss";
-import "@/style/element.scss";
+import "@/style/elplus.scss";
 import App from "@/App.vue";
 // 引入 pinia
 import { createPinia } from "pinia";
