@@ -26,6 +26,9 @@ importers:
       fetch-jsonp:
         specifier: ^1.3.0
         version: 1.3.0
+      live2d-render:
+        specifier: ^0.0.9
+        version: 0.0.9
       lunar-javascript:
         specifier: ^1.7.7
         version: 1.7.7
@@ -1748,6 +1751,12 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  live2d-render@0.0.1:
+    resolution: {integrity: sha512-85wKvO6tgm+T1nLvf8pMlKseF7SCgPzhCUCMT9Z6iCBojvmfRp6e+JFzC8gEDsXqMWJiQQMo47gQZbkUFSp79Q==}
+
+  live2d-render@0.0.9:
+    resolution: {integrity: sha512-wkUt982i7dxSw+7GygIqq0IMcMzBLMc7A/92hq/8CKdgwQmUa9h0gLXLVf9HAZDRfNkUS3Tht2VXO4haDxg6xA==}
+
   local-pkg@0.4.3:
     resolution: {integrity: sha512-SFppqq5p42fe2qcZQqqEOiVRXl+WCP1MdT6k7BDEW1j++sp5fIY+/fdRQitvKgB5BrBcmrs5m/L0v2FrU5MY1g==}
     engines: {node: '>=14'}
@@ -2374,6 +2383,9 @@ packages:
 
   webpack-virtual-modules@0.6.1:
     resolution: {integrity: sha512-poXpCylU7ExuvZK8z+On3kX+S8o/2dQ/SVYueKA0D4WEMXROXgY8Ez50/bQEUmvoSMMrWcrJqCHuhAbsiwg7Dg==}
+
+  whatwg-fetch@3.6.20:
+    resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
 
   whatwg-url@7.1.0:
     resolution: {integrity: sha512-WUu7Rg1DroM7oQvGWfOiAK21n74Gg+T4elXEQYkOhtyLeWiJFoOGLXPKI/9gzIie9CtwVLm8wtw6YJdKyxSjeg==}
@@ -4333,6 +4345,15 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  live2d-render@0.0.1: {}
+
+  live2d-render@0.0.9:
+    dependencies:
+      live2d-render: 0.0.1
+      whatwg-fetch: 3.6.20
+    optionalDependencies:
+      fsevents: 2.3.3
+
   local-pkg@0.4.3: {}
 
   locate-path@6.0.0:
@@ -4971,6 +4992,8 @@ snapshots:
   webpack-sources@3.2.3: {}
 
   webpack-virtual-modules@0.6.1: {}
+
+  whatwg-fetch@3.6.20: {}
 
   whatwg-url@7.1.0:
     dependencies:

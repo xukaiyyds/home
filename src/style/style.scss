@@ -173,3 +173,13 @@ scrollbar-thumb {
   border-radius: 10px;
   background-color: #ffffff40;
 }
+
+// live2d 模型
+#live2d {
+  z-index: 0 !important;
+  right: -40px !important;
+}
+
+.button-item {
+  display: none !important;
+}

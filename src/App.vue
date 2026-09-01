@@ -59,6 +59,7 @@ import MoreSet from "@/views/MoreSet/index.vue";
 import SearchInp from "@/views/SearchInp/index.vue";
 import cursorInit from "@/utils/cursor.js";
 import config from "@/../package.json";
+import * as live2d from "live2d-render";
 
 const store = mainStore();
 
@@ -83,6 +84,7 @@ const monitorWidthChanges = (value) => {
     store.boxOpenState = false;
     store.setOpenState = false;
     store.searchOpenState = false;
+    store.live2dShow = false;
   }
 };
 
@@ -91,9 +93,36 @@ watch(
   (value) => monitorWidthChanges(value),
 );
 
+// 初始化Live2D
+const initLive2D = async (type) => {
+  // 根据 type 设置入口文件
+  if (type === "Mao") {
+    store.modelPath = "./live2d/Mao/Mao.model3.json";
+  } else if (type === "Hiyori") {
+    store.modelPath = "./live2d/Hiyori/Hiyori.model3.json";
+  } else if (type === "Wanko") {
+    store.modelPath = "./live2d/Wanko/Wanko.model3.json";
+  } else if (type === "Mark") {
+    store.modelPath = "./live2d/Mark/Mark.model3.json";
+  } else {
+    store.modelPath = "./live2d/Mao/Mao.model3.json";
+  }
+
+  await live2d.initializeLive2D({
+    ResourcesPath: store.modelPath, // 入口文件
+    BackgroundRGBA: [0.0, 0.0, 0.0, 0.0], // 背景颜色
+    CanvasSize: { height: 250, width: 200 }, // 调整大小
+    ShowToolBox: store.live2dShow, // 是否显示模型
+    LoadFromCache: true, // 是否使用 indexDB 进行缓存优化
+  });
+};
+
 onMounted(() => {
   // 自定义鼠标
   cursorInit();
+
+  // live2d模型
+  initLive2D(store.modelType);
 
   // 全局键盘事件
   window.addEventListener("keydown", (event) => {

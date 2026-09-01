@@ -42,6 +42,9 @@ export const mainStore = defineStore("main", {
       playerOrder: "list", // 循环顺序 "list", "random"
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
+      live2dShow: true, // 是否显示live2d模型
+      modelType: "Mao", // live2d模型种类
+      modelPath: "", // live2d模型路径
     };
   },
   getters: {
@@ -154,6 +157,9 @@ export const mainStore = defineStore("main", {
       "playerAutoplay",
       "playerLoop",
       "playerOrder",
+      "live2dShow",
+      "modelType",
+      "modelPath",
     ],
   },
 });

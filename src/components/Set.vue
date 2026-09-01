@@ -179,7 +179,25 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="4">
         <div class="item">
-          <span class="text">底栏歌词显示</span>
+          <span class="text">显示动画模型</span>
+          <el-switch
+            v-model="live2dShow"
+            @change="handleLive2dChange"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <el-radio-group v-show="live2dShow" v-model="modelType" size="small" text-color="#FFFFFF">
+            <el-radio @change="handleLive2dChange" value="Mao" border>Mao</el-radio>
+            <el-radio @change="handleLive2dChange" value="Hiyori" border>Hiyori</el-radio>
+            <el-radio @change="handleLive2dChange" value="Mark" border>Mark</el-radio>
+            <el-radio @change="handleLive2dChange" value="Wanko" border>Wanko</el-radio>
+          </el-radio-group>
+        </div>
+        <div class="item">
+          <span class="text">显示底栏歌词</span>
           <el-switch
             v-model="playerLrcShow"
             inline-prompt
@@ -276,6 +294,8 @@ const {
   playerOrder,
   playerLoop,
   shortcutHome,
+  live2dShow,
+  modelType,
 } = storeToRefs(store);
 
 // 默认选中项
@@ -413,6 +433,11 @@ const recoverSite = async (event) => {
     console.error("站点数据恢复失败：", error);
     ElMessage.error("站点数据恢复失败，请重试");
   }
+};
+
+// 操作模型提示
+const handleLive2dChange = (val) => {
+  ElMessage.success("操作成功，刷新后生效");
 };
 
 onMounted(() => {
