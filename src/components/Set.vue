@@ -263,7 +263,7 @@
           </el-radio-group>
         </div>
         <div class="item">
-          <span class="text">歌单切换</span>
+          <span class="text">切换歌单</span>
           <el-radio-group v-model="playerSwitchId" size="small" text-color="#FFFFFF">
             <el-radio :value="0" border>默认</el-radio>
             <el-radio :value="1" border>民谣</el-radio>
@@ -271,6 +271,10 @@
             <el-radio :value="3" border>欧美</el-radio>
           </el-radio-group>
         </div>
+        <!-- <div class="item">
+          <span class="text">自定义歌单</span>
+          <el-button @click="" size="small">自定义</el-button>
+        </div> -->
       </el-collapse-item>
       <el-collapse-item title="备份与恢复" name="6">
         <div class="item">
