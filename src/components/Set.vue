@@ -263,12 +263,12 @@
           </el-radio-group>
         </div>
         <div class="item">
-          <span class="text">切换歌单</span>
+          <span class="text">歌单切换</span>
           <el-radio-group v-model="playerSwitchId" size="small" text-color="#FFFFFF">
             <el-radio :value="0" border>默认</el-radio>
             <el-radio :value="1" border>民谣</el-radio>
-            <el-radio :value="2" border>欧美</el-radio>
-            <!-- <el-radio value="5059661515" border>周杰伦</el-radio> -->
+            <el-radio :value="2" border>摇滚</el-radio>
+            <el-radio :value="3" border>欧美</el-radio>
           </el-radio-group>
         </div>
       </el-collapse-item>

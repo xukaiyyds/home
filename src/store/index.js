@@ -42,7 +42,7 @@ export const mainStore = defineStore("main", {
       playerAutoplay: false, // 是否自动播放
       playerLoop: "all", // 循环播放 "all", "one", "none"
       playerOrder: "list", // 循环顺序 "list", "random"
-      playerSwitchId: "", // 切换歌单
+      playerSwitchId: 0, // 切换歌单
       playerTypeId: "", // 歌单ID
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据

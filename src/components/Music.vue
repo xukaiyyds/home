@@ -156,6 +156,7 @@ onMounted(() => {
       if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
         return;
       }
+      e.preventDefault();
       changePlayState();
     }
   });
