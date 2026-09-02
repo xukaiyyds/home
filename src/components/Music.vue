@@ -119,6 +119,21 @@ const changeMusicIndex = (type) => {
 };
 
 onMounted(() => {
+  // 监听用户首次交互
+  const handleFirstInteraction = () => {
+    if (store.playerAutoplay) {
+      // 如果播放器未播放，则尝试播放
+      if (!store.playerState && playerRef.value) {
+        playerRef.value.playToggle();
+      }
+    }
+    // 移除监听，只触发一次
+    document.removeEventListener("click", handleFirstInteraction);
+    document.removeEventListener("keydown", handleFirstInteraction);
+  };
+  document.addEventListener("click", handleFirstInteraction);
+  document.addEventListener("keydown", handleFirstInteraction);
+
   // Alt+M键事件
   window.addEventListener("keydown", (event) => {
     if (event.altKey && event.key.toLowerCase() === "m") {
