@@ -56,7 +56,7 @@
                   />
                 </template>
                 <el-option-group
-                  v-for="group in searchEngineList"
+                  v-for="group in computedEngineList"
                   :key="group.label"
                   :label="group.label"
                 >
@@ -77,6 +77,15 @@
                     <span class="option-text">{{ engine.name }}</span>
                   </el-option>
                 </el-option-group>
+                <!-- 自定义搜索引擎按钮 -->
+                <template #footer>
+                  <div class="custom-footer" @click.stop="openCustomDialog">
+                    <span class="custom-icon">
+                      <SettingConfig theme="outline" size="16" fill="#909399" />
+                    </span>
+                    <span class="custom-text">自定义配置</span>
+                  </div>
+                </template>
               </el-select>
             </template>
             <template #append>
@@ -95,6 +104,37 @@
         </div>
       </el-card>
     </div>
+    <!-- 自定义搜索引擎对话框 -->
+    <el-dialog
+      v-model="customDialogVisible"
+      title="自定义搜索引擎"
+      width="500px"
+      align-center
+      destroy-on-close
+    >
+      <el-form>
+        <el-form-item label="搜索名称">
+          <el-input
+            v-model="customEngineNameInput"
+            placeholder="例如：豆瓣"
+            maxlength="10"
+            show-word-limit
+            clearable
+          />
+        </el-form-item>
+        <el-form-item label="搜索地址">
+          <el-input
+            v-model="customEngineUrlInput"
+            placeholder="例如：https://www.douban.com/search?q="
+            clearable
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button type="info" @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="confirmCustomEngine">添加</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -104,6 +144,7 @@ import {
   Search,
   Seo,
   Find,
+  SettingConfig,
   World,
   Robot,
   Translate,
@@ -119,7 +160,7 @@ import {
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";
 import ShortCut from "@/components/ShortCut.vue";
-import searchEngineList from "@/assets/searchEngineList.json";
+import searchEngineListRaw from "@/assets/searchEngineList.json";
 import identifyInput from "@/utils/identifyInput";
 
 const store = mainStore();
@@ -127,12 +168,13 @@ const closeShow = ref(false);
 const keyword = ref("");
 const selectRef = ref(null);
 const searchInput = ref(null);
-const { searchEngine } = storeToRefs(store);
+const { searchEngine, customEngineUrl, customEngineName } = storeToRefs(store);
 
 const iconMap = {
   Search,
   Seo,
   Find,
+  SettingConfig,
   World,
   Robot,
   Translate,
@@ -150,6 +192,68 @@ const iconMap = {
 const groupIconMap = {
   搜索: Find,
   翻译: Translate,
+  自定义: SettingConfig,
+};
+
+// 自定义引擎对话框
+const customDialogVisible = ref(false);
+const customEngineUrlInput = ref("");
+const customEngineNameInput = ref("");
+
+// 动态构建引擎列表
+const computedEngineList = computed(() => {
+  const list = JSON.parse(JSON.stringify(searchEngineListRaw));
+  // 如果存在自定义引擎 URL，添加自定义分组
+  if (customEngineUrl.value && customEngineUrl.value.trim() !== "") {
+    list.push({
+      label: "自定义",
+      options: [
+        {
+          key: "custom",
+          name: customEngineName.value || "自定义",
+          icon: "Search", // 自定义图标
+          searchUrl: customEngineUrl.value,
+        },
+      ],
+    });
+  }
+  return list;
+});
+
+// 展平所有引擎（用于查找）
+const allEngines = computed(() => computedEngineList.value.flatMap((g) => g.options));
+
+// 当前选中的引擎对象（处理自定义）
+const currentEngine = computed(() => {
+  if (searchEngine.value === "custom") {
+    // 自定义引擎
+    if (customEngineUrl.value) {
+      return {
+        key: "custom",
+        name: customEngineName.value || "自定义",
+        icon: "Search",
+        searchUrl: customEngineUrl.value,
+      };
+    } else {
+      // 如果自定义 URL 为空，回退到第一个
+      return allEngines.value.find((e) => e.key === "Baidu") || allEngines.value[0];
+    }
+  }
+  return allEngines.value.find((e) => e.key === searchEngine.value) || allEngines.value[0];
+});
+
+// 当前分组图标
+const currentGroupIcon = computed(() => {
+  const groupLabel = getGroupLabelByEngineKey(searchEngine.value);
+  return groupIconMap[groupLabel] || Find;
+});
+
+// 根据引擎 key 查找所属分组 label
+const getGroupLabelByEngineKey = (key) => {
+  for (const group of computedEngineList.value) {
+    if (group.options.some((e) => e.key === key)) return group.label;
+  }
+  return null;
 };
 
 // 监听搜索界面打开状态
@@ -165,40 +269,60 @@ watch(
   },
 );
 
-// 选中搜索引擎后，焦点移到输入框内
+// 选中搜索引擎后聚焦到输入框
 const handleSelectChange = (val) => {
+  // 如果选中的是自定义，但 URL 为空，弹窗让用户输入
+  if (val === "custom" && !customEngineUrl.value) {
+    // 打开对话框，让用户输入
+    openCustomDialog();
+    // 重置回之前的值
+    store.searchEngine = "Baidu";
+    ElMessage.info("请先设置自定义搜索引擎");
+    return;
+  }
   nextTick(() => {
     searchInput.value?.focus();
   });
 };
 
-// 展平所有引擎
-const allEngines = computed(() => searchEngineList.flatMap((group) => group.options));
-
-// 当前选中的引擎对象
-const currentEngine = computed(() => {
-  return (
-    allEngines.value.find((engine) => engine.key === searchEngine.value) || allEngines.value[0]
-  );
-});
-
-// 根据引擎 key 查找所属分组 label
-const getGroupLabelByEngineKey = (key) => {
-  for (const group of searchEngineList) {
-    if (group.options.some((engine) => engine.key === key)) {
-      return group.label;
-    }
-  }
-  return null;
+// 取消后聚焦到搜索输入框，避免焦点残留
+const handleCancel = () => {
+  customDialogVisible.value = false;
+  nextTick(() => {
+    searchInput.value?.focus();
+  });
 };
 
-// 当前分组对应的图标
-const currentGroupIcon = computed(() => {
-  const groupLabel = getGroupLabelByEngineKey(searchEngine.value);
-  return groupIconMap[groupLabel] || Find; // 默认显示
-});
+// 打开自定义对话框
+const openCustomDialog = () => {
+  customEngineUrlInput.value = customEngineUrl.value || "";
+  customEngineNameInput.value = customEngineName.value || "";
+  customDialogVisible.value = true;
+};
 
-// 执行搜索
+// 确认添加自定义引擎
+const confirmCustomEngine = () => {
+  const url = customEngineUrlInput.value.trim();
+  const name = customEngineNameInput.value.trim() || "自定义";
+  if (!url) {
+    ElMessage.error("请输入搜索链接");
+    return;
+  }
+  // 简单验证 URL 格式（至少包含 http 或 https）
+  if (!/^https?:\/\//i.test(url)) {
+    ElMessage.error("请输入以 http:// 或 https:// 开头的完整 URL");
+    return;
+  }
+  // 保存到 store（会自动切换 searchEngine = 'custom'）
+  store.setCustomEngine(url, name);
+  customDialogVisible.value = false;
+  ElMessage.success(`已添加自定义搜索引擎：${name}`);
+  nextTick(() => {
+    searchInput.value?.focus();
+  });
+};
+
+// 执行搜索（修改 URL 拼接逻辑，支持 {keyword}）
 const handleSearch = () => {
   const text = keyword.value.trim();
   if (!text) {
@@ -213,19 +337,20 @@ const handleSearch = () => {
   let url = "";
   const inputType = identifyInput(text);
   if (inputType === "url") {
-    // 直接访问网址
     url = text.startsWith("http") ? text : `https://${text}`;
   } else if (inputType === "email") {
-    // 发送邮件
     url = `mailto:${text}`;
   } else {
-    // 使用搜索引擎
-    url = currentEngine.value.searchUrl + encodeURIComponent(text);
+    const searchUrl = currentEngine.value.searchUrl;
+    // 如果包含 {keyword} 则替换，否则直接拼接
+    if (searchUrl.includes("{keyword}")) {
+      url = searchUrl.replace(/\{keyword\}/g, encodeURIComponent(text));
+    } else {
+      url = searchUrl + encodeURIComponent(text);
+    }
   }
 
-  // 在新窗口打开
   window.open(url, "_blank");
-  // 清空输入框
   if (store.clearContent) {
     keyword.value = "";
   }
@@ -302,6 +427,27 @@ const handleSearch = () => {
           align-items: center;
           margin-left: 4px;
           color: #909399;
+        }
+
+        .custom-footer {
+          padding: 6px 10px;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          transition: background 0.2s;
+          .custom-icon {
+            vertical-align: middle;
+          }
+          .custom-text {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+            color: #909399;
+          }
+          &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            .custom-text {
+              color: #fff;
+            }
+          }
         }
       }
 

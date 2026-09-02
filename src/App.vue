@@ -132,10 +132,10 @@ const initLive2D = async (type) => {
     store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
   } else if (type === "Hiyori") {
     store.modelPath = `${basePath}/live2d/Hiyori/Hiyori.model3.json`;
-  } else if (type === "Wanko") {
-    store.modelPath = `${basePath}/live2d/Wanko/Wanko.model3.json`;
   } else if (type === "Mark") {
     store.modelPath = `${basePath}/live2d/Mark/Mark.model3.json`;
+  } else if (type === "Wanko") {
+    store.modelPath = `${basePath}/live2d/Wanko/Wanko.model3.json`;
   } else {
     store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
   }

@@ -19,6 +19,8 @@ export const mainStore = defineStore("main", {
       snowflakeShow: false, // 雪花特效显示
       siteStartShow: false, // 建站日期显示
       searchEngine: "Baidu", // 搜索引擎
+      customEngineUrl: "", // 自定义搜索引擎 URL
+      customEngineName: "", // 自定义引擎名称
       clearContent: true, // 清空输入框
       showLunar: false, // 显示农历
       use12HourFormat: false, // 12小时制
@@ -116,6 +118,12 @@ export const mainStore = defineStore("main", {
         this.searchEngine = engineKey;
       }
     },
+    // 更改自定义搜索引擎
+    setCustomEngine(url, name = "自定义") {
+      this.customEngineUrl = url;
+      this.customEngineName = name;
+      this.searchEngine = "custom";
+    },
     // 更改捷径数据
     setShortcutData(value) {
       this.shortcutData = value;
@@ -178,6 +186,8 @@ export const mainStore = defineStore("main", {
       "snowflakeShow",
       "siteStartShow",
       "searchEngine",
+      "customEngineUrl",
+      "customEngineName",
       "shortcutHome",
       "shortcutData",
       "clearContent",

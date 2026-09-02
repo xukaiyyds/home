@@ -403,7 +403,7 @@ const setCustomCover = () => {
 // 站点重置
 const resetSite = () => {
   ElMessageBox.confirm(
-    "重置后你的捷径数据和站点配置都将丢失！请确保你已经提前做好了备份",
+    "重置后你的捷径数据与站点配置都将丢失！请确保你已经做好了备份",
     "站点重置",
     {
       confirmButtonClass: "danger",
