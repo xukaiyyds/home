@@ -48,7 +48,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">在天气获取失败时显示农历</span>
+          <span class="text">当天气获取失败时显示农历</span>
           <el-switch
             v-model="showLunar"
             inline-prompt
@@ -95,9 +95,11 @@
               <el-input
                 v-model="customCoverUrl"
                 @keyup.enter="setCustomCover"
+                class="bg-input"
                 size="small"
                 autocomplete="off"
-                placeholder="如：https://plog.xukaiyyds.cn/img/wallpaper/动漫/01.jpg"
+                placeholder="例如：https://plog.xukaiyyds.cn/img/wallpaper/动漫/01.jpg"
+                clearable
               />
             </el-form-item>
             <el-form-item label="壁纸网站">
@@ -267,14 +269,18 @@
           <el-radio-group v-model="playerSwitchId" size="small" text-color="#FFFFFF">
             <el-radio :value="0" border>默认</el-radio>
             <el-radio :value="1" border>民谣</el-radio>
-            <el-radio :value="2" border>摇滚</el-radio>
-            <el-radio :value="3" border>欧美</el-radio>
+            <el-radio :value="2" border>欧美</el-radio>
+            <el-radio :value="3" border>自定义</el-radio>
           </el-radio-group>
+          <el-input
+            v-model="store.playCustomSong"
+            v-show="playerSwitchId === 3"
+            size="small"
+            placeholder="复制网易云音乐歌单链接?id=后面的数字，例如：5059633707"
+            class="song-input"
+            clearable
+          />
         </div>
-        <!-- <div class="item">
-          <span class="text">自定义歌单</span>
-          <el-button @click="" size="small">自定义</el-button>
-        </div> -->
       </el-collapse-item>
       <el-collapse-item title="备份与恢复" name="6">
         <div class="item">
@@ -536,9 +542,14 @@ onMounted(() => {
         border: none;
       }
 
-      .el-input__wrapper {
+      .bg-input {
         --el-input-bg-color: var(--main-input-background-color);
         --el-input-focus-border-color: #67c23a;
+      }
+
+      .song-input {
+        margin-top: 4px;
+        --el-input-focus-border-color: #eeeeee;
       }
 
       .el-collapse-item__content {

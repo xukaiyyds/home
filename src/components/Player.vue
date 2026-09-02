@@ -48,9 +48,8 @@ const listHeight = computed(() => props.listMaxHeight + "px");
 const songIdMap = {
   0: import.meta.env.VITE_SONG_ID,
   1: "5059661515",
-  2: "5059633707",
-  3: "2829816518",
-  4: "",
+  2: "2829816518",
+  3: store.playCustomSong,
 };
 
 const effectiveSongId = computed(() => {

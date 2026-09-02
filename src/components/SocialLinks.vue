@@ -79,7 +79,6 @@ const socialTip = ref("通过这里联系我吧");
     &:hover {
       background-color: var(--main-cards-background-color);
       backdrop-filter: blur(10px);
-      box-shadow: var(--main-box-shadow);
       .tip {
         display: block;
       }

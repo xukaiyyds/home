@@ -44,6 +44,7 @@ export const mainStore = defineStore("main", {
       playerOrder: "list", // 循环顺序 "list", "random"
       playerSwitchId: 0, // 切换歌单
       playerTypeId: "", // 歌单ID
+      playCustomSong: "", // 自定义歌单
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
       live2dShow: true, // 是否显示live2d模型
@@ -165,6 +166,7 @@ export const mainStore = defineStore("main", {
       "playerOrder",
       "playerSwitchId",
       "playerTypeId",
+      "playCustomSong",
       "live2dShow",
       "modelType",
       "modelPath",
