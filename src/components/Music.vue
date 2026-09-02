@@ -172,11 +172,12 @@ onMounted(() => {
 
 // 监听音量变化
 watch(
-  () => musicListShow,
-  (value) => {
-    store.musicVolume = value;
-    playerRef.value.changeVolume(store.musicVolume);
+  volumeNum,
+  (newVal) => {
+    store.musicVolume = newVal;
+    playerRef.value?.changeVolume(store.musicVolume);
   },
+  { immediate: true },
 );
 </script>
 

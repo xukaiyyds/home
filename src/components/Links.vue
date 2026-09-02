@@ -31,7 +31,9 @@
                 <component :is="siteIcon[item.icon] || siteIcon.Compass" />
               </Icon>
               <div class="item-content">
-                <span class="name text-hidden">{{ item.name }}</span>
+                <span class="name text-hidden">{{
+                  item.name === "网抑音乐" && store.musicClick ? "音乐列表" : item.name
+                }}</span>
               </div>
             </div>
           </el-col>
@@ -91,7 +93,7 @@ const siteIcon = {
 
 // 链接跳转
 const jumpLink = (data) => {
-  if (store.musicClick) {
+  if (data.name === "网抑音乐" && store.musicClick) {
     if (typeof $openList === "function") $openList();
   } else {
     window.open(data.url, "_blank");

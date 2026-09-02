@@ -211,7 +211,7 @@
           <span class="text">显示动画模型</span>
           <el-switch
             v-model="live2dShow"
-            @change="handleLive2dChange"
+            @change="refreshPrompt"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -219,10 +219,10 @@
         </div>
         <div class="item">
           <el-radio-group v-show="live2dShow" v-model="modelType" size="small" text-color="#FFFFFF">
-            <el-radio @change="handleLive2dChange" value="Mao" border>Mao</el-radio>
-            <el-radio @change="handleLive2dChange" value="Hiyori" border>Hiyori</el-radio>
-            <el-radio @change="handleLive2dChange" value="Mark" border>Mark</el-radio>
-            <el-radio @change="handleLive2dChange" value="Wanko" border>Wanko</el-radio>
+            <el-radio @change="refreshPrompt" value="Mao" border>Mao</el-radio>
+            <el-radio @change="refreshPrompt" value="Hiyori" border>Hiyori</el-radio>
+            <el-radio @change="refreshPrompt" value="Mark" border>Mark</el-radio>
+            <el-radio @change="refreshPrompt" value="Wanko" border>Wanko</el-radio>
           </el-radio-group>
         </div>
         <div class="item">
@@ -249,6 +249,7 @@
           <span class="text">自动播放</span>
           <el-switch
             v-model="playerAutoplay"
+            @change="refreshPrompt"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -258,6 +259,7 @@
           <span class="text">随机播放</span>
           <el-switch
             v-model="playerOrder"
+            @change="refreshPrompt"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -268,9 +270,9 @@
         <div class="item">
           <span class="text">循环模式</span>
           <el-radio-group v-model="playerLoop" size="small" text-color="#FFFFFF">
-            <el-radio value="all" border>列表</el-radio>
-            <el-radio value="one" border>单曲</el-radio>
-            <el-radio value="none" border>不循环</el-radio>
+            <el-radio @change="refreshPrompt" value="all" border>列表</el-radio>
+            <el-radio @change="refreshPrompt" value="one" border>单曲</el-radio>
+            <el-radio @change="refreshPrompt" value="none" border>不循环</el-radio>
           </el-radio-group>
         </div>
         <div class="item">
@@ -402,17 +404,13 @@ const setCustomCover = () => {
 
 // 站点重置
 const resetSite = () => {
-  ElMessageBox.confirm(
-    "重置后你的捷径数据与站点配置都将丢失！请确保你已经做好了备份",
-    "站点重置",
-    {
-      confirmButtonClass: "danger",
-      cancelButtonClass: "cancel-deletion",
-      confirmButtonText: "重置",
-      cancelButtonText: "取消",
-      type: "warning",
-    },
-  ).then(() => {
+  ElMessageBox.confirm("重置后你的捷径数据与站点配置都将丢失！请确保你已经做好了备份", "站点重置", {
+    confirmButtonClass: "danger",
+    cancelButtonClass: "cancel-deletion",
+    confirmButtonText: "重置",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
     localStorage.clear();
     ElMessage.success("站点重置成功，即将刷新");
     setTimeout(() => {
@@ -490,9 +488,13 @@ const recoverSite = async (event) => {
   }
 };
 
-// 操作模型提示
-const handleLive2dChange = (val) => {
-  ElMessage.success("操作成功，刷新后生效");
+// 刷新提示
+const refreshPrompt = () => {
+  ElMessage({
+    message: "刷新后生效",
+    grouping: true,
+    duration: 2000,
+  });
 };
 
 onMounted(() => {

@@ -63,6 +63,11 @@ const loadPlaylist = async () => {
     store.musicIsOk = true;
     playList.value = res;
     console.log("音乐加载完成", playList.value);
+    if (store.playerAutoplay) {
+      nextTick(() => {
+        player.value?.play();
+      });
+    }
   } catch (err) {
     console.error(err);
     store.musicIsOk = false;
