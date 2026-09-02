@@ -124,6 +124,12 @@ onMounted(() => {
     if (event.altKey && event.key.toLowerCase() === "m") {
       event.preventDefault();
       store.boxOpenState = false;
+      if (store.prioritizeFirst) {
+        if (store.setOpenState || store.searchOpenState) {
+          store.setOpenState = false;
+          store.searchOpenState = false;
+        }
+      }
       if (musicListShow.value) {
         closeMusicList();
         if (store.messageShow) {

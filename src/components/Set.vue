@@ -39,6 +39,15 @@
           />
         </div>
         <div class="item">
+          <span class="text">越先开启的页面层级就越高</span>
+          <el-switch
+            v-model="prioritizeFirst"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
           <span class="text">按下快捷键后弹出提示消息</span>
           <el-switch
             v-model="messageShow"
@@ -275,6 +284,7 @@
           <el-input
             v-model="store.playCustomSong"
             v-show="playerSwitchId === 3"
+            type="number"
             size="small"
             placeholder="复制网易云音乐歌单链接?id=后面的数字，例如：5059633707"
             class="song-input"
@@ -325,6 +335,7 @@ const {
   clearContent,
   showLunar,
   use12HourFormat,
+  prioritizeFirst,
   messageShow,
   musicClick,
   playerLrcShow,
@@ -550,6 +561,11 @@ onMounted(() => {
       .song-input {
         margin-top: 4px;
         --el-input-focus-border-color: #eeeeee;
+        /* 隐藏 Chrome / Safari / Edge 的步进箭头 */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+        }
       }
 
       .el-collapse-item__content {

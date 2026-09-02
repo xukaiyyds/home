@@ -13,7 +13,7 @@
     <div v-if="store.showBackgroundGray" :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
       <a
-        v-if="store.backgroundShow && [1, 2, 3].includes(store.coverType)"
+        v-if="store.backgroundShow && [0, 1, 2, 3].includes(store.coverType)"
         class="down"
         :href="store.bgUrl"
         target="_blank"
@@ -33,6 +33,7 @@ import initSnowfall from "@/utils/snow";
 const store = mainStore();
 const imgTimeout = ref(null);
 const emit = defineEmits(["loadComplete"]);
+const basePath = import.meta.env.MODE === "production" ? "" : ".";
 
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
@@ -44,7 +45,7 @@ const bgRandoms = Math.floor(Math.random() * 12 + 1)
 // 更换壁纸链接
 const changeBg = (type) => {
   if (type == 0) {
-    store.bgUrl = `/images/background${bgRandom}.jpg`;
+    store.bgUrl = `${basePath}/images/background${bgRandom}.jpg`;
   } else if (type == 1) {
     store.bgUrl = "https://api.xinyew.cn/api/bing";
   } else if (type == 2) {
@@ -87,7 +88,7 @@ const imgLoadError = () => {
       fill: "#efefef",
     }),
   });
-  store.bgUrl = `/images/background${bgRandom}.jpg`;
+  store.bgUrl = `${basePath}/images/background${bgRandom}.jpg`;
 };
 
 // 监听壁纸切换

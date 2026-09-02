@@ -50,6 +50,8 @@ export const mainStore = defineStore("main", {
       live2dShow: true, // 是否显示live2d模型
       modelType: "Mao", // live2d模型种类
       modelPath: "", // live2d模型路径
+      prioritizeFirst: false, // 页面层级
+      openTimes: {}, // 记录每个页面打开的时间戳
     };
   },
   getters: {
@@ -118,6 +120,30 @@ export const mainStore = defineStore("main", {
     setShortcutData(value) {
       this.shortcutData = value;
     },
+    /* 更改页面层级 */
+    registerPage(id) {
+      if (!this.openTimes[id]) {
+        this.openTimes[id] = Date.now();
+      }
+    },
+    unregisterPage(id) {
+      delete this.openTimes[id];
+    },
+    getZIndex(id) {
+      const time = this.openTimes[id];
+      if (time === undefined) return 0;
+      if (!this.prioritizeFirst) {
+        const fixedMap = { settings: 3, search: 2 };
+        return fixedMap[id] || 0;
+      }
+      const entries = Object.entries(this.openTimes);
+      const sorted = entries.slice().sort((a, b) => a[1] - b[1]);
+      const index = sorted.findIndex(([key]) => key === id);
+      return 1000 + index * 10 + 5;
+    },
+    togglePrioritizeFirst() {
+      this.prioritizeFirst = !this.prioritizeFirst;
+    },
     // 恢复数据
     recoverSiteData(data) {
       let isSuccess = false;
@@ -157,6 +183,7 @@ export const mainStore = defineStore("main", {
       "clearContent",
       "showLunar",
       "use12HourFormat",
+      "prioritizeFirst",
       "messageShow",
       "musicClick",
       "playerLrcShow",

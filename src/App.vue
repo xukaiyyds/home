@@ -14,6 +14,7 @@
         </section>
         <section
           class="more more-set"
+          :style="{ zIndex: settingsZIndex }"
           v-show="store.setOpenState"
           @click="store.setOpenState = false"
         >
@@ -21,6 +22,7 @@
         </section>
         <section
           class="more more-search"
+          :style="{ zIndex: searchZIndex }"
           v-show="store.searchOpenState"
           @click="store.searchOpenState = false"
         >
@@ -93,10 +95,39 @@ watch(
   (value) => monitorWidthChanges(value),
 );
 
+// 监听页面层级
+const settingsZIndex = computed(() => store.getZIndex("settings"));
+const searchZIndex = computed(() => store.getZIndex("search"));
+
+watch(
+  () => store.setOpenState,
+  (val) => {
+    if (val) {
+      store.registerPage("settings");
+    } else {
+      store.unregisterPage("settings");
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => store.searchOpenState,
+  (val) => {
+    if (val) {
+      store.registerPage("search");
+    } else {
+      store.unregisterPage("search");
+    }
+  },
+  { immediate: true },
+);
+
 // 初始化Live2D
 const initLive2D = async (type) => {
-  // 根据 type 设置入口文件
+  // 路由配置
   const basePath = import.meta.env.MODE === "production" ? "" : ".";
+  // 根据 type 设置入口文件
   if (type === "Mao") {
     store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
   } else if (type === "Hiyori") {
