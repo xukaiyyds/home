@@ -102,7 +102,7 @@ const siteName = import.meta.env.VITE_SITE_NAME;
     top: 0;
     width: 51%;
     height: 100%;
-    background: var(--main-loading-background-color);
+    background: var(--main-loading-bg-color);
     z-index: 1;
 
     &.section-left {

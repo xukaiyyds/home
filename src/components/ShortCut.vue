@@ -469,10 +469,10 @@ onBeforeUnmount(() => {
 
       .el-button {
         padding: 6px 12px;
-        background-color: var(--main-button-background-color);
+        background-color: var(--main-button-bg-color);
 
         &:hover {
-          background-color: var(--main-button-hover-background-color);
+          background-color: var(--main-button-hover-bg-color);
         }
 
         &:active {
@@ -538,13 +538,13 @@ onBeforeUnmount(() => {
         flex-direction: row;
         justify-content: center;
         border-radius: 6px;
-        background-color: var(--main-cards-background-color);
+        background-color: var(--main-cards-bg-color);
         box-shadow: var(--main-box-shadow);
         animation: fade 0.5s;
 
         &:hover {
           transform: scale(1.02);
-          background: var(--main-links-hover-background-color);
+          background: var(--main-links-hover-bg-color);
           transition: 0.3s;
         }
 
@@ -572,14 +572,14 @@ onBeforeUnmount(() => {
       margin-bottom: 20px;
       font-size: 16px;
       letter-spacing: 2px;
-      color: #cfd3dc;
+      color: #eee;
     }
 
     .el-button {
-      background-color: var(--main-button-background-color);
+      background-color: var(--main-button-bg-color);
 
       &:hover {
-        background-color: var(--main-button-hover-background-color);
+        background-color: var(--main-button-hover-bg-color);
       }
 
       &:active {
@@ -596,7 +596,7 @@ onBeforeUnmount(() => {
 .custom-context-menu {
   position: fixed;
   z-index: 999;
-  background: #ffffff60;
+  background: var(--main-panel-bg-color);
   backdrop-filter: blur(10px);
   border-radius: 8px;
   padding: 6px 0;

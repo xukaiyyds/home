@@ -303,7 +303,7 @@ onBeforeUnmount(() => {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: var(--main-more-background-color);
+      background-color: var(--main-mores-bg-color);
       backdrop-filter: blur(20px);
       animation: fade 0.5s;
     }
@@ -326,7 +326,7 @@ onBeforeUnmount(() => {
     left: calc(50% - 28px);
     width: 56px;
     height: 34px;
-    background: var(--main-cards-background-color);
+    background: var(--main-cards-bg-color);
     backdrop-filter: blur(10px);
     border-radius: 6px;
     transition: transform 0.3s;

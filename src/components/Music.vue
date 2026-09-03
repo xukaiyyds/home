@@ -311,7 +311,7 @@ watch(
       .el-slider {
         margin-right: 12px;
         --el-slider-main-bg-color: #efefef;
-        --el-slider-runway-bg-color: #ffffff40;
+        --el-slider-runway-bg-color: var(--main-cards-header-bg-color);
         --el-slider-button-size: 16px;
       }
     }
@@ -325,7 +325,7 @@ watch(
   margin: auto;
   width: 100%;
   height: 100%;
-  background-color: var(--main-more-background-color);
+  background-color: var(--main-mores-bg-color);
   backdrop-filter: blur(20px);
   z-index: 1;
 
@@ -338,7 +338,7 @@ watch(
     left: calc(50% - 320px);
     width: 640px;
     height: 600px;
-    background: #ffffff60;
+    background: var(--main-panel-bg-color);
     box-shadow: var(--main-box-shadow);
     border-radius: 6px;
     z-index: 999;

@@ -557,11 +557,12 @@ onMounted(() => {
   .collapse {
     border-radius: 8px;
     --el-collapse-content-bg-color: #ffffff10;
+    --el-collapse-content-bg-color: var(--main-cards-body-bg-color);
     border-color: transparent;
     overflow: hidden;
 
     :deep(.el-collapse-item__header) {
-      background-color: #ffffff30;
+      background-color: var(--main-cards-header-bg-color);
       color: #fff;
       font-size: 15px;
       padding-left: 18px;
@@ -605,7 +606,7 @@ onMounted(() => {
       }
 
       .bg-input {
-        --el-input-bg-color: var(--main-input-background-color);
+        --el-input-bg-color: var(--main-input-bg-color);
         --el-input-focus-border-color: #67c23a;
       }
 

@@ -39,7 +39,7 @@ const closeShow = ref(false);
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   width: 40%;
-  background: #ffffff60;
+  background: var(--main-panel-bg-color);
   border-radius: 6px;
   padding: 40px;
   box-shadow: var(--main-box-shadow);

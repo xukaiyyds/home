@@ -91,7 +91,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--main-open-music-background-color);
+    background: var(--main-open-music-bg-color);
     padding: 4px 0;
     border-radius: 8px 8px 0 0;
 

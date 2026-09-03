@@ -164,7 +164,7 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList });
 
     .aplayer-info {
       margin-left: 0;
-      background-color: #ffffff40;
+      background-color: var(--main-cards-header-bg-color);
       border-color: transparent !important;
 
       .aplayer-music {
@@ -221,9 +221,8 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList });
   }
 
   :deep(.aplayer-list) {
-    margin-top: 6px;
     height: v-bind(listHeight);
-    background-color: transparent;
+    background-color: var(--main-cards-body-bg-color);
 
     ol {
       &::-webkit-scrollbar-track {
@@ -234,12 +233,12 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList });
         border-color: transparent;
 
         &.aplayer-list-light {
-          background: #ffffff40;
+          background: var(--main-cards-header-bg-color);
           border-radius: 6px;
         }
 
         &:hover {
-          background: #ffffff26 !important;
+          background: var(--main-open-music-bg-color) !important;
           border-radius: 6px !important;
         }
 

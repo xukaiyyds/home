@@ -379,7 +379,7 @@ const handleSearch = () => {
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   width: 80%;
-  background: #ffffff60;
+  background: var(--main-panel-bg-color);
   border-radius: 6px;
   padding: 40px;
   box-shadow: var(--main-box-shadow);
@@ -469,12 +469,12 @@ const handleSearch = () => {
         --el-select-multiple-input-color: #ffffff;
 
         .el-popper__arrow::before {
-          background: var(--main-input-background-color);
+          background: var(--main-input-bg-color);
         }
       }
 
       :global(.engine-popper) {
-        background: var(--main-input-background-color);
+        background: var(--main-input-bg-color);
       }
 
       // 搜索框

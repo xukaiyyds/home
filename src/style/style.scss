@@ -15,7 +15,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--body-background-color);
+  background-color: var(--main-bg-color);
   overflow: hidden;
   font-family: "HarmonyOS_Regular", sans-serif;
 }
@@ -67,7 +67,7 @@ a:hover {
 // 卡片样式
 .cards {
   border-radius: 6px;
-  background-color: var(--main-cards-background-color);
+  background-color: var(--main-cards-bg-color);
   backdrop-filter: blur(10px);
   box-shadow: var(--main-box-shadow);
   transform: scale(1);
@@ -171,7 +171,7 @@ scrollbar {
 ::-webkit-scrollbar-thumb,
 scrollbar-thumb {
   border-radius: 10px;
-  background-color: #ffffff40;
+  background-color: var(--main-cards-header-bg-color);
 }
 
 // live2d 模型

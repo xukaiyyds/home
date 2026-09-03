@@ -135,7 +135,7 @@ const open = () => {
 
   &.blur {
     backdrop-filter: blur(10px);
-    background: var(--main-footer-background-color);
+    background: var(--main-footer-bg-color);
     font-size: 16px;
   }
 

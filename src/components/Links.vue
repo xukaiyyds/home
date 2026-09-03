@@ -169,7 +169,7 @@ const jumpLink = (data) => {
 
       &:hover {
         transform: scale(1.02);
-        background: var(--main-links-hover-background-color);
+        background: var(--main-links-hover-bg-color);
         transition: 0.3s;
       }
 
