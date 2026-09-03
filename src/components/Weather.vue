@@ -119,10 +119,10 @@ const getWeatherData = async () => {
       windpower: windPower,
     };
   } catch (error) {
-    console.error("天气信息获取失败:" + error);
-    weatherMsg.value = "天气数据获取失败";
     if (!store.showLunar) {
       onError("定位失败，无法获取天气信息");
+      weatherMsg.value = "天气数据获取失败";
+      console.error("天气信息获取失败:" + error);
     }
   }
 };

@@ -259,7 +259,6 @@
           <span class="text">随机播放</span>
           <el-switch
             v-model="playerOrder"
-            @change="refreshPrompt"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -270,9 +269,9 @@
         <div class="item">
           <span class="text">循环模式</span>
           <el-radio-group v-model="playerLoop" size="small" text-color="#FFFFFF">
-            <el-radio @change="refreshPrompt" value="all" border>列表</el-radio>
-            <el-radio @change="refreshPrompt" value="one" border>单曲</el-radio>
-            <el-radio @change="refreshPrompt" value="none" border>不循环</el-radio>
+            <el-radio value="all" border>列表</el-radio>
+            <el-radio value="one" border>单曲</el-radio>
+            <el-radio value="none" border>不循环</el-radio>
           </el-radio-group>
         </div>
         <div class="item">
@@ -284,7 +283,7 @@
             <el-radio :value="3" border>自定义</el-radio>
           </el-radio-group>
           <el-input
-            v-model="store.playCustomSong"
+            v-model="playCustomSong"
             v-show="playerSwitchId === 3"
             type="number"
             size="small"
@@ -320,7 +319,14 @@
 </template>
 
 <script setup>
-import { CheckSmall, CloseSmall, SuccessPicture, Error, Success } from "@icon-park/vue-next";
+import {
+  CheckSmall,
+  CloseSmall,
+  SuccessPicture,
+  Error,
+  Correct,
+  Success,
+} from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";
 import identifyInput from "@/utils/identifyInput";
@@ -346,6 +352,7 @@ const {
   playerOrder,
   playerLoop,
   playerSwitchId,
+  playCustomSong,
   shortcutHome,
   live2dShow,
   modelType,
@@ -412,7 +419,13 @@ const resetSite = () => {
     type: "warning",
   }).then(() => {
     localStorage.clear();
-    ElMessage.success("站点重置成功，即将刷新");
+    ElMessage({
+      message: "站点重置成功，即将刷新",
+      icon: h(Correct, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -437,10 +450,22 @@ const backupSite = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     // 备份完成
-    ElMessage.success("站点备份成功");
+    ElMessage({
+      message: "站点备份成功",
+      icon: h(Correct, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
   } catch (error) {
+    ElMessage({
+      message: "站点备份失败",
+      icon: h(Error, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
     console.error("站点备份失败：", error);
-    ElMessage.error("站点备份失败");
   }
 };
 
@@ -450,7 +475,13 @@ const recoverSite = async (event) => {
   try {
     const fileInput = event.target;
     if (!fileInput?.files.length) {
-      ElMessage.error("请选择要恢复的备份文件");
+      ElMessage({
+        message: "请选择要恢复的备份文件",
+        icon: h(Error, {
+          theme: "filled",
+          fill: "#efefef",
+        }),
+      });
       return false;
     }
     const file = fileInput.files[0];
@@ -471,20 +502,38 @@ const recoverSite = async (event) => {
       .then(() => {
         const isSuccess = store.recoverSiteData(data);
         if (isSuccess) {
-          ElMessage.success("站点恢复成功，即将刷新");
+          ElMessage({
+            message: "站点恢复成功，即将刷新",
+            icon: h(Correct, {
+              theme: "filled",
+              fill: "#efefef",
+            }),
+          });
           setTimeout(() => {
             window.location.reload();
           }, 1000);
         } else {
-          ElMessage.error("站点数据恢复失败，请重试");
+          ElMessage({
+            message: "站点数据恢复失败，请重试",
+            icon: h(Error, {
+              theme: "filled",
+              fill: "#efefef",
+            }),
+          });
         }
       })
       .catch(() => {
         recoverRef.value.value = null;
       });
   } catch (error) {
+    ElMessage({
+      message: "站点数据恢复失败，请重试",
+      icon: h(Error, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
     console.error("站点数据恢复失败：", error);
-    ElMessage.error("站点数据恢复失败，请重试");
   }
 };
 

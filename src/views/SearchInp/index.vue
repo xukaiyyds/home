@@ -113,7 +113,7 @@
       destroy-on-close
     >
       <el-form>
-        <el-form-item label="搜索名称">
+        <el-form-item label="搜索引擎名称">
           <el-input
             v-model="customEngineNameInput"
             placeholder="例如：豆瓣"
@@ -122,7 +122,7 @@
             clearable
           />
         </el-form-item>
-        <el-form-item label="搜索地址">
+        <el-form-item label="搜索引擎地址">
           <el-input
             v-model="customEngineUrlInput"
             placeholder="例如：https://www.douban.com/search?q="
@@ -141,6 +141,8 @@
 <script setup>
 import {
   CloseOne,
+  Error,
+  Correct,
   Search,
   Seo,
   Find,
@@ -271,15 +273,6 @@ watch(
 
 // 选中搜索引擎后聚焦到输入框
 const handleSelectChange = (val) => {
-  // 如果选中的是自定义，但 URL 为空，弹窗让用户输入
-  if (val === "custom" && !customEngineUrl.value) {
-    // 打开对话框，让用户输入
-    openCustomDialog();
-    // 重置回之前的值
-    store.searchEngine = "Baidu";
-    ElMessage.info("请先设置自定义搜索引擎");
-    return;
-  }
   nextTick(() => {
     searchInput.value?.focus();
   });
@@ -304,19 +297,40 @@ const openCustomDialog = () => {
 const confirmCustomEngine = () => {
   const url = customEngineUrlInput.value.trim();
   const name = customEngineNameInput.value.trim() || "自定义";
+  // 简单验证
   if (!url) {
-    ElMessage.error("请输入搜索链接");
+    ElMessage({
+      message: "请输入搜索引擎地址",
+      icon: h(Error, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
     return;
   }
-  // 简单验证 URL 格式（至少包含 http 或 https）
   if (!/^https?:\/\//i.test(url)) {
-    ElMessage.error("请输入以 http:// 或 https:// 开头的完整 URL");
+    ElMessage({
+      message: "请输入以 http:// 或 https:// 开头的完整 URL",
+      icon: h(Error, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
     return;
   }
+  if (url !== store.customEngineUrl || name !== store.customEngineName) {
+    ElMessage({
+      message: `已添加搜索引擎：${name}`,
+      icon: h(Correct, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
+    });
+  }
+
   // 保存到 store（会自动切换 searchEngine = 'custom'）
   store.setCustomEngine(url, name);
   customDialogVisible.value = false;
-  ElMessage.success(`已添加自定义搜索引擎：${name}`);
   nextTick(() => {
     searchInput.value?.focus();
   });

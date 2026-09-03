@@ -135,14 +135,14 @@
         <el-form-item label="捷径名称" prop="name">
           <el-input
             v-model="formData.name"
-            placeholder="请输入捷径名称"
+            placeholder="例如：百度"
             maxlength="10"
             show-word-limit
             clearable
           />
         </el-form-item>
         <el-form-item label="站点链接" prop="url">
-          <el-input v-model="formData.url" placeholder="请输入站点链接" clearable />
+          <el-input v-model="formData.url" placeholder="例如：https://www.baidu.com" clearable />
         </el-form-item>
       </el-form>
       <template #footer>

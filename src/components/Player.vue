@@ -74,6 +74,26 @@ const loadPlaylist = async () => {
   }
 };
 
+// 监听随机播放
+watch(
+  () => store.playerOrder,
+  (newOrder) => {
+    if (!player.value) return;
+    player.value.aplayer.order = newOrder;
+  },
+);
+
+// 监听循环模式
+watch(
+  () => store.playerLoop,
+  (newLoop) => {
+    if (!player.value) return;
+    if (player.value) {
+      player.value.aplayer.loop = newLoop;
+    }
+  },
+);
+
 watch(() => store.playerSwitchId, loadPlaylist);
 
 onMounted(() => {
