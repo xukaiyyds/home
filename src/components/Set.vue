@@ -562,10 +562,11 @@ onMounted(() => {
     overflow: hidden;
 
     :deep(.el-collapse-item__header) {
-      background-color: var(--main-cards-header-bg-color);
-      color: #fff;
-      font-size: 15px;
       padding-left: 18px;
+      font-size: 15px;
+      color: #fff;
+      text-shadow: 0px 0px 4px #00000033;
+      background-color: var(--main-cards-header-bg-color);
       border-color: transparent;
     }
 
@@ -577,9 +578,9 @@ onMounted(() => {
 
         .el-button {
           margin: 10px 0;
-          background: #ffffff26;
+          background: var(--main-open-music-bg-color);
           border-radius: 8px;
-          border: none;
+          border-color: transparent;
         }
       }
 
@@ -594,19 +595,19 @@ onMounted(() => {
       }
 
       .el-slider {
+        --el-slider-runway-bg-color: var(--main-cards-header-bg-color);
         flex-basis: 70%;
       }
 
       .el-slider__bar {
-        background-color: #ffffff30;
+        background-color: #efefef;
       }
 
       .el-slider__button {
-        border: none;
+        border-color: transparent;
       }
 
       .bg-input {
-        --el-input-bg-color: var(--main-input-bg-color);
         --el-input-focus-border-color: #67c23a;
       }
 
@@ -632,7 +633,7 @@ onMounted(() => {
 
           .el-switch__core {
             border-color: transparent;
-            background-color: #ffffff30;
+            background-color: var(--main-cards-bg-color);
           }
 
           .el-radio-group {
@@ -648,7 +649,7 @@ onMounted(() => {
 
           .el-button {
             margin: 4px 0;
-            background-color: #ffffff26;
+            background-color: var(--main-open-music-bg-color);
           }
           .danger {
             &:hover {
@@ -681,7 +682,7 @@ onMounted(() => {
 
           .el-radio {
             margin: 10px 16px;
-            background: #ffffff26;
+            background: var(--main-open-music-bg-color);
             border: 2px solid transparent;
             border-radius: 8px;
 

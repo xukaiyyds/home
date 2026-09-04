@@ -243,7 +243,7 @@ onBeforeUnmount(() => {
     display: block;
     padding: 20px 26px;
     border-radius: 8px;
-    background-color: var(--main-button-bg-color);
+    background-color: var(--main-cards-bg-color);
     width: 120px;
     height: 30px;
     display: flex;

@@ -437,7 +437,6 @@ onBeforeUnmount(() => {
     .title {
       margin-left: 8px;
       font-size: 1rem;
-      text-shadow: 0 0 5px #00000025;
       flex: 1;
     }
 
@@ -469,7 +468,7 @@ onBeforeUnmount(() => {
 
       .el-button {
         padding: 6px 12px;
-        background-color: var(--main-button-bg-color);
+        background-color: var(--main-cards-bg-color);
 
         &:hover {
           background-color: var(--main-button-hover-bg-color);
@@ -576,7 +575,7 @@ onBeforeUnmount(() => {
     }
 
     .el-button {
-      background-color: var(--main-button-bg-color);
+      background-color: var(--main-cards-bg-color);
 
       &:hover {
         background-color: var(--main-button-hover-bg-color);

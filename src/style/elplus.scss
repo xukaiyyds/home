@@ -18,7 +18,7 @@
 // 输入框样式
 .el-input {
   --el-input-bg-color: var(--main-cards-bg-color) !important;
-  --el-input-text-color: #ffffff !important;
+  --el-input-text-color: #efefef !important;
 
   .el-input-group__prepend,
   .el-input-group__append {
@@ -63,30 +63,29 @@
 .el-message-box {
   background: var(--main-panel-bg-color) !important;
   backdrop-filter: blur(10px) !important;
+  .el-button {
+    border-color: transparent !important;
+  }
   .cancel-deletion {
     background-color: #909399 !important;
-    border: none !important;
     &:hover {
       background-color: rgb(166, 169, 173) !important;
     }
   }
   .success {
     background-color: #67c23a !important;
-    border: none !important;
     &:hover {
       background-color: rgb(133, 206, 97) !important;
     }
   }
   .warning {
     background-color: #e6a23c !important;
-    border: none !important;
     &:hover {
       background-color: rgb(235, 181, 99) !important;
     }
   }
   .danger {
     background-color: #f56c6c !important;
-    border: none !important;
     &:hover {
       background-color: rgb(247, 137, 137) !important;
     }

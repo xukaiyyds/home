@@ -469,17 +469,19 @@ const handleSearch = () => {
         --el-select-multiple-input-color: #ffffff;
 
         .el-popper__arrow::before {
-          background: var(--main-input-bg-color);
+          background: var(--main-select-bg-color);
         }
       }
 
       :global(.engine-popper) {
-        background: var(--main-input-bg-color);
+        background: var(--main-select-bg-color);
       }
 
       // 搜索框
       .input-search {
-        --el-input-placeholder-color: rgba(255, 255, 255, 0.4);
+        --el-input-border-color: #ffffff;
+        --el-input-placeholder-color: #efefef;
+        --el-input-hover-border-color: #dcdfe6;
         --el-input-focus-border-color: #eeeeee;
       }
 

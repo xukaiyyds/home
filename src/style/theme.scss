@@ -3,33 +3,31 @@
   --main-cards-bg-color: #00000050;
   --main-cards-header-bg-color: #00000060;
   --main-cards-body-bg-color: #00000040;
-  --main-panel-bg-color: #00000090;
+  --main-panel-bg-color: #00000080;
   --main-links-hover-bg-color: rgb(0 0 0 / 50%);
-  --main-mores-bg-color: #00000030;
+  --main-button-hover-bg-color: rgb(255 255 255 / 5%);
+  --main-mores-bg-color: rgb(0 0 0 / 15%);
   --main-footer-bg-color: rgb(0 0 0 / 25%);
-  --main-open-music-bg-color: #00000026;
-  --main-button-bg-color: #00000070;
-  --main-button-hover-bg-color: #00000080;
-  --main-input-bg-color: #262727;
+  --main-open-music-bg-color: #00000036;
+  --main-select-bg-color: #262727;
   --main-loading-bg-color: #333333;
-  --main-box-shadow: 0px 0px 4px 0px #00000040;
+  --main-box-shadow: 0px 0px 5px 0px #ffffff50;
 }
 
 [theme="light"] {
   --main-bg-color: #cfd3dc;
   --main-cards-bg-color: #ffffff30;
   --main-cards-header-bg-color: #ffffff40;
-  --main-cards-body-bg-color: #ffffff10;
+  --main-cards-body-bg-color: #ffffff20;
   --main-panel-bg-color: #ffffff60;
   --main-links-hover-bg-color: rgb(255 255 255 / 40%);
-  --main-mores-bg-color: #00000030;
+  --main-button-hover-bg-color: rgb(255 255 255 / 50%);
+  --main-mores-bg-color: rgb(0 0 0 / 5%);
   --main-footer-bg-color: rgb(255 255 255 / 15%);
   --main-open-music-bg-color: #ffffff26;
-  --main-button-bg-color: #ffffff70;
-  --main-button-hover-bg-color: #ffffff80;
-  --main-input-bg-color: #e5eaf3;
+  --main-select-bg-color: #e5eaf3;
   --main-loading-bg-color: #666666;
-  --main-box-shadow: 0px 0px 4px 0px #ffffff30;
+  --main-box-shadow: 0px 0px 5px 0px #00000020;
 }
 
 [theme="light"] #universeCanvas,

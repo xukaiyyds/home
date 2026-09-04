@@ -213,7 +213,7 @@ watch(
     margin-bottom: 6px;
 
     span {
-      background: #ffffff26;
+      background: var(--main-open-music-bg-color);
       padding: 2px 8px;
       border-radius: 6px;
       margin: 0px 6px;

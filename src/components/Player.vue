@@ -222,6 +222,7 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList });
 
   :deep(.aplayer-list) {
     height: v-bind(listHeight);
+    border-top: 0;
     background-color: var(--main-cards-body-bg-color);
 
     ol {
