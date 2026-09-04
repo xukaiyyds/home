@@ -28,7 +28,9 @@
 import { mainStore } from "@/store";
 import { Error } from "@icon-park/vue-next";
 import initUniverse from "@/utils/dark";
+import initFirefly from "@/utils/firefly";
 import initSnowfall from "@/utils/snow";
+import initBubble from "@/utils/bubbles";
 
 const store = mainStore();
 const imgTimeout = ref(null);
@@ -98,37 +100,91 @@ watch(
   },
 );
 
-// 星空特效&雪花特效
+// 特效管理
 const cleanup = ref({
-  universe: null, // 清理函数
+  universe: null,
+  firefly: null,
   snowfall: null,
+  bubble: null,
 });
 
 const toggleEffect = (type, show) => {
-  // 销毁旧特效
   if (cleanup.value[type]) {
     cleanup.value[type]();
     cleanup.value[type] = null;
   }
-
-  // 创建新特效
   if (show) {
-    const initFn = type === "snowfall" ? initSnowfall : initUniverse;
-    cleanup.value[type] = initFn();
+    let initFn = null;
+    if (type === "snowfall") initFn = initSnowfall;
+    else if (type === "universe") initFn = initUniverse;
+    else if (type === "firefly") initFn = initFirefly;
+    else if (type === "bubble") initFn = initBubble;
+    if (initFn) {
+      cleanup.value[type] = initFn();
+    }
   }
 };
 
-// 监听 store 状态变化
-watch(
-  () => store.darkstarShow,
-  (val) => toggleEffect("universe", val),
-);
+// 根据当前粒子类型切换特效
+const switchParticle = (type) => {
+  // 先关闭所有特效
+  Object.keys(cleanup.value).forEach((key) => {
+    if (cleanup.value[key]) {
+      cleanup.value[key]();
+      cleanup.value[key] = null;
+    }
+  });
+  // 再开启选中的
+  if (type) {
+    const typeMap = {
+      star: "universe",
+      snow: "snowfall",
+      firefly: "firefly",
+      bubble: "bubble",
+    };
+    const effectType = typeMap[type];
+    if (effectType) {
+      let initFn = null;
+      if (effectType === "snowfall") initFn = initSnowfall;
+      else if (effectType === "universe") initFn = initUniverse;
+      else if (effectType === "firefly") initFn = initFirefly;
+      else if (effectType === "bubble") initFn = initBubble;
+      if (initFn) {
+        cleanup.value[effectType] = initFn();
+      }
+    }
+  }
+};
 
 watch(
-  () => store.snowflakeShow,
-  (val) => toggleEffect("snowfall", val),
+  () => store.showParticle,
+  (val) => {
+    if (!val) {
+      // 关闭所有特效
+      Object.keys(cleanup.value).forEach((key) => {
+        if (cleanup.value[key]) {
+          cleanup.value[key]();
+          cleanup.value[key] = null;
+        }
+      });
+    } else {
+      switchParticle(store.currentParticle);
+    }
+  },
+  { immediate: true },
 );
 
+// 监听粒子类型变化
+watch(
+  () => store.currentParticle,
+  (newVal) => {
+    if (store.showParticle) {
+      switchParticle(newVal);
+    }
+  },
+);
+
+// 组件销毁时清理
 onUnmounted(() => {
   Object.keys(cleanup.value).forEach((key) => {
     if (cleanup.value[key]) {
@@ -170,10 +226,6 @@ onMounted(() => {
   changeBg(store.coverType);
   // 加载主题
   changeThemeType(store.themeType);
-  // 加载星空特效
-  toggleEffect("universe", store.darkstarShow);
-  // 加载雪花特效
-  toggleEffect("snowfall", store.snowflakeShow);
 });
 
 onBeforeUnmount(() => {

@@ -15,8 +15,12 @@ export const mainStore = defineStore("main", {
       backgroundBlur: 0, // 壁纸模糊
       savedBackgroundBlur: 0, // 已保存壁纸模糊
       showBackgroundGray: true, // 壁纸遮罩显示
-      darkstarShow: false, // 星空特效显示
-      snowflakeShow: false, // 雪花特效显示
+      showParticle: false, // 显示粒子特效
+      currentParticle: 'star', // 默认星空
+      darkstar: false, // 星空特效
+      firefly: false, // 萤火虫特效
+      snowflake: false, // 雪花特效
+      bubble: false, // 气泡特效
       siteStartShow: false, // 建站日期显示
       searchEngine: "Baidu", // 搜索引擎
       customEngineUrl: "", // 自定义搜索引擎 URL
@@ -182,8 +186,12 @@ export const mainStore = defineStore("main", {
       "backgroundBlur",
       "savedBackgroundBlur",
       "showBackgroundGray",
-      "darkstarShow",
-      "snowflakeShow",
+      "showParticle",
+      "currentParticle",
+      "darkstar",
+      "firefly",
+      "snowflake",
+      "bubble",
       "siteStartShow",
       "searchEngine",
       "customEngineUrl",

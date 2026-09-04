@@ -188,22 +188,26 @@
           />
         </div>
         <div class="item">
-          <span class="text">显示星空特效</span>
+          <span class="text">显示背景特效</span>
           <el-switch
-            v-model="darkstarShow"
+            v-model="showParticle"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
           />
         </div>
         <div class="item">
-          <span class="text">显示雪花特效</span>
-          <el-switch
-            v-model="snowflakeShow"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
+          <el-radio-group
+            v-show="showParticle"
+            v-model="particleType"
+            size="small"
+            text-color="#FFFFFF"
+          >
+            <el-radio value="snow" border>雪花</el-radio>
+            <el-radio value="bubble" border>气泡</el-radio>
+            <el-radio value="star" border>星空</el-radio>
+            <el-radio value="firefly" border>萤火虫</el-radio>
+          </el-radio-group>
         </div>
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="4">
@@ -337,8 +341,11 @@ const {
   themeType,
   backgroundBlur,
   showBackgroundGray,
-  darkstarShow,
-  snowflakeShow,
+  showParticle,
+  darkstar,
+  firefly,
+  snowflake,
+  bubble,
   siteStartShow,
   clearContent,
   showLunar,
@@ -408,6 +415,38 @@ const setCustomCover = () => {
 
   dialogFormVisible.value = false;
 };
+
+// 粒子特效
+const particleType = ref("star");
+
+// 监听粒子类型变化
+watch(particleType, (newVal) => {
+  store.currentParticle = newVal;
+  // 先将所有特效关闭
+  darkstar.value = false;
+  snowflake.value = false;
+  firefly.value = false;
+  bubble.value = false;
+
+  // 再开启选中的特效
+  if (newVal === "star") darkstar.value = true;
+  else if (newVal === "snow") snowflake.value = true;
+  else if (newVal === "firefly") firefly.value = true;
+  else if (newVal === "bubble") bubble.value = true;
+});
+
+watch(darkstar, (val) => {
+  if (val) particleType.value = "star";
+});
+watch(snowflake, (val) => {
+  if (val) particleType.value = "snow";
+});
+watch(firefly, (val) => {
+  if (val) particleType.value = "firefly";
+});
+watch(bubble, (val) => {
+  if (val) particleType.value = "bubble";
+});
 
 // 站点重置
 const resetSite = () => {
@@ -547,6 +586,13 @@ const refreshPrompt = () => {
 };
 
 onMounted(() => {
+  // 根据已有状态设置单选按钮
+  if (darkstar.value) particleType.value = "star";
+  else if (snowflake.value) particleType.value = "snow";
+  else if (firefly.value) particleType.value = "firefly";
+  else if (bubble.value) particleType.value = "bubble";
+  else particleType.value = "star";
+  store.currentParticle = particleType.value;
   // 检测是否存在自定义壁纸
   if (store.backgroundCustom) customCoverUrl.value = store.backgroundCustom;
 });
