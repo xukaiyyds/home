@@ -31,6 +31,7 @@ import initUniverse from "@/utils/dark";
 import initFirefly from "@/utils/firefly";
 import initSnowfall from "@/utils/snow";
 import initBubble from "@/utils/bubbles";
+import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
 const imgTimeout = ref(null);
@@ -90,6 +91,9 @@ const imgLoadError = () => {
     }),
   });
   store.bgUrl = `/images/background${bgRandom}.jpg`;
+  if (store.webSpeech) {
+    SpeechLocal("壁纸加载失败.mp3");
+  }
 };
 
 // 监听壁纸切换

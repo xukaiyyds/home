@@ -73,7 +73,7 @@ const siteUrl = computed(() => {
 
 const open = () => {
   ElMessageBox.alert(
-    "空格\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（播放/暂停网抑音乐）<br>Tab\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭时光胶囊）<br>Alt + M\u00A0\u00A0\u00A0\u00A0（打开/关闭音乐列表）<br>Alt + S\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭全网搜索）<br>鼠标滚轮（滑动网站/捷径列表）<br>鼠标中键（开启/退出壁纸展示）<br>鼠标右键（打开/关闭全局设置）",
+    "空格\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（播放/暂停网抑音乐）<br>Tab\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭时光胶囊）<br>Alt + M\u00A0\u00A0\u00A0\u00A0（打开/关闭音乐列表）<br>Alt + S\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭全网搜索）<br>鼠标滚轮（滑动网站/捷径列表）<br>鼠标中键（启用/退出壁纸预览）<br>鼠标右键（打开/关闭全局设置）",
     "本站快捷键",
     {
       dangerouslyUseHTMLString: true,

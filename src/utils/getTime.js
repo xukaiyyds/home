@@ -1,5 +1,6 @@
 import { h } from "vue";
 import { Calendar } from "@icon-park/vue-next";
+import { SpeechLocal } from "@/utils/speech";
 import dayjs from "dayjs";
 import lunar from "lunar-calendar";
 
@@ -95,6 +96,33 @@ export const helloInit = () => {
     dangerouslyUseHTMLString: true,
     message: `<strong>${hello}</strong> 欢迎来到我的主页`,
   });
+};
+
+export const speechHelloInit = () => {
+  const hour = new Date().getHours();
+  let hellosound = null;
+  if (hour < 5) {
+    hellosound = "欢迎1.mp3";
+  } else if (hour < 7) {
+    hellosound = "欢迎2.mp3";
+  } else if (hour < 9) {
+    hellosound = "欢迎3.mp3";
+  } else if (hour < 11) {
+    hellosound = "欢迎4.mp3";
+  } else if (hour < 14) {
+    hellosound = "欢迎5.mp3";
+  } else if (hour < 17) {
+    hellosound = "欢迎6.mp3";
+  } else if (hour < 18) {
+    hellosound = "欢迎7.mp3";
+  } else if (hour < 22) {
+    hellosound = "欢迎8.mp3";
+  } else if (hour < 23) {
+    hellosound = "欢迎9.mp3";
+  } else {
+    hellosound = "欢迎10.mp3";
+  }
+  SpeechLocal(hellosound);
 };
 
 // 获取农历日期

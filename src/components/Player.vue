@@ -25,6 +25,7 @@ import { MusicOne, PlayWrong } from "@icon-park/vue-next";
 import { getPlayerList } from "@/api";
 import { mainStore } from "@/store";
 import APlayer from "@worstone/vue-aplayer";
+import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
 
@@ -71,6 +72,11 @@ const loadPlaylist = async () => {
       grouping: true,
       icon: h(PlayWrong, { theme: "filled", fill: "#efefef" }),
     });
+    setTimeout(() => {
+      if (store.webSpeech) {
+        SpeechLocal("播放器加载失败.mp3");
+      }
+    }, 15000);
   }
 };
 
@@ -143,6 +149,13 @@ const loadMusicError = () => {
     icon: h(PlayWrong, { theme: "filled", fill: "#EFEFEF" }),
     duration: 2000,
   });
+  if (store.webSpeech) {
+    if (playList.value.length > 1) {
+      SpeechLocal("歌曲加载失败.mp3");
+    } else {
+      SpeechLocal("播放器未知异常.mp3");
+    }
+  }
   console.error("播放歌曲错误: " + player.value.aplayer.audio[player.value.aplayer.index].name);
 };
 

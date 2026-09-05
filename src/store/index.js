@@ -33,7 +33,7 @@ export const mainStore = defineStore("main", {
       musicIsOk: false, // 音乐是否加载完成
       musicVolume: 0, // 音乐音量
       musicOpenState: false, // 音乐面板开启状态
-      backgroundShow: false, // 壁纸展示状态
+      backgroundShow: false, // 壁纸预览状态
       boxOpenState: false, // 盒子开启状态
       mobileOpenState: false, // 移动端开启状态
       mobileFuncState: false, // 移动端功能区开启状态
@@ -56,6 +56,7 @@ export const mainStore = defineStore("main", {
       live2dShow: true, // 是否显示live2d模型
       modelType: "Mao", // live2d模型种类
       modelPath: "", // live2d模型路径
+      webSpeech: false, // ai语音播报
       prioritizeFirst: false, // 页面层级
       openTimes: {}, // 记录每个页面打开的时间戳
     };
@@ -213,6 +214,7 @@ export const mainStore = defineStore("main", {
       "playerTypeId",
       "playCustomSong",
       "live2dShow",
+      "webSpeech",
       "modelType",
       "modelPath",
     ],

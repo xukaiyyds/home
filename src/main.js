@@ -3,6 +3,7 @@ import "@/style/theme.scss";
 import "@/style/style.scss";
 import "@/style/elplus.scss";
 import App from "@/App.vue";
+import { SpeechLocal } from "@/utils/speech";
 // 引入 pinia
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
@@ -21,4 +22,7 @@ navigator.serviceWorker.addEventListener("controllerchange", () => {
   // 弹出更新提醒
   console.log("站点已更新，刷新后生效");
   ElMessage("站点已更新，刷新后生效");
+  if (store.webSpeech) {
+    SpeechLocal("网站更新.mp3");
+  }
 });

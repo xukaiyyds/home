@@ -26,6 +26,7 @@
 import { getXiaomiWeather, getXiaomiCityByGeo } from "@/api";
 import { Error } from "@icon-park/vue-next";
 import { getLunarDate } from "@/utils/getTime.js";
+import { SpeechLocal } from "@/utils/speech";
 import { mainStore } from "@/store";
 const store = mainStore();
 
@@ -121,6 +122,11 @@ const getWeatherData = async () => {
   } catch (error) {
     if (!store.showLunar) {
       onError("定位失败，无法获取天气信息");
+      setTimeout(() => {
+        if (store.webSpeech) {
+          SpeechLocal("天气加载失败.mp3");
+        }
+      }, 7000);
       weatherMsg.value = "天气数据获取失败";
       console.error("天气信息获取失败:" + error);
     }

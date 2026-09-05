@@ -212,6 +212,15 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="4">
         <div class="item">
+          <span class="text">AI 语音交互</span>
+          <el-switch
+            v-model="webSpeech"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
           <span class="text">显示动画模型</span>
           <el-switch
             v-model="live2dShow"
@@ -333,6 +342,7 @@ import {
 } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";
+import { SpeechLocal } from "@/utils/speech";
 import identifyInput from "@/utils/identifyInput";
 
 const store = mainStore();
@@ -362,6 +372,7 @@ const {
   playCustomSong,
   shortcutHome,
   live2dShow,
+  webSpeech,
   modelType,
 } = storeToRefs(store);
 
@@ -377,6 +388,9 @@ const radioChange = () => {
       fill: "#efefef",
     }),
   });
+  if (store.webSpeech) {
+    SpeechLocal("更换壁纸成功.mp3");
+  }
 };
 
 // 自定义壁纸
@@ -409,6 +423,9 @@ const setCustomCover = () => {
         fill: "#efefef",
       }),
     });
+    if (store.webSpeech) {
+      SpeechLocal("壁纸ID设置成功.mp3");
+    }
   } else {
     store.bgUrl = store.backgroundCustom;
   }

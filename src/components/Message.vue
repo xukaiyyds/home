@@ -37,6 +37,7 @@ import { QuoteLeft, QuoteRight } from "@vicons/fa";
 import { Error } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
+import { SpeechLocal } from "@/utils/speech";
 const store = mainStore();
 
 // 主页站点logo
@@ -78,6 +79,9 @@ const changeBox = () => {
         fill: "#efefef",
       }),
     });
+    if (store.webSpeech) {
+      SpeechLocal("分辨率不足.mp3");
+    }
   }
 };
 
@@ -88,6 +92,9 @@ watch(
     if (value) {
       descriptionText.hello = import.meta.env.VITE_DESC_HELLO_OTHER;
       descriptionText.text = import.meta.env.VITE_DESC_TEXT_OTHER;
+      if (store.webSpeech) {
+        SpeechLocal("惊讶.mp3");
+      }
     } else {
       descriptionText.hello = import.meta.env.VITE_DESC_HELLO;
       descriptionText.text = import.meta.env.VITE_DESC_TEXT;

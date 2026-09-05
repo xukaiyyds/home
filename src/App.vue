@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { helloInit, checkDays } from "@/utils/getTime.js";
+import { helloInit, speechHelloInit, checkDays } from "@/utils/getTime.js";
 import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { Icon } from "@vicons/utils";
@@ -60,6 +60,7 @@ import Box from "@/views/Box/index.vue";
 import MoreSet from "@/views/MoreSet/index.vue";
 import SearchInp from "@/views/SearchInp/index.vue";
 import cursorInit from "@/utils/cursor.js";
+import { SpeechLocal } from "@/utils/speech";
 import config from "@/../package.json";
 import * as live2d from "live2d-render";
 
@@ -75,6 +76,9 @@ const loadComplete = () => {
   nextTick(() => {
     // 欢迎提示
     helloInit();
+    if (store.webSpeech) {
+      speechHelloInit();
+    }
     // 节日提醒
     checkDays();
   });
@@ -104,6 +108,9 @@ watch(
   (val) => {
     if (val) {
       store.registerPage("settings");
+      if (store.webSpeech) {
+        SpeechLocal("鼠标右键.mp3");
+      }
     } else {
       store.unregisterPage("settings");
     }
@@ -116,6 +123,9 @@ watch(
   (val) => {
     if (val) {
       store.registerPage("search");
+      if (store.webSpeech) {
+        SpeechLocal("找东西.mp3");
+      }
     } else {
       store.unregisterPage("search");
     }
@@ -239,10 +249,17 @@ onMounted(() => {
       store.backgroundShow = !store.backgroundShow;
       if (store.messageShow) {
         ElMessage({
-          message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
+          message: `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
           grouping: true,
           duration: 2000,
         });
+        if (store.webSpeech) {
+          if (store.backgroundShow) {
+            SpeechLocal("壁纸预览已启用.mp3");
+          } else {
+            SpeechLocal("壁纸预览已退出.mp3");
+          }
+        }
       }
     }
   });
