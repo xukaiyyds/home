@@ -16,7 +16,7 @@ export const mainStore = defineStore("main", {
       savedBackgroundBlur: 0, // 已保存壁纸模糊
       showBackgroundGray: true, // 壁纸遮罩显示
       showParticle: false, // 显示粒子特效
-      currentParticle: 'star', // 默认星空
+      currentParticle: "star", // 默认星空
       darkstar: false, // 星空特效
       firefly: false, // 萤火虫特效
       snowflake: false, // 雪花特效
@@ -45,6 +45,9 @@ export const mainStore = defineStore("main", {
       playerLrc: "歌词加载中", // 当前播放歌词
       playerLrcShow: true, // 是否显示底栏歌词
       footerBlur: true, // 底栏模糊
+      footerProgressBar: true, // 底栏进度条
+      audioRef: null,
+      playerCanplay: false,
       playerAutoplay: false, // 是否自动播放
       playerLoop: "all", // 循环播放 "all", "one", "none"
       playerOrder: "list", // 循环顺序 "list", "random"
@@ -107,6 +110,10 @@ export const mainStore = defineStore("main", {
     // 更改歌词
     setPlayerLrc(value) {
       this.playerLrc = value;
+    },
+    // 更改歌曲进度
+    setPlayerCanplay(value) {
+      this.playerCanplay = value;
     },
     // 更改歌曲数据
     setPlayerData(title, artist) {
@@ -207,6 +214,7 @@ export const mainStore = defineStore("main", {
       "musicClick",
       "playerLrcShow",
       "footerBlur",
+      "footerProgressBar",
       "playerAutoplay",
       "playerLoop",
       "playerOrder",

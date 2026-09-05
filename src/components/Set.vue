@@ -248,7 +248,16 @@
           />
         </div>
         <div class="item">
-          <span class="text">底栏背景模糊</span>
+          <span class="text">显示底栏进度条</span>
+          <el-switch
+            v-model="footerProgressBar"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">显示底栏背景模糊</span>
           <el-switch
             v-model="footerBlur"
             inline-prompt
@@ -365,6 +374,7 @@ const {
   musicClick,
   playerLrcShow,
   footerBlur,
+  footerProgressBar,
   playerAutoplay,
   playerOrder,
   playerLoop,
@@ -467,6 +477,9 @@ watch(bubble, (val) => {
 
 // 站点重置
 const resetSite = () => {
+  if (store.webSpeech) {
+    SpeechLocal("重置.mp3");
+  }
   ElMessageBox.confirm("重置后你的捷径数据与站点配置都将丢失！请确保你已经做好了备份", "站点重置", {
     confirmButtonClass: "danger",
     cancelButtonClass: "cancel-deletion",
@@ -474,17 +487,28 @@ const resetSite = () => {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    localStorage.clear();
-    ElMessage({
-      message: "站点重置成功，即将刷新",
-      icon: h(Correct, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
+    if (store.webSpeech) {
+      SpeechLocal("重置中.mp3");
+    }
+    const loading = ElLoading.service({
+      lock: true,
+      text: "Loading",
+      background: "rgba(0, 0, 0, 0.7)",
     });
     setTimeout(() => {
+      localStorage.clear();
+      ElMessage({
+        message: "站点重置成功，即将刷新",
+        icon: h(Correct, {
+          theme: "filled",
+          fill: "#efefef",
+        }),
+      });
+    }, 3000);
+    setTimeout(() => {
+      loading.close();
       window.location.reload();
-    }, 1000);
+    }, 4000);
   });
 };
 

@@ -17,6 +17,7 @@
     @pause="onPause"
     @timeupdate="onTimeUp"
     @error="loadMusicError"
+    @canplay="onCanplay"
   />
 </template>
 
@@ -123,6 +124,8 @@ const onPause = () => {
 };
 
 const onTimeUp = () => {
+  store.playerCurrentTime = player.value.audioStatus.playedTime;
+  store.playerDuration = player.value.audioStatus.duration;
   let lyrics = player.value.aplayer.lyrics[playIndex.value];
   let idx = player.value.aplayer.lyricIndex;
   if (!lyrics || !lyrics[idx]) return;
@@ -159,7 +162,28 @@ const loadMusicError = () => {
   console.error("播放歌曲错误: " + player.value.aplayer.audio[player.value.aplayer.index].name);
 };
 
-defineExpose({ playToggle, changeVolume, changeSong, toggleList });
+const getAudioRef = () => {
+  return player.value?.audioRef || null;
+};
+
+function updatePositionState() {
+  if ("mediaSession" in navigator) {
+    navigator.mediaSession.setPositionState({
+      duration: player.value.audioStatus.duration,
+      position: player.value.audioStatus.playedTime,
+    });
+  }
+}
+
+const onCanplay = () => {
+  store.setPlayerCanplay(true);
+  if (player.value?.audioRef) {
+    store.audioRef = player.value.audioRef;
+  }
+  updatePositionState();
+};
+
+defineExpose({ playToggle, changeVolume, changeSong, toggleList, getAudioRef });
 </script>
 
 <style lang="scss" scoped>

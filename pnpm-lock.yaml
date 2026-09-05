@@ -29,6 +29,9 @@ importers:
       live2d-render:
         specifier: ^0.0.9
         version: 0.0.9
+      lodash:
+        specifier: ^4.18.1
+        version: 4.18.1
       lunar-calendar:
         specifier: ^0.1.4
         version: 0.1.4
