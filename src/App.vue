@@ -271,10 +271,6 @@ const handleMiddleClick = (event) => {
 
 const handleHelpToggle = (event) => {
   if (event.altKey && (event.key === "a" || event.key === "A")) {
-    const activeEl = document.activeElement;
-    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
-      return;
-    }
     event.preventDefault();
     toggleHelp();
   }

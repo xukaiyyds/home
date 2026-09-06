@@ -34,7 +34,12 @@
         <!-- 查看帮助 -->
         <span class="hidden">
           &amp;
-          <a @click="toggleHelp"> 查看快捷键 </a>
+          <a @click="toggleHelp" style="position: relative">
+            查看快捷键
+            <span v-show="isAltPressed" class="alt-hint-overlay">
+              <span class="alt-hint-text">Alt A</span>
+            </span>
+          </a>
         </span>
       </div>
       <div v-else class="lrc" @dblclick="toggleForceIcon">
@@ -57,7 +62,7 @@ import { mainStore } from "@/store";
 import config from "@/../package.json";
 import ProgressBar from "@/components/ProgressBar.vue";
 import { SpeechLocal } from "@/utils/speech";
-import { toggleHelp } from '@/utils/help';
+import { toggleHelp } from "@/utils/help";
 
 const store = mainStore();
 const fullYear = new Date().getFullYear();
@@ -105,6 +110,26 @@ const toggleForceIcon = () => {
     }
   }
 };
+
+const isAltPressed = ref(false);
+
+// Alt 键按下/释放事件
+const handleAltKey = (event) => {
+  event.preventDefault();
+  if (event.key === "Alt") {
+    isAltPressed.value = event.type === "keydown";
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("keydown", handleAltKey);
+  document.addEventListener("keyup", handleAltKey);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", handleAltKey);
+  document.removeEventListener("keyup", handleAltKey);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -149,6 +174,41 @@ const toggleForceIcon = () => {
         height: 18px;
         display: inherit;
       }
+    }
+  }
+
+  .alt-hint-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+    animation: fadeIn 0.15s ease;
+  }
+
+  .alt-hint-text {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 

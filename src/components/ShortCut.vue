@@ -136,7 +136,7 @@
           <el-input
             v-model="formData.name"
             placeholder="例如：百度"
-            maxlength="10"
+            maxlength="20"
             show-word-limit
             clearable
           />
@@ -272,7 +272,7 @@ const confirmDelete = (item) => {
     `确认删除 “<el-text style="color:#E6A23C">${item.name}</el-text>” 捷径？此操作无法恢复！`,
     "删除捷径",
     {
-      confirmButtonClass: "warning",
+      confirmButtonClass: "danger",
       cancelButtonClass: "cancel-deletion",
       dangerouslyUseHTMLString: true,
       confirmButtonText: "删除",
