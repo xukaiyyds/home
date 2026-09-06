@@ -73,11 +73,11 @@ const loadPlaylist = async () => {
       grouping: true,
       icon: h(PlayWrong, { theme: "filled", fill: "#efefef" }),
     });
-    setTimeout(() => {
-      if (store.webSpeech) {
+    if (store.webSpeech) {
+      setTimeout(() => {
         SpeechLocal("播放器加载失败.mp3");
-      }
-    }, 15000);
+      }, 15000);
+    }
   }
 };
 

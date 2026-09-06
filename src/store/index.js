@@ -21,12 +21,12 @@ export const mainStore = defineStore("main", {
       firefly: false, // 萤火虫特效
       snowflake: false, // 雪花特效
       bubble: false, // 气泡特效
-      siteStartShow: false, // 建站日期显示
+      siteStartShow: true, // 建站日期显示
       searchEngine: "Baidu", // 搜索引擎
       customEngineUrl: "", // 自定义搜索引擎 URL
       customEngineName: "", // 自定义引擎名称
       clearContent: true, // 清空输入框
-      showLunar: false, // 显示农历
+      showLunar: true, // 显示农历
       use12HourFormat: false, // 12小时制
       messageShow: true, // 操作消息显示
       musicClick: false, // 音乐链接是否跳转
@@ -46,6 +46,7 @@ export const mainStore = defineStore("main", {
       playerLrcShow: true, // 是否显示底栏歌词
       footerBlur: true, // 底栏模糊
       footerProgressBar: true, // 底栏进度条
+      forceShowIcon: false, // 进度图标常驻
       audioRef: null,
       playerCanplay: false,
       playerAutoplay: false, // 是否自动播放
@@ -56,11 +57,11 @@ export const mainStore = defineStore("main", {
       playCustomSong: "", // 自定义歌单
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
-      live2dShow: true, // 是否显示live2d模型
+      live2dShow: false, // 是否显示live2d模型
       modelType: "Mao", // live2d模型种类
       modelPath: "", // live2d模型路径
-      webSpeech: false, // ai语音播报
-      prioritizeFirst: false, // 页面层级
+      webSpeech: false, // 语音播报
+      prioritizeFirst: true, // 页面层级
       openTimes: {}, // 记录每个页面打开的时间戳
     };
   },
@@ -215,6 +216,7 @@ export const mainStore = defineStore("main", {
       "playerLrcShow",
       "footerBlur",
       "footerProgressBar",
+      "forceShowIcon",
       "playerAutoplay",
       "playerLoop",
       "playerOrder",

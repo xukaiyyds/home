@@ -161,14 +161,14 @@
       </el-collapse-item>
       <el-collapse-item title="主题与背景" name="3">
         <div class="item">
-          <span class="text">主题模式切换</span>
+          <span class="text">主题模式</span>
           <el-radio-group v-model="themeType" text-color="#FFFFFF">
             <el-radio value="light" border>浅色模式</el-radio>
             <el-radio value="dark" border>深色模式</el-radio>
           </el-radio-group>
         </div>
         <div class="item">
-          <span class="text">背景模糊程度</span>
+          <span class="text">背景模糊</span>
           <el-slider
             v-model="backgroundBlur"
             :min="0"
@@ -179,7 +179,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">显示背景遮罩</span>
+          <span class="text">背景遮罩</span>
           <el-switch
             v-model="showBackgroundGray"
             inline-prompt
@@ -188,7 +188,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">显示背景特效</span>
+          <span class="text">背景特效</span>
           <el-switch
             v-model="showParticle"
             inline-prompt
@@ -212,7 +212,7 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="4">
         <div class="item">
-          <span class="text">AI 语音交互</span>
+          <span class="text">语音交互</span>
           <el-switch
             v-model="webSpeech"
             inline-prompt
@@ -221,7 +221,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">显示动画模型</span>
+          <span class="text">动画模型</span>
           <el-switch
             v-model="live2dShow"
             @change="refreshPrompt"
@@ -239,7 +239,7 @@
           </el-radio-group>
         </div>
         <div class="item">
-          <span class="text">显示底栏歌词</span>
+          <span class="text">底栏歌词</span>
           <el-switch
             v-model="playerLrcShow"
             inline-prompt
@@ -247,8 +247,8 @@
             :inactive-icon="CloseSmall"
           />
         </div>
-        <div class="item">
-          <span class="text">显示底栏进度条</span>
+        <div class="item" v-show="playerLrcShow">
+          <span class="text">底栏进度条</span>
           <el-switch
             v-model="footerProgressBar"
             inline-prompt
@@ -256,8 +256,17 @@
             :inactive-icon="CloseSmall"
           />
         </div>
+        <div class="item" v-if="playerLrcShow" v-show="footerProgressBar">
+          <span class="text">进度图标常驻</span>
+          <el-switch
+            v-model="forceShowIcon"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
         <div class="item">
-          <span class="text">显示底栏背景模糊</span>
+          <span class="text">底栏背景模糊</span>
           <el-switch
             v-model="footerBlur"
             inline-prompt
@@ -375,6 +384,7 @@ const {
   playerLrcShow,
   footerBlur,
   footerProgressBar,
+  forceShowIcon,
   playerAutoplay,
   playerOrder,
   playerLoop,
@@ -436,8 +446,6 @@ const setCustomCover = () => {
     if (store.webSpeech) {
       SpeechLocal("壁纸ID设置成功.mp3");
     }
-  } else {
-    store.bgUrl = store.backgroundCustom;
   }
 
   dialogFormVisible.value = false;
@@ -486,30 +494,32 @@ const resetSite = () => {
     confirmButtonText: "重置",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(() => {
-    if (store.webSpeech) {
-      SpeechLocal("重置中.mp3");
-    }
-    const loading = ElLoading.service({
-      lock: true,
-      text: "Loading",
-      background: "rgba(0, 0, 0, 0.7)",
-    });
-    setTimeout(() => {
-      localStorage.clear();
-      ElMessage({
-        message: "站点重置成功，即将刷新",
-        icon: h(Correct, {
-          theme: "filled",
-          fill: "#efefef",
-        }),
+  })
+    .then(() => {
+      if (store.webSpeech) {
+        SpeechLocal("重置中.mp3");
+      }
+      setTimeout(() => {
+        localStorage.clear();
+        ElMessage({
+          message: "站点重置成功，即将刷新",
+          icon: h(Correct, {
+            theme: "filled",
+            fill: "#efefef",
+          }),
+        });
+      }, 2500);
+      const loading = ElLoading.service({
+        lock: true,
+        text: "Loading",
+        background: "rgba(0, 0, 0, 0.7)",
       });
-    }, 3000);
-    setTimeout(() => {
-      loading.close();
-      window.location.reload();
-    }, 4000);
-  });
+      setTimeout(() => {
+        loading.close();
+        window.location.reload();
+      }, 4000);
+    })
+    .catch(() => {});
 };
 
 // 站点备份
@@ -582,16 +592,24 @@ const recoverSite = async (event) => {
       .then(() => {
         const isSuccess = store.recoverSiteData(data);
         if (isSuccess) {
-          ElMessage({
-            message: "站点恢复成功，即将刷新",
-            icon: h(Correct, {
-              theme: "filled",
-              fill: "#efefef",
-            }),
+          setTimeout(() => {
+            ElMessage({
+              message: "站点恢复成功，即将刷新",
+              icon: h(Correct, {
+                theme: "filled",
+                fill: "#efefef",
+              }),
+            });
+          }, 500);
+          const loading = ElLoading.service({
+            lock: true,
+            text: "Loading",
+            background: "rgba(0, 0, 0, 0.7)",
           });
           setTimeout(() => {
+            loading.close();
             window.location.reload();
-          }, 1000);
+          }, 2000);
         } else {
           ElMessage({
             message: "站点数据恢复失败，请重试",
@@ -683,7 +701,7 @@ onMounted(() => {
 
       .el-slider {
         --el-slider-runway-bg-color: var(--main-cards-header-bg-color);
-        flex-basis: 70%;
+        flex-basis: 50%;
       }
 
       .el-slider__bar {

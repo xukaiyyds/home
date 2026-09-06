@@ -6,7 +6,7 @@
       :style="{ width: isDragging ? `${dragProgress}%` : `${progressBarWidth}%` }"
     >
       <img
-        v-if="showProgressIcon"
+        v-show="showIcon"
         src="/images/icon/ProgressBar.ico"
         class="progress-icon"
         draggable="false"
@@ -17,7 +17,7 @@
       <Loading
         v-if="!store.playerCanplay"
         theme="filled"
-        size="32"
+        size="24"
         fill="#f7989e"
         :spin="true"
         class="loading-icon"
@@ -27,32 +27,32 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from "vue";
 import { Loading } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { throttle } from "lodash";
 
 const store = mainStore();
-const showProgressIcon = ref(false);
+
+// 本地状态
 const isDragging = ref(false);
 const dragProgress = ref(0);
 const icon = ref(null);
 let dragTimer = null;
-let audioElement = null;
 
-// 接收 playerRef
+// 新增 prop
 const props = defineProps({
-  forceShowIcon: {
+  footerHover: {
     type: Boolean,
     default: false,
   },
-  playerRef: {
-    type: Object,
-    default: null,
-  },
 });
 
-// 进度计算
+// 使用计算属性控制图标显示
+const showIcon = computed(() => {
+  return store.forceShowIcon || props.footerHover;
+});
+
+// 计算属性
 const progressBarWidth = computed(() => {
   if (!store.playerState) return 0;
   const duration = store.playerDuration || 0;
@@ -60,22 +60,12 @@ const progressBarWidth = computed(() => {
   return (store.playerCurrentTime / duration) * 100 || 0;
 });
 
-// 获取 audio 元素
+// 获取 audio
 const getAudio = () => {
-  // 从 store 获取
   if (store.audioRef) {
     return store.audioRef;
   }
-  // 降级
   return document.querySelector("audio");
-};
-
-// 鼠标事件
-const handleMouseEnter = () => {
-  showProgressIcon.value = props.forceShowIcon || true;
-};
-const handleMouseLeave = () => {
-  showProgressIcon.value = props.forceShowIcon || false;
 };
 
 const handleMouseDown = (e) => {
@@ -163,29 +153,13 @@ const onTouchEnd = () => {
   }, 1000);
 };
 
-// 监听外部强制显示
-watch(
-  () => props.forceShowIcon,
-  (val) => {
-    showProgressIcon.value = val || false;
-  },
-  { immediate: true },
-);
-
+// 生命周期
 onMounted(() => {
-  nextTick(() => {
-    audioElement = document.querySelector("audio");
-    const footer = document.querySelector("#footer");
-    if (footer) {
-      footer.addEventListener("mouseenter", handleMouseEnter);
-      footer.addEventListener("mouseleave", handleMouseLeave);
-    }
-    document.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("touchmove", onTouchMove, { passive: false });
-    document.addEventListener("touchend", onTouchEnd);
-    document.addEventListener("touchcancel", onTouchEnd);
-  });
+  document.addEventListener("mouseup", onMouseUp);
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("touchmove", onTouchMove, { passive: false });
+  document.addEventListener("touchend", onTouchEnd);
+  document.addEventListener("touchcancel", onTouchEnd);
 });
 
 onBeforeUnmount(() => {
@@ -194,11 +168,6 @@ onBeforeUnmount(() => {
   document.removeEventListener("touchmove", onTouchMove);
   document.removeEventListener("touchend", onTouchEnd);
   document.removeEventListener("touchcancel", onTouchEnd);
-  const footer = document.querySelector("#footer");
-  if (footer) {
-    footer.removeEventListener("mouseenter", handleMouseEnter);
-    footer.removeEventListener("mouseleave", handleMouseLeave);
-  }
 });
 </script>
 
@@ -231,10 +200,10 @@ onBeforeUnmount(() => {
       position: absolute;
       user-select: none;
       touch-action: none;
-      top: -16px;
-      right: -16px;
-      width: 32px;
-      height: 32px;
+      top: -12px;
+      right: -12px;
+      width: 24px;
+      height: 24px;
       color: #f7989e;
     }
 
@@ -242,11 +211,11 @@ onBeforeUnmount(() => {
       position: absolute;
       user-select: none;
       touch-action: none;
-      top: -16px;
-      right: -16px;
+      top: -12px;
+      right: -12px;
       opacity: 1;
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
       cursor: grab;
       transform: translateX(var(--progress-icon-x, 0)) translateZ(0);
       will-change: transform;

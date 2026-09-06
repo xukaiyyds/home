@@ -7,7 +7,7 @@
       :style="{ '--blur': store.backgroundBlur + 'px' }"
       alt="cover"
       @load="imgLoadComplete"
-      @error.once="imgLoadError"
+      @error="imgLoadError"
       @animationend="imgAnimationEnd"
     />
     <div v-if="store.showBackgroundGray" :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
@@ -92,7 +92,9 @@ const imgLoadError = () => {
   });
   store.bgUrl = `/images/background${bgRandom}.jpg`;
   if (store.webSpeech) {
-    SpeechLocal("壁纸加载失败.mp3");
+    setTimeout(() => {
+      SpeechLocal("壁纸加载失败.mp3");
+    }, 1900);
   }
 };
 
@@ -111,23 +113,6 @@ const cleanup = ref({
   snowfall: null,
   bubble: null,
 });
-
-const toggleEffect = (type, show) => {
-  if (cleanup.value[type]) {
-    cleanup.value[type]();
-    cleanup.value[type] = null;
-  }
-  if (show) {
-    let initFn = null;
-    if (type === "snowfall") initFn = initSnowfall;
-    else if (type === "universe") initFn = initUniverse;
-    else if (type === "firefly") initFn = initFirefly;
-    else if (type === "bubble") initFn = initBubble;
-    if (initFn) {
-      cleanup.value[type] = initFn();
-    }
-  }
-};
 
 // 根据当前粒子类型切换特效
 const switchParticle = (type) => {
@@ -205,7 +190,7 @@ const changeThemeType = (val) => {
   htmlElement.setAttribute("theme", themeType);
 };
 
-// 监听颜色变化
+// 监听主题变化
 watch(
   () => store.themeType,
   (val) => changeThemeType(val),

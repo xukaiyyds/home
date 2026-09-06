@@ -325,7 +325,6 @@ watch(
   margin: auto;
   width: 100%;
   height: 100%;
-  background-color: var(--main-mores-bg-color);
   backdrop-filter: blur(20px);
   z-index: 1;
 

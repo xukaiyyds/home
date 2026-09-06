@@ -122,11 +122,11 @@ const getWeatherData = async () => {
   } catch (error) {
     if (!store.showLunar) {
       onError("定位失败，无法获取天气信息");
-      setTimeout(() => {
-        if (store.webSpeech) {
+      if (store.webSpeech) {
+        setTimeout(() => {
           SpeechLocal("天气加载失败.mp3");
-        }
-      }, 7000);
+        }, 7000);
+      }
       weatherMsg.value = "天气数据获取失败";
       console.error("天气信息获取失败:" + error);
     }

@@ -1,5 +1,10 @@
 <template>
-  <footer id="footer" :class="store.footerBlur ? 'blur' : null">
+  <footer
+    id="footer"
+    :class="store.footerBlur ? 'blur' : null"
+    @mouseenter="isFooterHover = true"
+    @mouseleave="isFooterHover = false"
+  >
     <Transition name="fade" mode="out-in">
       <div v-if="!store.playerState || !store.playerLrcShow" class="power">
         <span>
@@ -33,7 +38,7 @@
         </span>
       </div>
       <div v-else class="lrc" @dblclick="toggleForceIcon">
-        <ProgressBar :forceShowIcon="forceShowIcon" />
+        <ProgressBar :footerHover="isFooterHover" />
         <Transition name="fade" mode="out-in">
           <div class="lrc-all" :key="store.getPlayerLrc">
             <music-one theme="filled" size="18" fill="#efefef" />
@@ -55,7 +60,8 @@ import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
 const fullYear = new Date().getFullYear();
-const forceShowIcon = ref(false);
+const isFooterHover = ref(false);
+let chuover = 0;
 
 // 加载配置数据
 const startYear = ref(
@@ -76,21 +82,32 @@ const siteUrl = computed(() => {
 });
 
 const toggleForceIcon = () => {
-  forceShowIcon.value = !forceShowIcon.value;
-  ElMessage({
-    dangerouslyUseHTMLString: true,
-    message: `${forceShowIcon.value ? "已启用" : "已禁用"}进度图标常驻`,
-  });
-  if (forceShowIcon.value) {
-    SpeechLocal("启用进度图标常驻.mp3");
-  } else {
-    SpeechLocal("禁用进度图标常驻.mp3");
+  store.forceShowIcon = !store.forceShowIcon;
+  if (store.messageShow) {
+    ElMessage({
+      dangerouslyUseHTMLString: true,
+      message: `${store.forceShowIcon ? "已启用" : "已禁用"}进度图标常驻`,
+    });
+  }
+  if (store.webSpeech) {
+    if (store.forceShowIcon) {
+      SpeechLocal("启用进度图标常驻.mp3");
+    } else {
+      SpeechLocal("禁用进度图标常驻.mp3");
+    }
+    chuover += 1;
+    if (chuover > 3) {
+      SpeechLocal("戳戳.mp3");
+      setTimeout(() => {
+        chuover = 0;
+      }, 10000);
+    }
   }
 };
 
 const open = () => {
   ElMessageBox.alert(
-    "空格\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（播放/暂停网抑音乐）<br>Tab\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭时光胶囊）<br>Alt + M\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭音乐列表）<br>Alt + S\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭全网搜索）<br>鼠标滚轮\u00A0\u00A0\u00A0\u00A0\u00A0（滑动网站/捷径列表）<br>鼠标中键\u00A0\u00A0\u00A0\u00A0\u00A0（启用/退出壁纸预览）<br>鼠标右键\u00A0\u00A0\u00A0\u00A0\u00A0（打开/关闭全局设置）<br>双击进度条（启用/禁用进度图标常驻）",
+    `<div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">空格</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（播放/暂停网抑音乐）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Tab</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭时光胶囊）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Alt + M</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭音乐列表）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Alt + S</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭全网搜索）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标滚轮</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（滑动网站/捷径列表）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标中键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/退出壁纸预览）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标右键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭全局设置）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">双击底栏歌词</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/禁用进度图标常驻）</span></div>`,
     "本站快捷键",
     {
       dangerouslyUseHTMLString: true,
@@ -101,7 +118,7 @@ const open = () => {
       center: true,
       icon: markRaw(KeyboardOne),
     },
-  );
+  ).catch(() => {});
 };
 </script>
 
