@@ -428,6 +428,9 @@ const setCustomCover = () => {
         fill: "#efefef",
       }),
     });
+    if (store.webSpeech) {
+      SpeechLocal("壁纸ID设置失败.mp3");
+    }
     return;
   }
 

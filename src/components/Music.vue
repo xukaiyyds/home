@@ -80,6 +80,7 @@ import {
   VolumeNotice,
 } from "@icon-park/vue-next";
 import Player from "@/components/Player.vue";
+import { SpeechLocal } from "@/utils/speech";
 import { mainStore } from "@/store";
 const store = mainStore();
 
@@ -100,6 +101,9 @@ const playerData = reactive({
 const openMusicList = () => {
   musicListShow.value = true;
   playerRef.value.toggleList();
+  if (store.webSpeech) {
+    SpeechLocal("好耶.mp3");
+  }
 };
 
 // 关闭播放列表
