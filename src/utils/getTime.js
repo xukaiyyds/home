@@ -1,5 +1,5 @@
 import { h } from "vue";
-import { Calendar } from "@icon-park/vue-next";
+import { Calendar, Sunrise, Sun, Moon, Sleep } from "@icon-park/vue-next";
 import { SpeechLocal } from "@/utils/speech";
 import dayjs from "dayjs";
 import lunar from "lunar-calendar";
@@ -75,6 +75,7 @@ export const getTimeCapsule = () => {
 export const helloInit = () => {
   const hour = new Date().getHours();
   let hello = null;
+  let iconComponent = null;
   if (hour < 6) {
     hello = "凌晨好";
   } else if (hour < 9) {
@@ -92,9 +93,22 @@ export const helloInit = () => {
   } else {
     hello = "夜深了";
   }
+  if (hour >= 5 && hour < 11) {
+    iconComponent = Sunrise;
+  } else if (hour >= 11 && hour < 17) {
+    iconComponent = Sun;
+  } else if (hour >= 17 && hour < 22) {
+    iconComponent = Moon;
+  } else {
+    iconComponent = Sleep;
+  }
   ElMessage({
     dangerouslyUseHTMLString: true,
-    message: `<strong>${hello}</strong> 欢迎来到我的主页`,
+    message: `<strong>${hello}</strong>`,
+    icon: h(iconComponent, {
+      theme: "filled",
+      fill: "#efefef",
+    }),
   });
 };
 

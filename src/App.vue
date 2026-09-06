@@ -61,6 +61,7 @@ import MoreSet from "@/views/MoreSet/index.vue";
 import SearchInp from "@/views/SearchInp/index.vue";
 import cursorInit from "@/utils/cursor.js";
 import { SpeechLocal } from "@/utils/speech";
+import { toggleHelp } from "@/utils/help";
 import config from "@/../package.json";
 import * as live2d from "live2d-render";
 
@@ -159,6 +160,126 @@ const initLive2D = async (type) => {
   });
 };
 
+// 全局键盘事件
+const handleGlobalKeydown = (event) => {
+  const activeEl = document.activeElement;
+  const isInputFocused = activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable);
+  if (event.key === "Tab") {
+    if (isInputFocused) {
+      return;
+    }
+    event.preventDefault();
+    store.boxOpenState = !store.boxOpenState;
+    if (store.messageShow) {
+      ElMessage({
+        message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
+        grouping: true,
+        duration: 2000,
+      });
+    }
+    return;
+  }
+};
+
+const handleThemeSwitch = (event) => {
+  if (event.altKey && (event.key === "d" || event.key === "D")) {
+    event.preventDefault();
+    store.themeType = store.themeType === "dark" ? "light" : "dark";
+    if (store.messageShow) {
+      ElMessage({
+        message: `已切换至${store.themeType === "dark" ? "深色" : "浅色"}模式`,
+        grouping: true,
+        duration: 2000,
+      });
+    }
+  }
+};
+
+const handleSearchToggle = (event) => {
+  if (event.altKey && event.key.toLowerCase() === "s") {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
+      return;
+    }
+    event.preventDefault();
+    store.searchOpenState = !store.searchOpenState;
+    if (store.messageShow) {
+      ElMessage({
+        message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
+        grouping: true,
+        duration: 2000,
+      });
+      if (store.searchOpenState) {
+        ElMessage({
+          message: "右键链接可编辑或删除捷径哦",
+          grouping: true,
+        });
+      }
+    }
+  }
+};
+
+const handleContextMenu = (event) => {
+  const target = event.target;
+  const isShortcutItem =
+    target.closest?.(".shortcut-item-wrapper") || target.closest?.(".shortcut-item");
+  // 点击在捷径链接上，允许组件内部处理
+  if (isShortcutItem) {
+    return true;
+  }
+  // 如果有 monitorWidthChanges 函数则调用
+  if (typeof monitorWidthChanges === "function") {
+    monitorWidthChanges(store.innerWidth);
+  }
+  // 移动端禁用右键
+  if (store.innerWidth < 721) {
+    ElMessage({
+      message: "为了浏览体验，已禁用右键",
+      grouping: true,
+      duration: 2000,
+    });
+    event.preventDefault();
+    return false;
+  }
+  // 切换全局设置面板
+  store.setOpenState = !store.setOpenState;
+  if (store.messageShow) {
+    ElMessage({
+      message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
+      grouping: true,
+      duration: 2000,
+    });
+  }
+  event.preventDefault();
+  return false;
+};
+
+const handleMiddleClick = (event) => {
+  if (event.button !== 1) return;
+  store.backgroundShow = !store.backgroundShow;
+  if (store.messageShow) {
+    ElMessage({
+      message: `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
+      grouping: true,
+      duration: 2000,
+    });
+  }
+  if (store.webSpeech) {
+    SpeechLocal(store.backgroundShow ? "壁纸预览已启用.mp3" : "壁纸预览已退出.mp3");
+  }
+};
+
+const handleHelpToggle = (event) => {
+  if (event.altKey && (event.key === "a" || event.key === "A")) {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
+      return;
+    }
+    event.preventDefault();
+    toggleHelp();
+  }
+};
+
 onMounted(() => {
   // 自定义鼠标
   cursorInit();
@@ -166,103 +287,23 @@ onMounted(() => {
   // live2d模型
   initLive2D(store.modelType);
 
-  // 全局键盘事件
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Tab") {
-      const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
-        return;
-      } else {
-        event.preventDefault();
-        store.boxOpenState = !store.boxOpenState;
-        if (store.messageShow) {
-          ElMessage({
-            message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
-            grouping: true,
-            duration: 2000,
-          });
-        }
-      }
-    }
-  });
+  // 时光胶囊
+  document.addEventListener("keydown", handleGlobalKeydown);
 
-  window.addEventListener("keydown", (event) => {
-    if (event.altKey && event.key.toLowerCase() === "s") {
-      event.preventDefault();
-      store.searchOpenState = !store.searchOpenState;
-      if (store.messageShow) {
-        ElMessage({
-          message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
-          grouping: true,
-          duration: 2000,
-        });
-        if (store.searchOpenState) {
-          ElMessage({
-            message: "右键链接可编辑或删除捷径哦",
-            grouping: true,
-          });
-        }
-      }
-    }
-  });
+  // 主题模式
+  document.addEventListener("keydown", handleThemeSwitch);
 
-  // 鼠标右键事件
-  document.oncontextmenu = (event) => {
-    // 判断是否点击在捷径链接上
-    const target = event.target;
-    const isShortcutItem =
-      target.closest?.(".shortcut-item-wrapper") || target.closest?.(".shortcut-item");
+  // 全网搜索
+  document.addEventListener("keydown", handleSearchToggle);
 
-    if (isShortcutItem) {
-      return true;
-    }
+  // 全局设置
+  document.addEventListener("contextmenu", handleContextMenu);
 
-    if (typeof monitorWidthChanges === "function") {
-      monitorWidthChanges(store.innerWidth);
-    }
+  // 预览壁纸
+  document.addEventListener("mousedown", handleMiddleClick);
 
-    // 移动端禁用右键
-    if (store.innerWidth < 721) {
-      ElMessage({
-        message: "为了浏览体验，已禁用右键",
-        grouping: true,
-        duration: 2000,
-      });
-      return false;
-    }
-
-    // 切换全局设置面板
-    store.setOpenState = !store.setOpenState;
-    if (store.messageShow) {
-      ElMessage({
-        message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
-        grouping: true,
-        duration: 2000,
-      });
-    }
-    return false;
-  };
-
-  // 鼠标中键事件
-  window.addEventListener("mousedown", (event) => {
-    if (event.button == 1) {
-      store.backgroundShow = !store.backgroundShow;
-      if (store.messageShow) {
-        ElMessage({
-          message: `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
-          grouping: true,
-          duration: 2000,
-        });
-        if (store.webSpeech) {
-          if (store.backgroundShow) {
-            SpeechLocal("壁纸预览已启用.mp3");
-          } else {
-            SpeechLocal("壁纸预览已退出.mp3");
-          }
-        }
-      }
-    }
-  });
+  // 获取帮助
+  document.addEventListener("keydown", handleHelpToggle);
 
   // 监听当前页面宽度
   getWidth();
@@ -286,6 +327,16 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", getWidth);
+  document.removeEventListener("keydown", handleGlobalKeydown);
+  document.removeEventListener("keydown", handleThemeSwitch);
+  document.removeEventListener("keydown", handleSearchToggle);
+  document.removeEventListener("contextmenu", handleContextMenu);
+  document.removeEventListener("mousedown", handleMiddleClick);
+  document.removeEventListener("keydown", handleHelpToggle);
+  if (isHelpOpen) {
+    ElMessageBox.close();
+    isHelpOpen = false;
+  }
 });
 </script>
 

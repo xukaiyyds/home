@@ -264,8 +264,10 @@ watch(
   (newVal) => {
     if (newVal) {
       nextTick(() => {
-        selectRef.value?.focus();
-        selectRef.value?.toggleMenu();
+        if (store.focusSearch) {
+          selectRef.value?.focus();
+          selectRef.value?.toggleMenu();
+        }
       });
     }
   },

@@ -25,6 +25,7 @@ export const mainStore = defineStore("main", {
       searchEngine: "Baidu", // 搜索引擎
       customEngineUrl: "", // 自定义搜索引擎 URL
       customEngineName: "", // 自定义引擎名称
+      focusSearch: false, // 聚焦搜索引擎
       clearContent: true, // 清空输入框
       showLunar: true, // 显示农历
       use12HourFormat: false, // 12小时制
@@ -207,6 +208,7 @@ export const mainStore = defineStore("main", {
       "customEngineName",
       "shortcutHome",
       "shortcutData",
+      "focusSearch",
       "clearContent",
       "showLunar",
       "use12HourFormat",

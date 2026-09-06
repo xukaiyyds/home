@@ -34,7 +34,7 @@
         <!-- 查看帮助 -->
         <span class="hidden">
           &amp;
-          <a @click="open"> 查看快捷键 </a>
+          <a @click="toggleHelp"> 查看快捷键 </a>
         </span>
       </div>
       <div v-else class="lrc" @dblclick="toggleForceIcon">
@@ -52,11 +52,12 @@
 </template>
 
 <script setup>
-import { MusicOne, KeyboardOne } from "@icon-park/vue-next";
+import { MusicOne } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
 import ProgressBar from "@/components/ProgressBar.vue";
 import { SpeechLocal } from "@/utils/speech";
+import { toggleHelp } from '@/utils/help';
 
 const store = mainStore();
 const fullYear = new Date().getFullYear();
@@ -103,22 +104,6 @@ const toggleForceIcon = () => {
       }, 10000);
     }
   }
-};
-
-const open = () => {
-  ElMessageBox.alert(
-    `<div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">空格</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（播放/暂停网抑音乐）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Tab</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭时光胶囊）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Alt + M</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭音乐列表）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Alt + S</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭全网搜索）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标滚轮</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（滑动网站/捷径列表）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标中键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/退出壁纸预览）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标右键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭全局设置）</span></div><div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">双击底栏歌词</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/禁用进度图标常驻）</span></div>`,
-    "本站快捷键",
-    {
-      dangerouslyUseHTMLString: true,
-      modal: true,
-      closeOnClickModal: true,
-      closeOnPressEscape: true,
-      showConfirmButton: false,
-      center: true,
-      icon: markRaw(KeyboardOne),
-    },
-  ).catch(() => {});
 };
 </script>
 

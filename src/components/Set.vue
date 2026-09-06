@@ -21,18 +21,27 @@
           />
         </div>
         <div class="item">
-          <span class="text">完成搜索后清空输入框内容</span>
+          <span class="text">点击网抑音乐打开音乐列表</span>
           <el-switch
-            v-model="clearContent"
+            v-model="musicClick"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
           />
         </div>
         <div class="item">
-          <span class="text">点击网抑音乐打开音乐列表</span>
+          <span class="text">打开搜索自动聚焦搜索引擎</span>
           <el-switch
-            v-model="musicClick"
+            v-model="focusSearch"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">搜索后自动清空输入框内容</span>
+          <el-switch
+            v-model="clearContent"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -375,6 +384,7 @@ const {
   snowflake,
   bubble,
   siteStartShow,
+  focusSearch,
   clearContent,
   showLunar,
   use12HourFormat,
@@ -595,6 +605,9 @@ const recoverSite = async (event) => {
       .then(() => {
         const isSuccess = store.recoverSiteData(data);
         if (isSuccess) {
+          if (store.webSpeech) {
+            SpeechLocal("恢复中.mp3");
+          }
           setTimeout(() => {
             ElMessage({
               message: "站点恢复成功，即将刷新",
@@ -603,7 +616,7 @@ const recoverSite = async (event) => {
                 fill: "#efefef",
               }),
             });
-          }, 500);
+          }, 2500);
           const loading = ElLoading.service({
             lock: true,
             text: "Loading",
@@ -612,7 +625,7 @@ const recoverSite = async (event) => {
           setTimeout(() => {
             loading.close();
             window.location.reload();
-          }, 2000);
+          }, 4000);
         } else {
           ElMessage({
             message: "站点数据恢复失败，请重试",

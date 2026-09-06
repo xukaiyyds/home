@@ -122,6 +122,39 @@ const changeMusicIndex = (type) => {
   playerRef.value.changeSong(type);
 };
 
+// 监听音量变化
+watch(
+  volumeNum,
+  (newVal) => {
+    store.musicVolume = newVal;
+    playerRef.value?.changeVolume(store.musicVolume);
+  },
+  { immediate: true },
+);
+
+// 回到主页
+const handleHToggle = (event) => {
+  if (event.altKey && (event.key === "h" || event.key === "H")) {
+    event.preventDefault();
+    // 如果有任何浮层打开，则关闭它们
+    if (store.boxOpenState || store.setOpenState || store.searchOpenState || musicListShow.value) {
+      store.boxOpenState = false;
+      store.setOpenState = false;
+      store.searchOpenState = false;
+      if (musicListShow.value) {
+        closeMusicList();
+      }
+      if (store.messageShow) {
+        ElMessage({
+          message: "已回到主页",
+          grouping: true,
+          duration: 2000,
+        });
+      }
+    }
+  }
+};
+
 onMounted(() => {
   // 监听用户首次交互
   const handleFirstInteraction = () => {
@@ -137,6 +170,9 @@ onMounted(() => {
   };
   document.addEventListener("click", handleFirstInteraction);
   document.addEventListener("keydown", handleFirstInteraction);
+
+  // Alt+H键事件
+  document.addEventListener("keydown", handleHToggle);
 
   // Alt+M键事件
   window.addEventListener("keydown", (event) => {
@@ -189,15 +225,9 @@ onMounted(() => {
   window.$openList = openMusicList;
 });
 
-// 监听音量变化
-watch(
-  volumeNum,
-  (newVal) => {
-    store.musicVolume = newVal;
-    playerRef.value?.changeVolume(store.musicVolume);
-  },
-  { immediate: true },
-);
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", handleHToggle);
+});
 </script>
 
 <style lang="scss" scoped>
