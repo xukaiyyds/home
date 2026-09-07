@@ -134,6 +134,25 @@ watch(
   { immediate: true },
 );
 
+// 当设置和搜索页面打开时，自动关闭音乐列表
+watch(
+  () => store.setOpenState,
+  (newVal) => {
+    if (newVal && musicListShow.value) {
+      closeMusicList();
+    }
+  },
+);
+
+watch(
+  () => store.searchOpenState,
+  (newVal) => {
+    if (newVal && musicListShow.value) {
+      closeMusicList();
+    }
+  },
+);
+
 // 上一首/下一首
 const handleHorizontalArrow = (event) => {
   const activeEl = document.activeElement;

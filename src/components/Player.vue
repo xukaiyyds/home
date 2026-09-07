@@ -1,6 +1,6 @@
 <template>
   <APlayer
-    v-if="playList[0]"
+    v-if="playList.length"
     ref="player"
     :audio="playList"
     :autoplay="store.playerAutoplay"
@@ -55,16 +55,30 @@ const songIdMap = {
 };
 
 const effectiveSongId = computed(() => {
-  const switchId = store.playerSwitchId;
-  return songIdMap[switchId] || songIdMap[0];
+  return songIdMap[store.playerSwitchId] || songIdMap[0];
 });
 
 const loadPlaylist = async () => {
   try {
+    // 先清空播放列表，强制 APlayer 重置
+    playList.value = [];
     const res = await getPlayerList(props.songServer, props.songType, effectiveSongId.value);
     store.musicIsOk = true;
+    // 赋值新歌单
     playList.value = res;
     console.log("音乐加载完成", playList.value);
+
+    // 等待 DOM 更新后重置索引
+    nextTick(() => {
+      if (player.value && player.value.aplayer) {
+        // 重置索引到 0
+        player.value.aplayer.index = 0;
+        // 如果自动播放开启，尝试播放
+        if (store.playerAutoplay) {
+          player.value.play().catch(() => {});
+        }
+      }
+    });
   } catch (err) {
     console.error(err);
     store.musicIsOk = false;
@@ -80,6 +94,20 @@ const loadPlaylist = async () => {
     }
   }
 };
+
+// 监听播放列表变化，当列表更新且不为空时，确保索引为0
+watch(
+  playList,
+  (newVal) => {
+    if (newVal.length && player.value && player.value.aplayer) {
+      // 如果当前索引不是0，重置
+      if (player.value.aplayer.index !== 0) {
+        player.value.aplayer.index = 0;
+      }
+    }
+  },
+  { deep: false },
+);
 
 // 监听随机播放
 watch(
@@ -101,6 +129,7 @@ watch(
   },
 );
 
+// 监听歌单切换
 watch(() => store.playerSwitchId, loadPlaylist);
 
 onMounted(() => {

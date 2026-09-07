@@ -1,14 +1,13 @@
 <template>
-  <div v-if="siteLinks[0]" class="links">
+  <div v-if="siteLinksList.length" class="links">
     <div class="line">
       <Icon size="20">
         <Link />
       </Icon>
       <span class="title">{{ store.shortcutHome ? "捷径列表" : "网站列表" }}</span>
     </div>
-    <!-- 网站列表 -->
     <Swiper
-      v-if="siteLinks[0]"
+      :key="store.shortcutHome ? 'shortcut' : 'site'"
       :modules="[Pagination, Mousewheel]"
       :slides-per-view="1"
       :space-between="40"
@@ -18,23 +17,17 @@
         bulletElement: 'div',
       }"
       :mousewheel="true"
+      :observer="true"
+      :observeParents="true"
     >
-      <SwiperSlide v-for="(page, pageIndex) in pagedLinks" :key="pageIndex">
+      <SwiperSlide v-for="(page, pageIndex) in siteLinksList" :key="pageIndex">
         <el-row class="link-all" :gutter="20">
           <el-col v-for="item in page" :key="item.id || item.name" :span="8">
-            <div
-              class="item cards"
-              :style="pageIndex < 3 ? 'margin-bottom: 20px' : null"
-              @click="jumpLink(item)"
-            >
+            <div class="item cards" @click="jumpLink(item)">
               <Icon size="26">
-                <component :is="siteIcon[item.icon] || siteIcon.Compass" />
+                <component :is="siteIcon[item.icon] || Compass" />
               </Icon>
-              <div class="item-content">
-                <span class="name text-hidden">{{
-                  item.name === "网抑音乐" && store.musicClick ? "音乐列表" : item.name
-                }}</span>
-              </div>
+              <span class="name text-hidden">{{ item.name }}</span>
             </div>
           </el-col>
         </el-row>
@@ -66,13 +59,11 @@ import { Pagination, Mousewheel } from "swiper/modules";
 
 const store = mainStore();
 
-const siteLinks = computed(() => store.siteLinks);
-
-// 分页（每页6个）
-const pagedLinks = computed(() => {
+const siteLinksList = computed(() => {
+  const data = store.siteLinks;
   const result = [];
-  for (let i = 0; i < siteLinks.value.length; i += 6) {
-    result.push(siteLinks.value.slice(i, i + 6));
+  for (let i = 0; i < data.length; i += 6) {
+    result.push(data.slice(i, i + 6));
   }
   return result;
 });

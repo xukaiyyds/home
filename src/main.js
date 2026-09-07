@@ -23,6 +23,6 @@ navigator.serviceWorker.addEventListener("controllerchange", () => {
   console.log("站点已更新，刷新后生效");
   ElMessage("站点已更新，刷新后生效");
   if (store.webSpeech) {
-    SpeechLocal("网站更新.mp3");
+    SpeechLocal("更新提示.mp3");
   }
 });

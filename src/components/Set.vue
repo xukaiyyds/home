@@ -30,7 +30,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">搜索页和设置页能同时打开</span>
+          <span class="text">搜索和设置页可以同时打开</span>
           <el-switch
             v-model="prioritizeFirst"
             inline-prompt
@@ -330,6 +330,7 @@
           <el-input
             v-model="playCustomSong"
             v-show="playerSwitchId === 3"
+            @change="refreshPrompt"
             type="number"
             size="small"
             placeholder="复制网易云音乐歌单链接?id=后面的数字，例如：5059633707"
