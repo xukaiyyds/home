@@ -6,6 +6,7 @@
   backdrop-filter: blur(10px);
   border-radius: 25px !important;
   border-color: transparent !important;
+  box-shadow: var(--main-box-shadow) !important;
 
   .el-message__badge {
     display: none;

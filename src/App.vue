@@ -48,7 +48,17 @@
 
 <script setup>
 import { helloInit, speechHelloInit, checkDays } from "@/utils/getTime.js";
-import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
+import {
+  HamburgerButton,
+  CloseSmall,
+  Setting,
+  Search,
+  HourglassFull,
+  HourglassNull,
+  Brightness,
+  PreviewOpen,
+  PreviewClose,
+} from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { Icon } from "@vicons/utils";
 import Loading from "@/components/Loading.vue";
@@ -110,7 +120,7 @@ watch(
     if (val) {
       store.registerPage("settings");
       if (store.webSpeech) {
-        SpeechLocal("鼠标右键.mp3");
+        SpeechLocal("果咩纳塞.mp3");
       }
     } else {
       store.unregisterPage("settings");
@@ -171,10 +181,14 @@ const handleGlobalKeydown = (event) => {
     event.preventDefault();
     store.boxOpenState = !store.boxOpenState;
     if (store.messageShow) {
+      let iconComponent = null;
+      store.boxOpenState ? (iconComponent = HourglassFull) : (iconComponent = HourglassNull);
       ElMessage({
-        message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
-        grouping: true,
         duration: 2000,
+        message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
+        icon: h(iconComponent, {
+          fill: "#efefef",
+        }),
       });
     }
     return;
@@ -187,9 +201,11 @@ const handleThemeSwitch = (event) => {
     store.themeType = store.themeType === "dark" ? "light" : "dark";
     if (store.messageShow) {
       ElMessage({
-        message: `已切换至${store.themeType === "dark" ? "深色" : "浅色"}模式`,
-        grouping: true,
         duration: 2000,
+        message: `已切换至${store.themeType === "dark" ? "深色" : "浅色"}模式`,
+        icon: h(Brightness, {
+          fill: "#efefef",
+        }),
       });
     }
   }
@@ -197,17 +213,20 @@ const handleThemeSwitch = (event) => {
 
 const handleSearchToggle = (event) => {
   if (event.altKey && event.key.toLowerCase() === "s") {
-    const activeEl = document.activeElement;
-    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
-      return;
-    }
     event.preventDefault();
+    if (!store.prioritizeFirst) {
+      if (store.setOpenState) {
+        store.setOpenState = false;
+      }
+    }
     store.searchOpenState = !store.searchOpenState;
     if (store.messageShow) {
       ElMessage({
-        message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
-        grouping: true,
         duration: 2000,
+        message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
+        icon: h(Search, {
+          fill: "#efefef",
+        }),
       });
       if (store.searchOpenState) {
         ElMessage({
@@ -231,6 +250,12 @@ const handleContextMenu = (event) => {
   if (typeof monitorWidthChanges === "function") {
     monitorWidthChanges(store.innerWidth);
   }
+  // 开启多页面
+  if (!store.prioritizeFirst) {
+    if (store.searchOpenState) {
+      store.searchOpenState = false;
+    }
+  }
   // 移动端禁用右键
   if (store.innerWidth < 721) {
     ElMessage({
@@ -238,6 +263,9 @@ const handleContextMenu = (event) => {
       grouping: true,
       duration: 2000,
     });
+    if (store.webSpeech) {
+      SpeechLocal("鼠标右键.mp3");
+    }
     event.preventDefault();
     return false;
   }
@@ -245,9 +273,11 @@ const handleContextMenu = (event) => {
   store.setOpenState = !store.setOpenState;
   if (store.messageShow) {
     ElMessage({
-      message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
-      grouping: true,
       duration: 2000,
+      message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
+      icon: h(Setting, {
+        fill: "#efefef",
+      }),
     });
   }
   event.preventDefault();
@@ -258,10 +288,14 @@ const handleMiddleClick = (event) => {
   if (event.button !== 1) return;
   store.backgroundShow = !store.backgroundShow;
   if (store.messageShow) {
+    let iconComponent = null;
+    store.backgroundShow ? (iconComponent = PreviewOpen) : (iconComponent = PreviewClose);
     ElMessage({
-      message: `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
-      grouping: true,
       duration: 2000,
+      message: `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
+      icon: h(iconComponent, {
+        fill: "#efefef",
+      }),
     });
   }
   if (store.webSpeech) {
@@ -343,7 +377,6 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
   transform: scale(1.2);
   transition: transform 0.3s;
   animation: fade-blur-main-in 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
@@ -368,6 +401,7 @@ onBeforeUnmount(() => {
       left: 0;
       width: 100%;
       height: 100%;
+      background-color: rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(20px);
       animation: fade 0.5s;
     }
@@ -390,7 +424,7 @@ onBeforeUnmount(() => {
     left: calc(50% - 28px);
     width: 56px;
     height: 34px;
-    background: var(--main-cards-bg-color);
+    background-color: var(--main-cards-bg-color);
     backdrop-filter: blur(10px);
     border-radius: 6px;
     transition: transform 0.3s;

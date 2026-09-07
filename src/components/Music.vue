@@ -78,6 +78,8 @@ import {
   VolumeMute,
   VolumeSmall,
   VolumeNotice,
+  MusicMenu,
+  HomeTwo,
 } from "@icon-park/vue-next";
 import Player from "@/components/Player.vue";
 import { SpeechLocal } from "@/utils/speech";
@@ -132,7 +134,45 @@ watch(
   { immediate: true },
 );
 
-// 回到主页
+// 上一首/下一首
+const handleHorizontalArrow = (event) => {
+  const activeEl = document.activeElement;
+  if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    changeMusicIndex(0); // 上一首
+  } else if (event.key === "ArrowRight") {
+    event.preventDefault();
+    changeMusicIndex(1); // 下一首
+  }
+};
+
+// 调节音量
+const handleVerticalArrow = (event) => {
+  const activeEl = document.activeElement;
+  if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    changeMusicIndex(0);
+  } else if (event.key === "ArrowRight") {
+    event.preventDefault();
+    changeMusicIndex(1);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    volumeNum.value = Math.min(1, volumeNum.value + 0.05);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    volumeNum.value = Math.max(0, volumeNum.value - 0.05);
+  }
+};
+
+// 回到首页
 const handleHToggle = (event) => {
   if (event.altKey && (event.key === "h" || event.key === "H")) {
     event.preventDefault();
@@ -146,9 +186,11 @@ const handleHToggle = (event) => {
       }
       if (store.messageShow) {
         ElMessage({
-          message: "已回到主页",
-          grouping: true,
           duration: 2000,
+          message: "已回到首页",
+          icon: h(HomeTwo, {
+            fill: "#efefef",
+          }),
         });
       }
     }
@@ -171,6 +213,12 @@ onMounted(() => {
   document.addEventListener("click", handleFirstInteraction);
   document.addEventListener("keydown", handleFirstInteraction);
 
+  // 左右方向键事件
+  document.addEventListener("keydown", handleHorizontalArrow);
+
+  // 上下方向键事件
+  document.addEventListener("keydown", handleVerticalArrow);
+
   // Alt+H键事件
   document.addEventListener("keydown", handleHToggle);
 
@@ -179,28 +227,30 @@ onMounted(() => {
     if (event.altKey && event.key.toLowerCase() === "m") {
       event.preventDefault();
       store.boxOpenState = false;
-      if (store.prioritizeFirst) {
-        if (store.setOpenState || store.searchOpenState) {
-          store.setOpenState = false;
-          store.searchOpenState = false;
-        }
+      if (store.setOpenState || store.searchOpenState) {
+        store.setOpenState = false;
+        store.searchOpenState = false;
       }
       if (musicListShow.value) {
         closeMusicList();
         if (store.messageShow) {
           ElMessage({
-            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
-            grouping: true,
             duration: 2000,
+            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
+            icon: h(MusicMenu, {
+              fill: "#efefef",
+            }),
           });
         }
       } else {
         openMusicList();
         if (store.messageShow) {
           ElMessage({
-            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
-            grouping: true,
             duration: 2000,
+            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
+            icon: h(MusicMenu, {
+              fill: "#efefef",
+            }),
           });
         }
       }
@@ -226,6 +276,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  document.removeEventListener("keydown", handleHorizontalArrow);
+  document.removeEventListener("keydown", handleVerticalArrow);
   document.removeEventListener("keydown", handleHToggle);
 });
 </script>
@@ -359,6 +411,7 @@ onBeforeUnmount(() => {
   margin: auto;
   width: 100%;
   height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(20px);
   z-index: 1;
 

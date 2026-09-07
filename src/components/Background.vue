@@ -94,7 +94,7 @@ const imgLoadError = () => {
   if (store.webSpeech) {
     setTimeout(() => {
       SpeechLocal("壁纸加载失败.mp3");
-    }, 1900);
+    }, 2000);
   }
 };
 

@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { MusicOne } from "@icon-park/vue-next";
+import { MusicOne, Cat } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
 import ProgressBar from "@/components/ProgressBar.vue";
@@ -91,8 +91,12 @@ const toggleForceIcon = () => {
   store.forceShowIcon = !store.forceShowIcon;
   if (store.messageShow) {
     ElMessage({
-      dangerouslyUseHTMLString: true,
+      duration: 2000,
       message: `${store.forceShowIcon ? "已启用" : "已禁用"}进度图标常驻`,
+      icon: h(Cat, {
+        theme: "filled",
+        fill: "#efefef",
+      }),
     });
   }
   if (store.webSpeech) {
@@ -113,11 +117,10 @@ const toggleForceIcon = () => {
 
 const isAltPressed = ref(false);
 
-// Alt 键按下/释放事件
 const handleAltKey = (event) => {
-  event.preventDefault();
   if (event.key === "Alt") {
     isAltPressed.value = event.type === "keydown";
+    event.preventDefault();
   }
 };
 
@@ -183,18 +186,16 @@ onBeforeUnmount(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--main-bg-color);
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    z-index: 10;
     animation: fadeIn 0.15s ease;
   }
 
   .alt-hint-text {
-    color: #fff;
     font-size: 14px;
     font-weight: bold;
     letter-spacing: 2px;

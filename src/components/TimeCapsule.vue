@@ -63,6 +63,7 @@ onBeforeUnmount(() => {
     align-items: center;
     margin: 0.2rem 0 1.5rem;
     font-size: 1.1rem;
+    text-shadow: 0 0 5px #00000050;
     .i-icon {
       display: flex;
       justify-content: center;

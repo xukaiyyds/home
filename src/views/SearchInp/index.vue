@@ -413,6 +413,7 @@ const handleSearch = () => {
       align-items: center;
       flex-direction: row;
       font-size: 18px;
+      text-shadow: 0 0 5px #00000050;
 
       .i-icon {
         width: 28px;
@@ -447,22 +448,16 @@ const handleSearch = () => {
 
         .custom-footer {
           padding: 6px 10px;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
           transition: background 0.2s;
           .custom-icon {
             vertical-align: middle;
           }
           .custom-text {
-            display: inline-flex;
-            align-items: center;
-            margin-left: 6px;
+            margin-left: 4px;
             color: #909399;
           }
           &:hover {
-            background: rgba(255, 255, 255, 0.05);
-            .custom-text {
-              color: #fff;
-            }
+            background-color: #fff;
           }
         }
       }

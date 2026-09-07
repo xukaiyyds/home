@@ -269,12 +269,12 @@ const submitForm = () => {
 // 删除
 const confirmDelete = (item) => {
   ElMessageBox.confirm(
-    `确认删除 “<el-text style="color:#E6A23C">${item.name}</el-text>” 捷径？此操作无法恢复！`,
+    `确认删除 <strong><el-text style="color:#409EFF">${item.name}</el-text></strong> 捷径？此操作<el-text style="color:#E6A23C">无法恢复</el-text>！`,
     "删除捷径",
     {
+      dangerouslyUseHTMLString: true,
       confirmButtonClass: "danger",
       cancelButtonClass: "cancel-deletion",
-      dangerouslyUseHTMLString: true,
       confirmButtonText: "删除",
       cancelButtonText: "取消",
       type: "warning",
@@ -437,6 +437,7 @@ onBeforeUnmount(() => {
     .title {
       margin-left: 8px;
       font-size: 1rem;
+      text-shadow: 0 0 5px #00000050;
       flex: 1;
     }
 

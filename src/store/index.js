@@ -58,11 +58,11 @@ export const mainStore = defineStore("main", {
       playCustomSong: "", // 自定义歌单
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
-      live2dShow: false, // 是否显示live2d模型
+      live2dShow: true, // 是否显示live2d模型
       modelType: "Mao", // live2d模型种类
       modelPath: "", // live2d模型路径
-      webSpeech: false, // 语音播报
-      prioritizeFirst: true, // 页面层级
+      webSpeech: true, // 语音播报
+      prioritizeFirst: false, // 页面层级
       openTimes: {}, // 记录每个页面打开的时间戳
     };
   },

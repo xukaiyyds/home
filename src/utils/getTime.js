@@ -103,10 +103,8 @@ export const helloInit = () => {
     iconComponent = Sleep;
   }
   ElMessage({
-    dangerouslyUseHTMLString: true,
-    message: `<strong>${hello}</strong>`,
+    message: `${hello}`,
     icon: h(iconComponent, {
-      theme: "filled",
       fill: "#efefef",
     }),
   });
@@ -180,9 +178,12 @@ const lunarAnniversaries = {
 
 const showFestivalMessage = (name) => {
   ElMessage({
-    message: `今天是${name}`,
+    dangerouslyUseHTMLString: true,
     duration: 5000,
-    icon: h(Calendar, { theme: "filled", fill: "#efefef" }),
+    message: `今天是 <strong>${name}</strong>`,
+    icon: h(Calendar, {
+      fill: "#efefef",
+    }),
   });
 };
 

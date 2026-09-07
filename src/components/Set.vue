@@ -30,6 +30,15 @@
           />
         </div>
         <div class="item">
+          <span class="text">搜索页和设置页能同时打开</span>
+          <el-switch
+            v-model="prioritizeFirst"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
           <span class="text">打开搜索自动聚焦搜索引擎</span>
           <el-switch
             v-model="focusSearch"
@@ -42,15 +51,6 @@
           <span class="text">搜索后自动清空输入框内容</span>
           <el-switch
             v-model="clearContent"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
-          <span class="text">越先开启的页面层级就越高</span>
-          <el-switch
-            v-model="prioritizeFirst"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -122,42 +122,47 @@
             </el-form-item>
             <el-form-item label="壁纸网站">
               <a class="btn-links" href="https://www.bizhihui.com" target="_blank">
-                <el-button type="success" size="small" round>壁纸汇</el-button>
+                <el-button type="primary" size="small" round>壁纸汇</el-button>
               </a>
               <a class="btn-links" href="https://desk.3gbizhi.com" target="_blank">
-                <el-button type="success" size="small" round>3G壁纸</el-button>
+                <el-button type="primary" size="small" round>3G壁纸</el-button>
               </a>
               <a class="btn-links" href="https://unsplash.com/t/wallpapers" target="_blank">
-                <el-button type="success" size="small" round>Unsplash</el-button>
+                <el-button type="primary" size="small" round>Unsplash</el-button>
               </a>
               <a class="btn-links" href="https://www.wallpaperhub.app/wallpapers" target="_blank">
-                <el-button type="success" size="small" round>WallpaperHub</el-button>
+                <el-button type="primary" size="small" round>WallpaperHub</el-button>
               </a>
               <a class="btn-links" href="https://wallhaven.cc" target="_blank">
-                <el-button type="success" size="small" round>Wallhaven</el-button>
+                <el-button type="primary" size="small" round>Wallhaven</el-button>
               </a>
             </el-form-item>
             <el-form-item label="图床工具">
               <a class="btn-links" href="https://www.superbed.cn" target="_blank">
-                <el-button type="success" size="small" round>聚合图床</el-button>
+                <el-button type="primary" size="small" round>聚合图床</el-button>
               </a>
               <a class="btn-links" href="https://imgchr.com" target="_blank">
-                <el-button type="success" size="small" round>路过图床</el-button>
+                <el-button type="primary" size="small" round>路过图床</el-button>
               </a>
               <a class="btn-links" href="https://7bu.top" target="_blank">
-                <el-button type="success" size="small" round>去不图床</el-button>
+                <el-button type="primary" size="small" round>去不图床</el-button>
               </a>
             </el-form-item>
             <el-form-item label="收藏壁纸">
               <a class="btn-links" href="https://plog.xukaiyyds.cn/wallpaper" target="_blank">
-                <el-button type="success" size="small" round>壁纸库</el-button>
+                <el-button type="primary" size="small" round>壁纸库</el-button>
               </a>
             </el-form-item>
             <el-form-item label="使用方法">
-              <el-text class="mx-1" type="success"
-                >1. 在各大高清壁纸网站中选好心仪的壁纸，然后下载下来。 <br />2.
-                将下载好的壁纸上传到你的图床工具网站中。<br />3.
-                将上传好的图片链接复制到此处即可。<br />4.
+              <el-text type="info" size="small"
+                >1. 在各大高清壁纸网站中选好心仪的壁纸，然后下载下来。</el-text
+              >
+              <el-text type="info" size="small"
+                >2. 将下载好的壁纸上传到你的图床工具网站中。</el-text
+              >
+              <el-text type="info" size="small">3. 将上传好的图片链接复制到此处即可。</el-text>
+              <el-text type="info" size="small"
+                >4.
                 或者直接从我收藏的壁纸库里挑选心仪的壁纸，然后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text
               >
             </el-form-item>
@@ -339,11 +344,11 @@
           <el-button @click="resetSite" class="danger" size="small">重置</el-button>
         </div>
         <div class="item">
-          <span class="text">将捷径数据与站点配置进行备份</span>
-          <el-button @click="backupSite" class="warning" size="small">备份</el-button>
+          <span class="text">将站点数据进行备份</span>
+          <el-button @click="backupSite" class="success" size="small">备份</el-button>
         </div>
         <div class="item">
-          <span class="text">将备份好的捷径数据与站点配置进行恢复</span>
+          <span class="text">将备份好的站点数据进行恢复</span>
           <input
             ref="recoverRef"
             type="file"
@@ -414,7 +419,6 @@ const radioChange = () => {
   ElMessage({
     message: "壁纸更换成功",
     icon: h(SuccessPicture, {
-      theme: "filled",
       fill: "#efefef",
     }),
   });
@@ -452,7 +456,6 @@ const setCustomCover = () => {
     ElMessage({
       message: "自定义壁纸更换成功",
       icon: h(SuccessPicture, {
-        theme: "filled",
         fill: "#efefef",
       }),
     });
@@ -501,13 +504,18 @@ const resetSite = () => {
   if (store.webSpeech) {
     SpeechLocal("重置.mp3");
   }
-  ElMessageBox.confirm("重置后你的捷径数据与站点配置都将丢失！请确保你已经做好了备份", "站点重置", {
-    confirmButtonClass: "danger",
-    cancelButtonClass: "cancel-deletion",
-    confirmButtonText: "重置",
-    cancelButtonText: "取消",
-    type: "warning",
-  })
+  ElMessageBox.confirm(
+    `重置后你所有的 <strong><el-text style="color:#409EFF">捷径数据</el-text></strong> 与 <strong><el-text style="color:#409EFF">站点配置</el-text></strong> 都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经<el-text style="color:#67C23A">做好了备份</el-text>`,
+    "站点重置",
+    {
+      dangerouslyUseHTMLString: true,
+      confirmButtonClass: "danger",
+      cancelButtonClass: "cancel-deletion",
+      confirmButtonText: "重置",
+      cancelButtonText: "取消",
+      type: "warning",
+    },
+  )
     .then(() => {
       if (store.webSpeech) {
         SpeechLocal("重置中.mp3");
@@ -515,7 +523,7 @@ const resetSite = () => {
       setTimeout(() => {
         localStorage.clear();
         ElMessage({
-          message: "站点重置成功，即将刷新",
+          message: "重置成功，即将刷新",
           icon: h(Correct, {
             theme: "filled",
             fill: "#efefef",
@@ -554,7 +562,7 @@ const backupSite = () => {
     URL.revokeObjectURL(url);
     // 备份完成
     ElMessage({
-      message: "站点备份成功",
+      message: "站点数据备份成功",
       icon: h(Correct, {
         theme: "filled",
         fill: "#efefef",
@@ -562,13 +570,13 @@ const backupSite = () => {
     });
   } catch (error) {
     ElMessage({
-      message: "站点备份失败",
+      message: "站点数据备份失败",
       icon: h(Error, {
         theme: "filled",
         fill: "#efefef",
       }),
     });
-    console.error("站点备份失败：", error);
+    console.error("站点数据备份失败：", error);
   }
 };
 
@@ -592,9 +600,10 @@ const recoverSite = async (event) => {
     const data = JSON.parse(jsonData);
     // 恢复数据
     ElMessageBox.confirm(
-      "确认使用该恢复文件？你现有的捷径数据以及自定义设置都将被覆盖！",
+      `确认使用该恢复文件？你现有的 <strong><el-text style="color:#409EFF">捷径数据</el-text></strong> 以及 <strong><el-text style="color:#409EFF">站点配置</el-text></strong> 都将被<el-text style="color:#E6A23C">覆盖</el-text>！`,
       "站点恢复",
       {
+        dangerouslyUseHTMLString: true,
         confirmButtonClass: "success",
         cancelButtonClass: "cancel-deletion",
         confirmButtonText: "恢复",
@@ -610,7 +619,7 @@ const recoverSite = async (event) => {
           }
           setTimeout(() => {
             ElMessage({
-              message: "站点恢复成功，即将刷新",
+              message: "恢复成功，即将刷新",
               icon: h(Correct, {
                 theme: "filled",
                 fill: "#efefef",
@@ -728,10 +737,6 @@ onMounted(() => {
         border-color: transparent;
       }
 
-      .bg-input {
-        --el-input-focus-border-color: #67c23a;
-      }
-
       .song-input {
         margin-top: 4px;
         --el-input-focus-border-color: #eeeeee;
@@ -778,14 +783,6 @@ onMounted(() => {
             }
             &:active {
               border-color: #f56c6c;
-            }
-          }
-          .warning {
-            &:hover {
-              background-color: rgb(235, 181, 99);
-            }
-            &:active {
-              border-color: #e6a23c;
             }
           }
           .success {

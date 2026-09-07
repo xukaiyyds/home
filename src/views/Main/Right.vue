@@ -1,8 +1,8 @@
 <template>
   <div :class="store.mobileOpenState ? 'right' : 'right hidden'">
-    <!-- 移动端 Logo -->
-    <div class="logo text-hidden" @click="store.mobileFuncState = !store.mobileFuncState">
-      <ExchangeAlt style="width: 2rem" />
+    <!-- 移动端切换按钮 -->
+    <div class="switch-button text-hidden" @click="store.mobileFuncState = !store.mobileFuncState">
+      <Switch theme="filled" size="20" fill="#efefef" />
     </div>
     <!-- 功能区 -->
     <Func />
@@ -13,7 +13,7 @@
 
 <script setup>
 import { mainStore } from "@/store";
-import { ExchangeAlt } from "@vicons/fa";
+import { Switch } from "@icon-park/vue-next";
 import Func from "@/views/Func/index.vue";
 import Link from "@/components/Links.vue";
 const store = mainStore();
@@ -25,14 +25,18 @@ const store = mainStore();
   width: 50%;
   margin-left: 0.75rem;
 
-  .logo {
-    width: 100%;
-    font-family: "Pacifico-Regular";
-    font-size: 2.25rem;
-    position: fixed;
-    top: 10%;
-    left: 0;
-    text-align: center;
+  .switch-button {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 84%;
+    left: calc(50% - 28px);
+    width: 56px;
+    height: 34px;
+    background: var(--main-cards-bg-color);
+    backdrop-filter: blur(10px);
+    border-radius: 6px;
     transition: transform 0.3s;
     animation: fade 0.5s;
 
@@ -45,12 +49,15 @@ const store = mainStore();
     }
 
     @media (max-height: 720px) {
-      width: calc(100% + 6px);
-      top: 43.26px; // 721px * 0.06
+      bottom: 605.64px; // 721px * 0.84
+      left: 170.5px; // 391 * 0.5 - 25px
+      @media (min-width: 391px) {
+        left: calc(50% - 25px);
+      }
     }
 
     @media (max-width: 390px) {
-      width: 391px;
+      left: 167.5px; // 391px * 0.5 - 28px
     }
   }
 

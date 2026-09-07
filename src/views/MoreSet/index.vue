@@ -73,6 +73,7 @@ const closeShow = ref(false);
         align-items: center;
         flex-direction: row;
         font-size: 18px;
+        text-shadow: 0 0 5px #00000050;
         margin-bottom: 16px;
 
         .i-icon {
