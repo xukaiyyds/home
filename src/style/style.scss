@@ -177,9 +177,22 @@ scrollbar-thumb {
 // live2d 模型
 #live2d {
   z-index: 0 !important;
-  right: -40px !important;
+  right: -20px !important;
+}
+
+#live2dMessageBox,
+.__live2d-toolbox-item:nth-child(2),
+.__live2d-toolbox-item:nth-child(3),
+.__live2d-toolbox-item:last-child {
+  display: none !important;
 }
 
 .button-item {
-  display: none !important;
+  position: relative;
+  top: 208px;
+  right: 4px;
+}
+
+.__live2d-toolbox-item {
+  background-color: var(--main-footer-bg-color) !important;
 }

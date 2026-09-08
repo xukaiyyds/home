@@ -26,6 +26,7 @@
             autocomplete="false"
             placeholder="想搜点什么"
             @keydown.enter.prevent="handleSearch"
+            :clear-icon="Close"
             clearable
           >
             <template #prepend>
@@ -43,6 +44,7 @@
                 default-first-option
                 no-match-text="没有匹配的数据"
                 fit-input-width
+                :clear-icon="Close"
                 clearable
               >
                 <template #prefix>
@@ -119,6 +121,8 @@
             placeholder="例如：豆瓣"
             maxlength="10"
             show-word-limit
+            word-limit-position="outside"
+            :clear-icon="Close"
             clearable
           />
         </el-form-item>
@@ -126,6 +130,7 @@
           <el-input
             v-model="customEngineUrlInput"
             placeholder="例如：https://www.douban.com/search?q="
+            :clear-icon="Close"
             clearable
           />
         </el-form-item>
@@ -158,6 +163,7 @@ import {
   Google,
   Duck,
   Github,
+  Close,
 } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";

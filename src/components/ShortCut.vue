@@ -12,6 +12,7 @@
           size="small"
           :prefix-icon="Search"
           class="search-input"
+          :clear-icon="CloseSmall"
           clearable
         />
         <el-button size="small" @click="openAddModal">
@@ -138,11 +139,18 @@
             placeholder="例如：百度"
             maxlength="20"
             show-word-limit
+            word-limit-position="outside"
+            :clear-icon="Close"
             clearable
           />
         </el-form-item>
         <el-form-item label="站点链接" prop="url">
-          <el-input v-model="formData.url" placeholder="例如：https://www.baidu.com" clearable />
+          <el-input
+            v-model="formData.url"
+            placeholder="例如：https://www.baidu.com"
+            :clear-icon="Close"
+            clearable
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -155,7 +163,8 @@
 
 <script setup>
 import { Icon } from "@vicons/utils";
-import { Link, Search, Plus, Download, Upload, Edit, TrashAlt } from "@vicons/fa";
+import { Link, Plus, Download, Upload, Edit, TrashAlt } from "@vicons/fa";
+import { Search, Close, CloseSmall } from "@icon-park/vue-next";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination, Mousewheel } from "swiper/modules";
 import { mainStore } from "@/store";

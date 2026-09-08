@@ -27,7 +27,9 @@
               <Icon size="26">
                 <component :is="siteIcon[item.icon] || Compass" />
               </Icon>
-              <span class="name text-hidden">{{ item.name }}</span>
+              <span class="name text-hidden">
+                {{ item.name === "网抑音乐" && store.musicClick ? "音乐列表" : item.name }}
+              </span>
             </div>
           </el-col>
         </el-row>

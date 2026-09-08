@@ -32,7 +32,7 @@
           </a>
         </span>
         <!-- 查看帮助 -->
-        <span class="hidden">
+        <span class="hidden-key">
           &amp;
           <a @click="toggleHelp" style="position: relative">
             查看快捷键
@@ -226,6 +226,10 @@ onBeforeUnmount(() => {
 
   @media (max-width: 720px) {
     font-size: 0.9rem;
+
+    .hidden-key {
+      display: none;
+    }
 
     &.blur {
       font-size: 0.9rem;

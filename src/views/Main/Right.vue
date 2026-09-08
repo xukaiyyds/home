@@ -1,9 +1,9 @@
 <template>
   <div :class="store.mobileOpenState ? 'right' : 'right hidden'">
     <!-- 移动端切换按钮 -->
-    <div class="switch-button text-hidden" @click="store.mobileFuncState = !store.mobileFuncState">
-      <Switch theme="filled" size="20" fill="#efefef" />
-    </div>
+    <Icon class="switch-button" size="24" @click="store.mobileFuncState = !store.mobileFuncState">
+      <Switch />
+    </Icon>
     <!-- 功能区 -->
     <Func />
     <!-- 网站链接 -->
@@ -13,6 +13,7 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { Icon } from "@vicons/utils";
 import { Switch } from "@icon-park/vue-next";
 import Func from "@/views/Func/index.vue";
 import Link from "@/components/Links.vue";

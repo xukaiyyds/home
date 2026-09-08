@@ -117,6 +117,7 @@
                 size="small"
                 autocomplete="off"
                 placeholder="例如：https://plog.xukaiyyds.cn/img/wallpaper/动漫/01.jpg"
+                :clear-icon="CloseSmall"
                 clearable
               />
             </el-form-item>
@@ -238,7 +239,6 @@
           <span class="text">动画模型</span>
           <el-switch
             v-model="live2dShow"
-            @change="refreshPrompt"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -332,9 +332,10 @@
             v-show="playerSwitchId === 3"
             @change="refreshPrompt"
             type="number"
+            class="song-input"
             size="small"
             placeholder="复制网易云音乐歌单链接?id=后面的数字，例如：5059633707"
-            class="song-input"
+            :clear-icon="CloseSmall"
             clearable
           />
         </div>
@@ -372,6 +373,7 @@ import {
   Error,
   Correct,
   Success,
+  Redo,
 } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";
@@ -665,8 +667,10 @@ const recoverSite = async (event) => {
 const refreshPrompt = () => {
   ElMessage({
     message: "刷新后生效",
-    grouping: true,
-    duration: 2000,
+    icon: h(Redo, {
+      theme: "filled",
+      fill: "#efefef",
+    }),
   });
 };
 

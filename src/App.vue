@@ -165,10 +165,54 @@ const initLive2D = async (type) => {
     ResourcesPath: store.modelPath, // 入口文件
     BackgroundRGBA: [0.0, 0.0, 0.0, 0.0], // 背景颜色
     CanvasSize: { height: 250, width: 200 }, // 调整大小
-    ShowToolBox: store.live2dShow, // 是否显示模型
-    LoadFromCache: true, // 是否使用 indexDB 进行缓存优化
+    ShowToolBox: true,
+    LoadFromCache: true,
   });
+  toggleLive2dDisplay(store.live2dShow);
 };
+
+// 控制 Live2D 模型和工具箱的显示/隐藏
+const toggleLive2dDisplay = (show) => {
+  const applyDisplay = () => {
+    // 控制模型
+    const live2dEl = document.getElementById("live2d");
+    if (live2dEl) {
+      live2dEl.style.display = show ? "" : "none";
+    }
+
+    // 控制工具箱
+    const item = document.querySelector(".__live2d-toolbox-item");
+    if (item) {
+      let container = item.parentElement;
+      while (container && getComputedStyle(container).position !== "fixed") {
+        container = container.parentElement;
+      }
+      if (container) {
+        container.style.display = show ? "" : "none";
+      }
+    }
+  };
+
+  // 立即执行一次
+  applyDisplay();
+  // 如果元素尚未渲染，延迟重试（针对初始化阶段）
+  setTimeout(applyDisplay, 300);
+  setTimeout(applyDisplay, 600);
+};
+
+// 监听模型变化
+watch(
+  () => store.live2dShow,
+  (newVal) => {
+    toggleLive2dDisplay(newVal);
+  },
+  { immediate: true },
+);
+
+// live2d模型
+onMounted(async () => {
+  await initLive2D(store.modelType);
+});
 
 // 全局键盘事件
 const handleGlobalKeydown = (event) => {
@@ -313,9 +357,6 @@ const handleHelpToggle = (event) => {
 onMounted(() => {
   // 自定义鼠标
   cursorInit();
-
-  // live2d模型
-  initLive2D(store.modelType);
 
   // 时光胶囊
   document.addEventListener("keydown", handleGlobalKeydown);
