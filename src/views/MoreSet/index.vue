@@ -42,7 +42,7 @@ const closeShow = ref(false);
   background: var(--main-panel-bg-color);
   border-radius: 6px;
   padding: 40px;
-  box-shadow: var(--main-box-shadow);
+  box-shadow: var(--main-big-box-shadow);
 
   .close {
     position: absolute;

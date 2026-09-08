@@ -15,7 +15,7 @@
         <Search theme="filled" size="28" fill="#ffffff60" />
         <span class="name">全网搜索</span>
       </div>
-      <el-card class="nav">
+      <el-card class="nav" shadow="never">
         <template #header>
           <!-- 搜索框 -->
           <el-input
@@ -390,7 +390,7 @@ const handleSearch = () => {
   background: var(--main-panel-bg-color);
   border-radius: 6px;
   padding: 40px;
-  box-shadow: var(--main-box-shadow);
+  box-shadow: var(--main-big-box-shadow);
 
   .close {
     position: absolute;
@@ -431,6 +431,7 @@ const handleSearch = () => {
     .nav {
       margin-top: 20px;
       height: 100%;
+      box-shadow: var(--main-small-box-shadow);
 
       // 下拉菜单
       .engine-select {
@@ -482,9 +483,9 @@ const handleSearch = () => {
 
       // 搜索框
       .input-search {
-        --el-input-border-color: #ffffff;
-        --el-input-placeholder-color: #efefef;
+        --el-input-border-color: #efefef;
         --el-input-hover-border-color: #dcdfe6;
+        --el-input-placeholder-color: #efefef;
         --el-input-focus-border-color: #eeeeee;
       }
 

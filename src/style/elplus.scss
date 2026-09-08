@@ -6,7 +6,7 @@
   backdrop-filter: blur(10px);
   border-radius: 25px !important;
   border-color: transparent !important;
-  box-shadow: var(--main-box-shadow) !important;
+  box-shadow: var(--main-small-box-shadow) !important;
 
   .el-message__badge {
     display: none;
@@ -19,7 +19,7 @@
 // 输入框样式
 .el-input {
   --el-input-bg-color: var(--main-cards-bg-color) !important;
-  --el-input-text-color: #efefef !important;
+  --el-input-text-color: #fff !important;
 
   .el-input-group__prepend,
   .el-input-group__append {
@@ -77,12 +77,6 @@
     background-color: #67c23a !important;
     &:hover {
       background-color: rgb(133, 206, 97) !important;
-    }
-  }
-  .warning {
-    background-color: #e6a23c !important;
-    &:hover {
-      background-color: rgb(235, 181, 99) !important;
     }
   }
   .danger {

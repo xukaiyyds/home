@@ -69,12 +69,12 @@ a:hover {
   border-radius: 6px;
   background-color: var(--main-cards-bg-color);
   backdrop-filter: blur(10px);
-  box-shadow: var(--main-box-shadow);
   transform: scale(1);
   transition:
-    backdrop-filter 0.3s,
-    transform 0.3s;
+  backdrop-filter 0.3s,
+  transform 0.3s;
   &:hover {
+    box-shadow: var(--main-small-box-shadow);
     transform: scale(1.01);
   }
   &:active {

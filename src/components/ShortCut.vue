@@ -548,12 +548,12 @@ onBeforeUnmount(() => {
         justify-content: center;
         border-radius: 6px;
         background-color: var(--main-cards-bg-color);
-        box-shadow: var(--main-box-shadow);
         animation: fade 0.5s;
 
         &:hover {
           transform: scale(1.02);
           background: var(--main-links-hover-bg-color);
+          box-shadow: var(--main-small-box-shadow);
           transition: 0.3s;
         }
 
@@ -611,7 +611,7 @@ onBeforeUnmount(() => {
   padding: 6px 0;
   text-align: center;
   min-width: 140px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--main-small-box-shadow);
   border: 1px solid rgba(255, 255, 255, 0.1);
 
   .menu-item {

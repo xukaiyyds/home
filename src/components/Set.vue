@@ -294,7 +294,6 @@
           <span class="text">自动播放</span>
           <el-switch
             v-model="playerAutoplay"
-            @change="refreshPrompt"
             inline-prompt
             :active-icon="CheckSmall"
             :inactive-icon="CloseSmall"
@@ -508,7 +507,7 @@ const resetSite = () => {
     SpeechLocal("重置.mp3");
   }
   ElMessageBox.confirm(
-    `重置后你所有的 <strong><el-text style="color:#409EFF">捷径数据</el-text></strong> 与 <strong><el-text style="color:#409EFF">站点配置</el-text></strong> 都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经<el-text style="color:#67C23A">做好了备份</el-text>`,
+    `重置后你所有的 <el-text style="color:#409EFF">捷径数据</el-text> 与 <el-text style="color:#409EFF">站点配置</el-text> 都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经<el-text style="color:#67C23A">做好了备份</el-text>`,
     "站点重置",
     {
       dangerouslyUseHTMLString: true,
@@ -603,7 +602,7 @@ const recoverSite = async (event) => {
     const data = JSON.parse(jsonData);
     // 恢复数据
     ElMessageBox.confirm(
-      `确认使用该恢复文件？你现有的 <strong><el-text style="color:#409EFF">捷径数据</el-text></strong> 以及 <strong><el-text style="color:#409EFF">站点配置</el-text></strong> 都将被<el-text style="color:#E6A23C">覆盖</el-text>！`,
+      `确认使用该恢复文件？你现有的 <el-text style="color:#409EFF">捷径数据</el-text> 以及 <el-text style="color:#409EFF">站点配置</el-text> 都将被<el-text style="color:#E6A23C">覆盖</el-text>！`,
       "站点恢复",
       {
         dangerouslyUseHTMLString: true,
@@ -694,6 +693,7 @@ onMounted(() => {
     --el-collapse-content-bg-color: #ffffff10;
     --el-collapse-content-bg-color: var(--main-cards-body-bg-color);
     border-color: transparent;
+    box-shadow: var(--main-small-box-shadow);
     overflow: hidden;
 
     :deep(.el-collapse-item__header) {

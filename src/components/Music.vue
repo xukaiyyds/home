@@ -444,7 +444,7 @@ onBeforeUnmount(() => {
     width: 640px;
     height: 600px;
     background: var(--main-panel-bg-color);
-    box-shadow: var(--main-box-shadow);
+    box-shadow: var(--main-big-box-shadow);
     border-radius: 6px;
     z-index: 999;
 
