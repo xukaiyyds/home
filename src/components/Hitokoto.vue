@@ -133,7 +133,7 @@ onMounted(() => {
       margin-top: 10px;
       font-weight: bold;
       align-self: flex-end;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
   }
 }

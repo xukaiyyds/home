@@ -135,9 +135,9 @@ onBeforeUnmount(() => {
           letter-spacing: 2px;
           font-family: "UnidreamLED";
           .amPm {
-            font-size: 1rem;
+            font-size: 1.25rem;
             opacity: 0.6;
-            margin-left: 6px;
+            margin-left: 4px;
           }
         }
         @media (min-width: 1201px) and (max-width: 1280px) {

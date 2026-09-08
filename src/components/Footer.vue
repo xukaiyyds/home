@@ -199,7 +199,7 @@ onBeforeUnmount(() => {
     font-size: 14px;
     font-weight: bold;
     letter-spacing: 2px;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    text-shadow: var(--main-big-text-shadow);
   }
 
   @keyframes fadeIn {

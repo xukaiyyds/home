@@ -3,6 +3,7 @@ import "@/style/theme.scss";
 import "@/style/style.scss";
 import "@/style/elplus.scss";
 import App from "@/App.vue";
+import { mainStore } from "@/store";
 import { SpeechLocal } from "@/utils/speech";
 // 引入 pinia
 import { createPinia } from "pinia";
@@ -16,6 +17,8 @@ pinia.use(piniaPluginPersistedstate);
 
 app.use(pinia);
 app.mount("#app");
+
+const store = mainStore();
 
 // PWA
 navigator.serviceWorker.addEventListener("controllerchange", () => {

@@ -218,10 +218,17 @@
             size="small"
             text-color="#FFFFFF"
           >
-            <el-radio value="snow" border>雪花</el-radio>
-            <el-radio value="bubble" border>气泡</el-radio>
-            <el-radio value="star" border>星空</el-radio>
-            <el-radio value="firefly" border>萤火虫</el-radio>
+            <el-radio v-for="type in availableParticleTypes" :key="type" :value="type" border>
+              {{
+                type === "snow"
+                  ? "雪花"
+                  : type === "bubble"
+                    ? "气泡"
+                    : type === "star"
+                      ? "星空"
+                      : "萤火虫"
+              }}
+            </el-radio>
           </el-radio-group>
         </div>
       </el-collapse-item>
@@ -501,6 +508,21 @@ watch(bubble, (val) => {
   if (val) particleType.value = "bubble";
 });
 
+const availableParticleTypes = computed(() => {
+  if (themeType.value === "light") {
+    return ["snow", "bubble"]; // 浅色模式只允许雪花和气泡
+  } else {
+    return ["star", "firefly"]; // 深色模式只允许星空和萤火虫
+  }
+});
+
+watch(themeType, (newVal) => {
+  const available = newVal === "light" ? ["snow", "bubble"] : ["star", "firefly"];
+  if (!available.includes(particleType.value)) {
+    particleType.value = available[0];
+  }
+});
+
 // 站点重置
 const resetSite = () => {
   if (store.webSpeech) {
@@ -694,13 +716,13 @@ onMounted(() => {
     --el-collapse-content-bg-color: var(--main-cards-body-bg-color);
     border-color: transparent;
     box-shadow: var(--main-small-box-shadow);
+    text-shadow: var(--main-small-text-shadow);
     overflow: hidden;
 
     :deep(.el-collapse-item__header) {
       padding-left: 18px;
       font-size: 15px;
       color: #fff;
-      text-shadow: 0px 0px 4px #00000033;
       background-color: var(--main-cards-header-bg-color);
       border-color: transparent;
     }
@@ -717,6 +739,10 @@ onMounted(() => {
           border-radius: 8px;
           border-color: transparent;
         }
+      }
+
+      .el-dialog {
+        text-shadow: none;
       }
 
       .btn-right {

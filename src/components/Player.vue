@@ -221,6 +221,7 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList, getAudioRef });
   border-radius: 6px;
   font-family: "HarmonyOS_Regular", sans-serif !important;
   box-shadow: var(--main-small-box-shadow) !important;
+  text-shadow: var(--main-small-text-shadow);
 
   :deep(.aplayer-body) {
     background-color: transparent;

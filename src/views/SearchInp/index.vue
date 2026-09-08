@@ -419,7 +419,7 @@ const handleSearch = () => {
       align-items: center;
       flex-direction: row;
       font-size: 18px;
-      text-shadow: 0 0 5px #00000050;
+      text-shadow: var(--main-big-text-shadow);
 
       .i-icon {
         width: 28px;
