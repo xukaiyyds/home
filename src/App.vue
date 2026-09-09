@@ -101,6 +101,7 @@ const monitorWidthChanges = (value) => {
     store.boxOpenState = false;
     store.setOpenState = false;
     store.searchOpenState = false;
+    store.showParticle = false;
     store.live2dShow = false;
   }
 };
@@ -112,11 +113,6 @@ watch(
 
 // 检测并设置系统主题
 let systemThemeListener = null;
-
-const setSystemTheme = () => {
-  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  store.themeType = isDark ? "dark" : "light";
-};
 
 // 监听页面层级
 const settingsZIndex = computed(() => store.getZIndex("settings"));
@@ -250,6 +246,12 @@ const handleGlobalKeydown = (event) => {
 const handleThemeSwitch = (event) => {
   if (event.altKey && (event.key === "d" || event.key === "D")) {
     event.preventDefault();
+    // 如果之前有系统监听，移除它
+    if (systemThemeListener) {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      media.removeEventListener("change", systemThemeListener);
+      systemThemeListener = null;
+    }
     store.themeType = store.themeType === "dark" ? "light" : "dark";
     if (store.messageShow) {
       ElMessage({
@@ -280,22 +282,18 @@ const handleSearchToggle = (event) => {
           fill: "#efefef",
         }),
       });
-      if (store.searchOpenState) {
-        ElMessage({
-          message: "右键链接可编辑或删除捷径哦",
-          grouping: true,
-        });
-      }
     }
   }
 };
 
 const handleContextMenu = (event) => {
   const target = event.target;
-  const isShortcutItem =
-    target.closest?.(".shortcut-item-wrapper") || target.closest?.(".shortcut-item");
-  // 点击在捷径链接上，允许组件内部处理
-  if (isShortcutItem) {
+  // 如果点击在捷径项上，放行
+  if (
+    target.closest?.(".item") ||
+    target.closest?.(".shortcut-item-wrapper") ||
+    target.closest?.(".shortcut-item")
+  ) {
     return true;
   }
   // 如果有 monitorWidthChanges 函数则调用
@@ -389,12 +387,20 @@ onMounted(() => {
   window.addEventListener("resize", getWidth);
 
   // 监听系统主题变化
-  setSystemTheme();
-  const media = window.matchMedia("(prefers-color-scheme: dark)");
-  systemThemeListener = (e) => {
-    store.themeType = e.matches ? "dark" : "light";
-  };
-  media.addEventListener("change", systemThemeListener);
+  if (store.themeType === null) {
+    // 首次设置系统主题
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    store.themeType = isDark ? "dark" : "light";
+
+    // 监听系统主题变化（只有用户从未手动设置时才监听）
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    systemThemeListener = (e) => {
+      store.themeType = e.matches ? "dark" : "light";
+    };
+    media.addEventListener("change", systemThemeListener);
+  } else {
+    // 已有用户设置，不覆盖，不添加系统监听
+  }
 
   // 控制台输出
   const styleTitle1 = "font-size: 20px;font-weight: 600;color: rgb(244,167,89);";

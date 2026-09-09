@@ -128,6 +128,7 @@
     <el-dialog
       v-model="dialogVisible"
       :title="dialogType === 'edit' ? '编辑捷径' : '添加捷径'"
+      :close-icon="Close"
       width="500px"
       align-center
       destroy-on-close
@@ -140,7 +141,7 @@
             maxlength="20"
             show-word-limit
             word-limit-position="outside"
-            :clear-icon="Close"
+            :clear-icon="CloseSmall"
             clearable
           />
         </el-form-item>
@@ -148,14 +149,16 @@
           <el-input
             v-model="formData.url"
             placeholder="例如：https://www.baidu.com"
-            :clear-icon="Close"
+            :clear-icon="CloseSmall"
             clearable
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button type="info" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm">确认</el-button>
+        <el-button type="primary" @click="submitForm">{{
+          dialogType === "edit" ? "更新" : "确认"
+        }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -597,40 +600,6 @@ onBeforeUnmount(() => {
 
       .buttons-text {
         margin-left: 4px;
-      }
-    }
-  }
-}
-
-.custom-context-menu {
-  position: fixed;
-  z-index: 999;
-  background: var(--main-panel-bg-color);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  padding: 6px 0;
-  text-align: center;
-  min-width: 140px;
-  box-shadow: var(--main-small-box-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  .menu-item {
-    padding: 8px 20px;
-    color: rgba(255, 255, 255, 0.9);
-    transition: background 0.15s;
-
-    .menu-text {
-      margin-left: 4px;
-      font-size: 14px;
-    }
-
-    &:hover {
-      background: rgb(133, 206, 97);
-    }
-
-    &.danger {
-      &:hover {
-        background: rgb(247, 137, 137);
       }
     }
   }

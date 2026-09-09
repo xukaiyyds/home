@@ -11,12 +11,12 @@ export const mainStore = defineStore("main", {
       coverType: 0, // 壁纸种类
       bgUrl: "", // 壁纸URL
       backgroundCustom: "", // 壁纸自定义
-      themeType: "", // 主题颜色
+      themeType: null, // 主题颜色
       backgroundBlur: 0, // 壁纸模糊
       savedBackgroundBlur: 0, // 已保存壁纸模糊
       showBackgroundGray: true, // 壁纸遮罩显示
-      showParticle: false, // 显示粒子特效
-      currentParticle: "star", // 默认星空
+      showParticle: true, // 显示粒子特效
+      currentParticle: "", // 默认特效跟随系统
       darkstar: false, // 星空特效
       firefly: false, // 萤火虫特效
       snowflake: false, // 雪花特效

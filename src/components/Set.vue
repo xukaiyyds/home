@@ -3,6 +3,35 @@
     <el-collapse class="collapse" v-model="activeName" accordion>
       <el-collapse-item title="基础设置" name="1">
         <div class="item">
+          <span class="text">按下快捷键后弹出提示消息</span>
+          <el-switch
+            v-model="messageShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">当天气获取失败时显示农历</span>
+          <el-switch
+            v-model="showLunar"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
+          <span class="text">在时光胶囊下显示建站日期</span>
+          <el-switch
+            v-model="siteStartShow"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="高级设置" name="2">
+        <div class="item">
           <span class="text">使用精简版十二小时制时间</span>
           <el-switch
             v-model="use12HourFormat"
@@ -20,7 +49,7 @@
             :inactive-icon="CloseSmall"
           />
         </div>
-        <div class="item">
+        <div class="item" v-show="!shortcutHome">
           <span class="text">点击网抑音乐打开音乐列表</span>
           <el-switch
             v-model="musicClick"
@@ -56,35 +85,8 @@
             :inactive-icon="CloseSmall"
           />
         </div>
-        <div class="item">
-          <span class="text">按下快捷键后弹出提示消息</span>
-          <el-switch
-            v-model="messageShow"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
-          <span class="text">当天气获取失败时显示农历</span>
-          <el-switch
-            v-model="showLunar"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
-          <span class="text">在时光胶囊下显示建站日期</span>
-          <el-switch
-            v-model="siteStartShow"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
       </el-collapse-item>
-      <el-collapse-item title="个性壁纸" name="2">
+      <el-collapse-item title="个性壁纸" name="3">
         <div class="bg-set">
           <el-radio-group v-model="coverType" text-color="#ffffff" @change="radioChange">
             <el-radio :value="0" size="large" border>默认壁纸</el-radio>
@@ -105,6 +107,7 @@
           v-model="dialogFormVisible"
           title="自定义壁纸"
           :modal="false"
+          :close-icon="Close"
           align-center
           fullscreen
         >
@@ -174,7 +177,7 @@
           </el-form>
         </el-dialog>
       </el-collapse-item>
-      <el-collapse-item title="主题与背景" name="3">
+      <el-collapse-item title="主题与背景" name="4">
         <div class="item">
           <span class="text">主题模式</span>
           <el-radio-group v-model="themeType" text-color="#FFFFFF">
@@ -232,7 +235,7 @@
           </el-radio-group>
         </div>
       </el-collapse-item>
-      <el-collapse-item title="个性化调整" name="4">
+      <el-collapse-item title="个性化调整" name="5">
         <div class="item">
           <span class="text">语音交互</span>
           <el-switch
@@ -296,7 +299,7 @@
           />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="播放器配置" name="5">
+      <el-collapse-item title="播放器配置" name="6">
         <div class="item">
           <span class="text">自动播放</span>
           <el-switch
@@ -346,7 +349,7 @@
           />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="备份与恢复" name="6">
+      <el-collapse-item title="备份与恢复" name="7">
         <div class="item">
           <span class="text">重置站点为默认状态</span>
           <el-button @click="resetSite" class="danger" size="small">重置</el-button>
@@ -374,6 +377,7 @@
 <script setup>
 import {
   CheckSmall,
+  Close,
   CloseSmall,
   SuccessPicture,
   Error,
@@ -421,7 +425,7 @@ const {
 } = storeToRefs(store);
 
 // 默认选中项
-const activeName = ref("2");
+const activeName = ref("3");
 
 // 壁纸切换
 const radioChange = () => {
@@ -701,7 +705,16 @@ onMounted(() => {
   else if (snowflake.value) particleType.value = "snow";
   else if (firefly.value) particleType.value = "firefly";
   else if (bubble.value) particleType.value = "bubble";
-  else particleType.value = "star";
+  else {
+    // 根据当前主题设置默认粒子类型
+    const defaultParticle = themeType.value === "light" ? "snow" : "star";
+    particleType.value = defaultParticle;
+    if (defaultParticle === "snow") {
+      snowflake.value = true;
+    } else if (defaultParticle === "star") {
+      darkstar.value = true;
+    }
+  }
   store.currentParticle = particleType.value;
   // 检测是否存在自定义壁纸
   if (store.backgroundCustom) customCoverUrl.value = store.backgroundCustom;

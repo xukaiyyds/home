@@ -71,8 +71,8 @@ a:hover {
   backdrop-filter: blur(10px);
   transform: scale(1);
   transition:
-  backdrop-filter 0.3s,
-  transform 0.3s;
+    backdrop-filter 0.3s,
+    transform 0.3s;
   &:hover {
     box-shadow: var(--main-small-box-shadow);
     transform: scale(1.01);
@@ -157,6 +157,41 @@ a:hover {
   &.active {
     opacity: 0.5;
     transform: scale(0.5);
+  }
+}
+
+// 右键菜单
+.custom-context-menu {
+  position: fixed;
+  z-index: 999;
+  background: var(--main-panel-bg-color);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 6px 0;
+  text-align: center;
+  min-width: 140px;
+  box-shadow: var(--main-small-box-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .menu-item {
+    padding: 8px 20px;
+    color: rgba(255, 255, 255, 0.9);
+    transition: background 0.15s;
+
+    .menu-text {
+      margin-left: 4px;
+      font-size: 14px;
+    }
+
+    &:hover {
+      background: rgb(133, 206, 97);
+    }
+
+    &.danger {
+      &:hover {
+        background: rgb(247, 137, 137);
+      }
+    }
   }
 }
 

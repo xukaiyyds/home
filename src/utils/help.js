@@ -1,4 +1,4 @@
-import { KeyboardOne } from "@icon-park/vue-next";
+import { KeyboardOne, Close } from "@icon-park/vue-next";
 
 // 帮助弹窗内容（统一维护）
 export const helpContent = `
@@ -13,6 +13,7 @@ export const helpContent = `
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标右键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭全局设置）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标中键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/退出壁纸预览）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标滚轮</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（滑动网站/捷径列表）</span></div>
+  <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">右键捷径链接</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（编辑/删除捷径）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">双击底栏歌词</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/禁用进度图标常驻）</span></div>
 `;
 
@@ -32,8 +33,10 @@ export const toggleHelp = () => {
     closeOnClickModal: true,
     closeOnPressEscape: true,
     showConfirmButton: false,
+    draggable: true,
     center: true,
     icon: markRaw(KeyboardOne),
+    closeIcon: markRaw(Close),
   })
     .catch(() => {})
     .finally(() => {

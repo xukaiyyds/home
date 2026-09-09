@@ -44,7 +44,7 @@
                 default-first-option
                 no-match-text="没有匹配的数据"
                 fit-input-width
-                :clear-icon="Close"
+                :clear-icon="CloseSmall"
                 clearable
               >
                 <template #prefix>
@@ -111,6 +111,7 @@
       v-model="customDialogVisible"
       title="自定义搜索引擎"
       width="500px"
+      :close-icon="Close"
       align-center
       destroy-on-close
     >
@@ -122,7 +123,7 @@
             maxlength="10"
             show-word-limit
             word-limit-position="outside"
-            :clear-icon="Close"
+            :clear-icon="CloseSmall"
             clearable
           />
         </el-form-item>
@@ -130,7 +131,7 @@
           <el-input
             v-model="customEngineUrlInput"
             placeholder="例如：https://www.douban.com/search?q="
-            :clear-icon="Close"
+            :clear-icon="CloseSmall"
             clearable
           />
         </el-form-item>
@@ -164,6 +165,7 @@ import {
   Duck,
   Github,
   Close,
+  CloseSmall,
 } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";

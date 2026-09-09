@@ -28,11 +28,5 @@
     "id": 5,
     "name": "文心",
     "url": "https://wenxin.baidu.com/"
-  },
-
-  {
-    "id": 6,
-    "name": "DeepL翻译",
-    "url": "https://www.deepl.com/zh/translator"
   }
 ]
