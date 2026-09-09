@@ -430,7 +430,7 @@ onBeforeUnmount(() => {
   margin: auto;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--main-mores-bg-color);
   backdrop-filter: blur(20px);
   z-index: 1;
 

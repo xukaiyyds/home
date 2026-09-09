@@ -21,8 +21,15 @@ export const getCurrentTime = (use12Hour = false) => {
   hour = hour < 10 ? "0" + hour : hour;
 
   let minute = time.getMinutes() < 10 ? "0" + time.getMinutes() : time.getMinutes();
-  let second = time.getSeconds() < 10 ? "0" + time.getSeconds() : time.getSeconds();
-  let weekday = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+  let second;
+  let weekday;
+  if (use12Hour) {
+    second = null; // 12小时制不显示秒
+    weekday = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+  } else {
+    second = time.getSeconds() < 10 ? "0" + time.getSeconds() : time.getSeconds();
+    weekday = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+  }
   let currentTime = {
     year,
     month,

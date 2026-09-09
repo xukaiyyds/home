@@ -110,6 +110,14 @@ watch(
   (value) => monitorWidthChanges(value),
 );
 
+// 检测并设置系统主题
+let systemThemeListener = null;
+
+const setSystemTheme = () => {
+  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  store.themeType = isDark ? "dark" : "light";
+};
+
 // 监听页面层级
 const settingsZIndex = computed(() => store.getZIndex("settings"));
 const searchZIndex = computed(() => store.getZIndex("search"));
@@ -380,6 +388,14 @@ onMounted(() => {
   getWidth();
   window.addEventListener("resize", getWidth);
 
+  // 监听系统主题变化
+  setSystemTheme();
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  systemThemeListener = (e) => {
+    store.themeType = e.matches ? "dark" : "light";
+  };
+  media.addEventListener("change", systemThemeListener);
+
   // 控制台输出
   const styleTitle1 = "font-size: 20px;font-weight: 600;color: rgb(244,167,89);";
   const styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
@@ -407,6 +423,10 @@ onBeforeUnmount(() => {
   if (isHelpOpen) {
     ElMessageBox.close();
     isHelpOpen = false;
+  }
+  if (systemThemeListener) {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    media.removeEventListener("change", systemThemeListener);
   }
 });
 </script>
@@ -442,7 +462,7 @@ onBeforeUnmount(() => {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: var(--main-mores-bg-color);
       backdrop-filter: blur(20px);
       animation: fade 0.5s;
     }

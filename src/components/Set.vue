@@ -3,7 +3,7 @@
     <el-collapse class="collapse" v-model="activeName" accordion>
       <el-collapse-item title="基础设置" name="1">
         <div class="item">
-          <span class="text">使用十二小时制时间</span>
+          <span class="text">使用精简版十二小时制时间</span>
           <el-switch
             v-model="use12HourFormat"
             inline-prompt
@@ -12,7 +12,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">在首页显示捷径列表</span>
+          <span class="text">在首页显示简洁版捷径列表</span>
           <el-switch
             v-model="shortcutHome"
             inline-prompt
@@ -770,6 +770,7 @@ onMounted(() => {
 
       .song-input {
         margin-top: 4px;
+        --el-input-placeholder-color: #efefef;
         --el-input-focus-border-color: #eeeeee;
         /* 隐藏 Chrome / Safari / Edge 的步进箭头 */
         input[type="number"]::-webkit-inner-spin-button,

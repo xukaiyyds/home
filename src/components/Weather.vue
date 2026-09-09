@@ -3,18 +3,23 @@
     <span>{{ weatherData.city }}&nbsp;</span>
     <span>{{ weatherData.weather.weather }}&nbsp;</span>
     <span>{{ weatherData.weather.temperature }}℃</span>
-    <span class="sm-hidden">
+    <span v-if="!store.use12HourFormat" class="sm-hidden">
       &nbsp;{{
         weatherData.weather.winddirection?.endsWith("风")
           ? weatherData.weather.winddirection
           : weatherData.weather.winddirection + "风"
       }}&nbsp;
     </span>
-    <span class="sm-hidden">{{ weatherData.weather.windpower }}&nbsp;级</span>
+    <span v-if="!store.use12HourFormat" class="sm-hidden">{{ weatherData.weather.windpower }}&nbsp;级</span>
   </div>
   <div class="weather" v-else>
     <template v-if="store.showLunar">
-      <span>{{ lunarInfo.year }}年 {{ lunarInfo.month }}{{ lunarInfo.day }}</span>
+      <template v-if="store.use12HourFormat">
+        <span>{{ lunarInfo.month }}{{ lunarInfo.day }}</span>
+      </template>
+      <template v-else>
+        <span>{{ lunarInfo.year }}年 {{ lunarInfo.month }}{{ lunarInfo.day }}</span>
+      </template>
     </template>
     <template v-else>
       <span>{{ weatherMsg }}</span>

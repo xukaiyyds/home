@@ -11,7 +11,7 @@ export const mainStore = defineStore("main", {
       coverType: 0, // 壁纸种类
       bgUrl: "", // 壁纸URL
       backgroundCustom: "", // 壁纸自定义
-      themeType: "dark", // 主题颜色
+      themeType: "", // 主题颜色
       backgroundBlur: 0, // 壁纸模糊
       savedBackgroundBlur: 0, // 已保存壁纸模糊
       showBackgroundGray: true, // 壁纸遮罩显示

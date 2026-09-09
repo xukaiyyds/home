@@ -12,13 +12,23 @@
         <div class="right cards" @click="changeBox">
           <div class="time">
             <div class="date">
-              <span>{{ currentTime.year }}&nbsp;年&nbsp;</span>
-              <span>{{ currentTime.month }}&nbsp;月&nbsp;</span>
-              <span>{{ currentTime.day }}&nbsp;日&nbsp;</span>
-              <span class="sm-hidden">{{ currentTime.weekday }}</span>
+              <template v-if="store.use12HourFormat">
+                <span
+                  >{{ currentTime.year }}&nbsp;/&nbsp;{{ currentTime.month }}&nbsp;/&nbsp;{{
+                    currentTime.day
+                  }}</span
+                >
+              </template>
+              <template v-else>
+                <span>{{ currentTime.year }}&nbsp;年&nbsp;</span>
+                <span>{{ currentTime.month }}&nbsp;月&nbsp;</span>
+                <span>{{ currentTime.day }}&nbsp;日</span>
+              </template>
+              <span class="sm-hidden">&nbsp;{{ currentTime.weekday }}</span>
             </div>
             <div class="text">
-              <span> {{ currentTime.hour }}:{{ currentTime.minute }}:{{ currentTime.second }}</span>
+              {{ currentTime.hour }}:{{ currentTime.minute
+              }}<span v-if="currentTime.second !== null">:{{ currentTime.second }}</span>
               <span v-if="store.use12HourFormat" class="amPm">{{ currentTime.amPm }}</span>
             </div>
           </div>
