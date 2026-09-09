@@ -34,7 +34,7 @@
         <!-- 查看帮助 -->
         <span class="hidden-key">
           &amp;
-          <a @click="toggleHelp" style="position: relative">
+          <a @click="toggleHelp" style="position: relative; padding: 1px">
             查看快捷键
             <span v-show="isAltPressed" class="alt-hint-overlay">
               <span class="alt-hint-text">Alt A</span>

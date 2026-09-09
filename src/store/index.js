@@ -15,7 +15,7 @@ export const mainStore = defineStore("main", {
       backgroundBlur: 0, // 壁纸模糊
       savedBackgroundBlur: 0, // 已保存壁纸模糊
       showBackgroundGray: true, // 壁纸遮罩显示
-      showParticle: true, // 显示粒子特效
+      showParticle: false, // 显示粒子特效
       currentParticle: "", // 默认特效跟随系统
       darkstar: false, // 星空特效
       firefly: false, // 萤火虫特效
@@ -25,7 +25,7 @@ export const mainStore = defineStore("main", {
       searchEngine: "Baidu", // 搜索引擎
       customEngineUrl: "", // 自定义搜索引擎 URL
       customEngineName: "", // 自定义引擎名称
-      focusSearch: false, // 聚焦搜索引擎
+      focusSearch: true, // 聚焦搜索引擎
       clearContent: true, // 清空输入框
       showLunar: true, // 显示农历
       use12HourFormat: false, // 12小时制
@@ -58,11 +58,11 @@ export const mainStore = defineStore("main", {
       playCustomSong: "", // 自定义歌单
       shortcutHome: false, // 是否在首页显示捷径
       shortcutData: defaultShortCut, // 捷径数据
-      live2dShow: true, // 是否显示live2d模型
+      live2dShow: false, // 是否显示live2d模型
       modelType: "Mao", // live2d模型种类
       modelPath: "", // live2d模型路径
-      webSpeech: true, // 语音播报
-      prioritizeFirst: false, // 页面层级
+      webSpeech: false, // 语音播报
+      prioritizeFirst: true, // 页面层级
       openTimes: {}, // 记录每个页面打开的时间戳
     };
   },

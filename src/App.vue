@@ -101,8 +101,6 @@ const monitorWidthChanges = (value) => {
     store.boxOpenState = false;
     store.setOpenState = false;
     store.searchOpenState = false;
-    store.showParticle = false;
-    store.live2dShow = false;
   }
 };
 

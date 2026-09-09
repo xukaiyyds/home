@@ -71,7 +71,12 @@
           />
         </el-form-item>
         <el-form-item label="站点链接" prop="url">
-          <el-input v-model="formData.url" placeholder="例如：https://www.baidu.com" :clear-icon="CloseSmall" clearable />
+          <el-input
+            v-model="formData.url"
+            placeholder="例如：https://www.baidu.com"
+            :clear-icon="CloseSmall"
+            clearable
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -202,6 +207,7 @@ const contextMenuY = ref(0);
 let contextItem = null;
 
 const openContextMenu = (event, item) => {
+  if (!store.shortcutHome) return;
   if (item.isAdd) return; // 添加项不显示菜单
   event.stopPropagation();
   contextItem = { ...item };
