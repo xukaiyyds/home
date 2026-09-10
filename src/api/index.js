@@ -53,8 +53,8 @@ export const getHitokoto = async () => {
  * 天气
  */
 
-// 使用 CF Worker 代理地址
-const PROXY_BASE_URL = "https://weather.niuzhix.dpdns.org/weather";
+// 使用代理地址
+const PROXY_BASE_URL = "https://weather.xukaiyyds.cn/api/proxy";
 
 // 获取城市信息
 export const getXiaomiCityByGeo = async (longitude, latitude) => {
@@ -69,11 +69,4 @@ export const getXiaomiWeather = async (latitude, longitude, locationKey) => {
   const url = `${PROXY_BASE_URL}/weather/all?latitude=${latitude}&longitude=${longitude}&locationKey=${encodeURIComponent(locationKey)}&days=15&appKey=weather20151024&sign=zUFJoAR2ZVrDy1vF3D07&isGlobal=false&locale=zh_cn`;
   const response = await fetch(url);
   return await response.json();
-};
-
-// 获取教书先生天气 API
-// https://api.oioweb.cn/doc/weather/GetWeather
-export const getOtherWeather = async () => {
-  const res = await fetch("https://api.oioweb.cn/api/weather/GetWeather");
-  return await res.json();
 };
