@@ -46,7 +46,7 @@ export const mainStore = defineStore("main", {
       playerLrc: "歌词加载中", // 当前播放歌词
       playerLrcShow: true, // 是否显示底栏歌词
       footerBlur: true, // 底栏模糊
-      footerProgressBar: true, // 底栏进度条
+      footerProgressBar: false, // 底栏进度条
       forceShowIcon: false, // 进度图标常驻
       audioRef: null,
       playerCanplay: false,

@@ -14,7 +14,7 @@ export const helpContent = `
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标中键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/退出壁纸预览）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">鼠标滚轮</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（滑动网站/捷径列表）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">右键捷径链接</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（编辑/删除捷径）</span></div>
-  <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">双击底栏歌词</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/禁用进度图标常驻）</span></div>
+  <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">双击底栏歌词</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（启用/禁用进度图标常驻）</span></div>
 `;
 
 // 弹窗状态（单例）

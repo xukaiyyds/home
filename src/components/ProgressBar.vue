@@ -180,7 +180,7 @@ onBeforeUnmount(() => {
   height: 1.5px;
   opacity: 1;
   user-select: none;
-  background-color: #fff;
+  background-color: #efefef;
   z-index: 999;
 
   .progress {

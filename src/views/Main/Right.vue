@@ -1,7 +1,12 @@
 <template>
   <div :class="store.mobileOpenState ? 'right' : 'right hidden'">
     <!-- 移动端切换按钮 -->
-    <Icon class="switch-button" size="24" @click="store.mobileFuncState = !store.mobileFuncState">
+    <Icon
+      class="switch-button"
+      size="16"
+      :class="{ 'is-flipped': store.mobileFuncState }"
+      @click="store.mobileFuncState = !store.mobileFuncState"
+    >
       <Switch />
     </Icon>
     <!-- 功能区 -->
@@ -28,10 +33,10 @@ const store = mainStore();
 
   .switch-button {
     position: absolute;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    bottom: 84%;
+    top: 10%;
     left: calc(50% - 28px);
     width: 56px;
     height: 34px;
@@ -40,6 +45,15 @@ const store = mainStore();
     border-radius: 6px;
     transition: transform 0.3s;
     animation: fade 0.5s;
+
+    :deep(svg) {
+      transition: transform 0.3s;
+      will-change: transform;
+    }
+
+    &.is-flipped :deep(svg) {
+      transform: scaleX(-1);
+    }
 
     &:active {
       transform: scale(0.95);
@@ -50,7 +64,7 @@ const store = mainStore();
     }
 
     @media (max-height: 720px) {
-      bottom: 605.64px; // 721px * 0.84
+      top: 72.1px; // 721px * 0.1
       left: 170.5px; // 391 * 0.5 - 25px
       @media (min-width: 391px) {
         left: calc(50% - 25px);

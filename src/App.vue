@@ -72,7 +72,6 @@ import SearchInp from "@/views/SearchInp/index.vue";
 import cursorInit from "@/utils/cursor.js";
 import { SpeechLocal } from "@/utils/speech";
 import { toggleHelp } from "@/utils/help";
-import config from "@/../package.json";
 import * as live2d from "live2d-render";
 
 const store = mainStore();
@@ -399,21 +398,6 @@ onMounted(() => {
   } else {
     // 已有用户设置，不覆盖，不添加系统监听
   }
-
-  // 控制台输出
-  const styleTitle1 = "font-size: 20px;font-weight: 600;color: rgb(244,167,89);";
-  const styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
-  const styleContent = "color: rgb(30,152,255);";
-  const title1 = "無名の主页";
-  const title2 = `
- _____ __  __  _______     ____     __
-|_   _|  \\/  |/ ____\\ \\   / /\\ \\   / /
-  | | | \\  / | (___  \\ \\_/ /  \\ \\_/ /
-  | | | |\\/| |\\___ \\  \\   /    \\   /
- _| |_| |  | |____) |  | |      | |
-|_____|_|  |_|_____/   |_|      |_|`;
-  const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
-  console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
 });
 
 onBeforeUnmount(() => {
@@ -513,7 +497,7 @@ onBeforeUnmount(() => {
         height: 721px;
         width: calc(100% + 6px);
       }
-      @media (min-width: 391px) {
+      @media (min-width: 371px) {
         // w 1201px ~ max
         padding-left: 0.7vw;
         padding-right: 0.25vw;
@@ -533,7 +517,7 @@ onBeforeUnmount(() => {
           padding-right: 1.7vw;
         }
         @media (max-width: 900px) {
-          // w 391px ~ 900px
+          // w 371px ~ 900px
           padding-left: 2vw;
           padding-right: calc(2vw - 6px);
         }
@@ -541,28 +525,28 @@ onBeforeUnmount(() => {
     }
     .menu {
       top: 605.64px; // 721px * 0.84
-      left: 170.5px; // 391 * 0.5 - 25px
-      @media (min-width: 391px) {
+      left: calc(371px * 0.5 - 25px);
+      @media (min-width: 371px) {
         left: calc(50% - 25px);
       }
     }
     .f-ter {
       top: 675px; // 721px - 46px
-      @media (min-width: 391px) {
+      @media (min-width: 371px) {
         padding-left: 6px;
       }
     }
   }
-  @media (max-width: 390px) {
+  @media (max-width: 370px) {
     overflow-x: auto;
     .container {
-      width: 391px;
+      width: 371px;
     }
     .menu {
-      left: 167.5px; // 391px * 0.5 - 28px
+      left: calc(370px * 0.5 - 28px);
     }
     .f-ter {
-      width: 391px;
+      width: 371px;
     }
     @media (min-height: 721px) {
       overflow-y: hidden;

@@ -46,9 +46,9 @@
         <ProgressBar :footerHover="isFooterHover" />
         <Transition name="fade" mode="out-in">
           <div class="lrc-all" :key="store.getPlayerLrc">
-            <music-one theme="filled" size="18" fill="#efefef" />
+            <WavesLeft theme="filled" size="18" fill="#efefef" />
             <span class="lrc-text text-hidden" v-html="store.getPlayerLrc" />
-            <music-one theme="filled" size="18" fill="#efefef" />
+            <WavesRight theme="filled" size="18" fill="#efefef" />
           </div>
         </Transition>
       </div>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { MusicOne, Cat } from "@icon-park/vue-next";
+import { WavesLeft, WavesRight, Cat } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
 import ProgressBar from "@/components/ProgressBar.vue";
