@@ -229,5 +229,6 @@ scrollbar-thumb {
 }
 
 .__live2d-toolbox-item {
+  backdrop-filter: blur(10px);
   background-color: var(--main-footer-bg-color) !important;
 }

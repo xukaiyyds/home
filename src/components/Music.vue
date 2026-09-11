@@ -4,7 +4,7 @@
     class="music cards"
     @mouseenter="volumeShow = true"
     @mouseleave="volumeShow = false"
-    v-show="store.musicOpenState"
+    v-show="store.musicOpenState && !store.useFloatingPlayer"
   >
     <div class="btns">
       <span @click="openMusicList()">音乐列表</span>
@@ -30,24 +30,30 @@
       </div>
       <div class="volume" v-show="volumeShow">
         <div class="icon">
-          <volume-mute theme="filled" size="24" fill="#efefef" v-if="volumeNum == 0" />
+          <volume-mute theme="filled" size="24" fill="#efefef" v-if="store.musicVolume == 0" />
           <volume-small
             theme="filled"
             size="24"
             fill="#efefef"
-            v-else-if="volumeNum > 0 && volumeNum < 0.7"
+            v-else-if="store.musicVolume > 0 && store.musicVolume < 0.7"
           />
           <volume-notice theme="filled" size="24" fill="#efefef" v-else />
         </div>
-        <el-slider v-model="volumeNum" :show-tooltip="false" :min="0" :max="1" :step="0.01" />
+        <el-slider
+          v-model="store.musicVolume"
+          :show-tooltip="false"
+          :min="0"
+          :max="1"
+          :step="0.01"
+        />
       </div>
     </div>
   </div>
   <!-- 音乐列表弹窗 -->
   <Transition name="fade" mode="out-in">
-    <div class="music-list" v-show="musicListShow" @click="closeMusicList()">
+    <div class="music-list" v-show="store.musicListShow" @click="closeMusicList()">
       <Transition name="zoom">
-        <div class="list" v-show="musicListShow" @click.stop>
+        <div class="list" v-show="store.musicListShow" @click.stop>
           <close-one
             class="close"
             theme="filled"
@@ -60,7 +66,7 @@
             :songServer="playerData.server"
             :songType="playerData.type"
             :songId="playerData.id"
-            :volume="volumeNum"
+            :volume="store.musicVolume"
           />
         </div>
       </Transition>
@@ -79,6 +85,7 @@ import {
   VolumeSmall,
   VolumeNotice,
   MusicMenu,
+  MusicList,
   HomeTwo,
 } from "@icon-park/vue-next";
 import Player from "@/components/Player.vue";
@@ -88,10 +95,8 @@ const store = mainStore();
 
 // 音量条数据
 const volumeShow = ref(false);
-const volumeNum = ref(store.musicVolume ? store.musicVolume : 0.7);
 
 // 播放列表数据
-const musicListShow = ref(false);
 const playerRef = ref(null);
 const playerData = reactive({
   server: import.meta.env.VITE_SONG_SERVER,
@@ -101,7 +106,7 @@ const playerData = reactive({
 
 // 开启播放列表
 const openMusicList = () => {
-  musicListShow.value = true;
+  store.musicListShow = true;
   playerRef.value.toggleList();
   if (store.webSpeech) {
     SpeechLocal("好耶.mp3");
@@ -110,7 +115,7 @@ const openMusicList = () => {
 
 // 关闭播放列表
 const closeMusicList = () => {
-  musicListShow.value = false;
+  store.musicListShow = false;
   playerRef.value.toggleList();
 };
 
@@ -126,10 +131,9 @@ const changeMusicIndex = (type) => {
 
 // 监听音量变化
 watch(
-  volumeNum,
-  (newVal) => {
-    store.musicVolume = newVal;
-    playerRef.value?.changeVolume(store.musicVolume);
+  () => store.musicVolume,
+  (v) => {
+    playerRef.value?.changeVolume(v);
   },
   { immediate: true },
 );
@@ -138,7 +142,7 @@ watch(
 watch(
   () => store.setOpenState,
   (newVal) => {
-    if (newVal && musicListShow.value) {
+    if (newVal && store.musicListShow) {
       closeMusicList();
     }
   },
@@ -147,7 +151,7 @@ watch(
 watch(
   () => store.searchOpenState,
   (newVal) => {
-    if (newVal && musicListShow.value) {
+    if (newVal && store.musicListShow) {
       closeMusicList();
     }
   },
@@ -184,10 +188,10 @@ const handleVerticalArrow = (event) => {
     changeMusicIndex(1);
   } else if (event.key === "ArrowUp") {
     event.preventDefault();
-    volumeNum.value = Math.min(1, volumeNum.value + 0.05);
+    store.musicVolume = Math.min(1, store.musicVolume + 0.05);
   } else if (event.key === "ArrowDown") {
     event.preventDefault();
-    volumeNum.value = Math.max(0, volumeNum.value - 0.05);
+    store.musicVolume = Math.max(0, store.musicVolume - 0.05);
   }
 };
 
@@ -196,11 +200,14 @@ const handleHToggle = (event) => {
   if (event.altKey && (event.key === "h" || event.key === "H")) {
     event.preventDefault();
     // 如果有任何浮层打开，则关闭它们
-    if (store.boxOpenState || store.setOpenState || store.searchOpenState || musicListShow.value) {
+    if (store.boxOpenState || store.setOpenState || store.searchOpenState || store.musicListShow) {
       store.boxOpenState = false;
       store.setOpenState = false;
       store.searchOpenState = false;
-      if (musicListShow.value) {
+      if (store.floatingMusicOpenState) {
+        store.floatingMusicOpenState = false;
+      }
+      if (store.musicListShow) {
         closeMusicList();
       }
       if (store.messageShow) {
@@ -241,6 +248,41 @@ onMounted(() => {
   // Alt+H键事件
   document.addEventListener("keydown", handleHToggle);
 
+  // M键事件
+  window.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key !== "m" && e.key !== "M") return;
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) return;
+    if (store.useFloatingPlayer) {
+      store.floatingMusicOpenState = !store.floatingMusicOpenState;
+      if (store.messageShow) {
+        ElMessage({
+          duration: 2000,
+          message: `已${store.floatingMusicOpenState ? "打开" : "关闭"}音乐播放器`,
+          icon: h(MusicMenu, {
+            fill: "#efefef",
+          }),
+        });
+      }
+      if (!store.floatingMusicOpenState && store.musicListShow) {
+        window.$closeList?.();
+      }
+    } else {
+      store.musicOpenState = !store.musicOpenState;
+      if (store.messageShow) {
+        ElMessage({
+          duration: 2000,
+          message: `已${store.floatingMusicOpenState ? "打开" : "关闭"}音乐播放器`,
+          icon: h(MusicListMenu, {
+            fill: "#efefef",
+          }),
+        });
+      }
+    }
+    e.preventDefault();
+  });
+
   // Alt+M键事件
   window.addEventListener("keydown", (event) => {
     if (event.altKey && event.key.toLowerCase() === "m") {
@@ -250,13 +292,13 @@ onMounted(() => {
         store.setOpenState = false;
         store.searchOpenState = false;
       }
-      if (musicListShow.value) {
+      if (store.musicListShow) {
         closeMusicList();
         if (store.messageShow) {
           ElMessage({
             duration: 2000,
-            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
-            icon: h(MusicMenu, {
+            message: `已${store.musicListShow ? "打开" : "关闭"}音乐列表`,
+            icon: h(MusicList, {
               fill: "#efefef",
             }),
           });
@@ -266,8 +308,8 @@ onMounted(() => {
         if (store.messageShow) {
           ElMessage({
             duration: 2000,
-            message: `已${musicListShow.value ? "打开" : "关闭"}音乐列表`,
-            icon: h(MusicMenu, {
+            message: `已${store.musicListShow ? "打开" : "关闭"}音乐列表`,
+            icon: h(MusicList, {
               fill: "#efefef",
             }),
           });
@@ -292,6 +334,16 @@ onMounted(() => {
   });
   // 挂载方法至 window
   window.$openList = openMusicList;
+  window.$closeList = closeMusicList;
+  window.$playerToggle = changePlayState;
+  window.$playerChange = changeMusicIndex;
+  window.$playerSeek = (val) => {
+    const audio = playerRef.value?.getAudioRef?.();
+    if (audio) audio.currentTime = val;
+  };
+  window.$setVolume = (v) => {
+    if (playerRef.value) playerRef.value.changeVolume(v);
+  };
 });
 
 onBeforeUnmount(() => {

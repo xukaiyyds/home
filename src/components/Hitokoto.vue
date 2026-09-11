@@ -12,6 +12,7 @@
         class="open-music"
         v-show="openMusicShow && store.musicIsOk"
         @click="store.musicOpenState = true"
+        v-if="!store.useFloatingPlayer"
       >
         <music-menu theme="filled" size="18" fill="#efefef" />
         <span>打开音乐播放器</span>

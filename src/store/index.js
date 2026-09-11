@@ -32,7 +32,14 @@ export const mainStore = defineStore("main", {
       messageShow: true, // 操作消息显示
       musicClick: false, // 音乐链接是否跳转
       musicIsOk: false, // 音乐是否加载完成
-      musicVolume: 0, // 音乐音量
+      musicVolume: 0.7, // 音乐音量
+      lastMusicVolume: 0.7, // 静音前备份
+      floatingMusicOpenState: false, // 悬浮音乐面板是否展开
+      useFloatingPlayer: false, // 是否启用悬浮播放器
+      playerCurrentTime: 0, // 底栏进度条用：当前秒数
+      playerDuration: 0, // 底栏进度条用：总秒数
+      audioCurrent: 0, // 悬浮面板用：当前秒数
+      audioDuration: 0, // 悬浮面板用：总秒数
       musicOpenState: false, // 音乐面板开启状态
       backgroundShow: false, // 壁纸预览状态
       boxOpenState: false, // 盒子开启状态
@@ -40,9 +47,11 @@ export const mainStore = defineStore("main", {
       mobileFuncState: false, // 移动端功能区开启状态
       setOpenState: false, // 设置页面开启状态
       searchOpenState: false, // 搜索页面开启状态
+      musicListShow: false,   // 音乐列表是否打开
       playerState: false, // 当前播放状态
       playerTitle: null, // 当前播放歌曲名
       playerArtist: null, // 当前播放歌手名
+      playerCover: null, // 当前播放歌曲封面
       playerLrc: "歌词加载中", // 当前播放歌词
       playerLrcShow: true, // 是否显示底栏歌词
       footerBlur: true, // 底栏模糊
@@ -76,6 +85,7 @@ export const mainStore = defineStore("main", {
       return {
         name: state.playerTitle,
         artist: state.playerArtist,
+        cover: state.playerCover,
       };
     },
     // 获取页面宽度
@@ -118,9 +128,10 @@ export const mainStore = defineStore("main", {
       this.playerCanplay = value;
     },
     // 更改歌曲数据
-    setPlayerData(title, artist) {
+    setPlayerData(title, artist, cover) {
       this.playerTitle = title;
       this.playerArtist = artist;
+      this.playerCover = cover;
     },
     // 更改壁纸加载状态
     setImgLoadStatus(value) {
@@ -225,6 +236,7 @@ export const mainStore = defineStore("main", {
       "playerSwitchId",
       "playerTypeId",
       "playCustomSong",
+      "useFloatingPlayer",
       "live2dShow",
       "webSpeech",
       "modelType",

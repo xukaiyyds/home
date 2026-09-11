@@ -4,8 +4,8 @@
     <el-row :gutter="20">
       <el-col :span="12">
         <div class="left">
-          <Hitokoto />
-          <Music v-if="playerHasId" />
+          <Hitokoto v-show="!store.musicOpenState || store.useFloatingPlayer" />
+          <Music />
         </div>
       </el-col>
       <el-col :span="12">

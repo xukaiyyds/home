@@ -6,6 +6,7 @@ export const helpContent = `
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">空格</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（播放/暂停音乐）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">左/右方向键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（上一曲/下一曲）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">上/下方向键</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（增加/减少音量）</span></div>
+  <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">M</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭音乐播放器）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Alt + M</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭音乐列表）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Tab</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（打开/关闭时光胶囊）</span></div>
   <div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:1px dashed #e0e0e0;"><span style="text-align:left; white-space:nowrap; margin-right:20px;">Alt + D</span><span style="text-align:left; white-space:nowrap; color:#CFD3DC;">（切换浅色/深色主题）</span></div>
@@ -33,7 +34,6 @@ export const toggleHelp = () => {
     closeOnClickModal: true,
     closeOnPressEscape: true,
     showConfirmButton: false,
-    draggable: true,
     center: true,
     icon: markRaw(KeyboardOne),
     closeIcon: markRaw(Close),

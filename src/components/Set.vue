@@ -237,7 +237,7 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="5">
         <div class="item">
-          <span class="text">语音交互</span>
+          <span class="text">AI 语音交互</span>
           <el-switch
             v-model="webSpeech"
             inline-prompt
@@ -246,7 +246,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">动画模型</span>
+          <span class="text">Live2D 动画模型</span>
           <el-switch
             v-model="live2dShow"
             inline-prompt
@@ -261,6 +261,15 @@
             <el-radio @change="refreshPrompt" value="Mark" border>Mark</el-radio>
             <el-radio @change="refreshPrompt" value="Wanko" border>Wanko</el-radio>
           </el-radio-group>
+        </div>
+        <div class="item">
+          <span class="text">悬浮音乐播放器</span>
+          <el-switch
+            v-model="useFloatingPlayer"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
         </div>
         <div class="item">
           <span class="text">底栏歌词</span>
@@ -418,6 +427,8 @@ const {
   playerLoop,
   playerSwitchId,
   playCustomSong,
+  useFloatingPlayer,
+  floatingMusicOpenState,
   shortcutHome,
   live2dShow,
   webSpeech,
@@ -526,6 +537,20 @@ watch(themeType, (newVal) => {
     particleType.value = available[0];
   }
 });
+
+// 悬浮播放器
+watch(
+  () => store.useFloatingPlayer,
+  (val) => {
+    if (val) {
+      // 关掉卡片里的音乐面板
+      store.musicOpenState = false;
+    } else {
+      // 关掉悬浮面板
+      store.floatingMusicOpenState = false;
+    }
+  },
+);
 
 // 站点重置
 const resetSite = () => {

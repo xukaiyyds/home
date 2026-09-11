@@ -8,7 +8,7 @@
     :autoSwitch="false"
     :loop="store.playerLoop"
     :order="store.playerOrder"
-    :volume="volume"
+    :volume="store.musicVolume"
     :showLrc="true"
     :listFolded="listFolded"
     :listMaxHeight="listMaxHeight"
@@ -66,7 +66,6 @@ const loadPlaylist = async () => {
     store.musicIsOk = true;
     // 赋值新歌单
     playList.value = res;
-    console.log("音乐加载完成", playList.value);
 
     // 等待 DOM 更新后重置索引
     nextTick(() => {
@@ -133,14 +132,46 @@ watch(
 watch(() => store.playerSwitchId, loadPlaylist);
 
 onMounted(() => {
+  // 歌词同步函数
+  let rafId = null;
+  const syncLrc = () => {
+    const ap = player.value?.aplayer;
+    if (ap && playList.value.length) {
+      const idx = ap.index;
+      const lyricIdx = ap.lyricIndex;
+      const lyrics = ap.lyrics?.[idx];
+      if (lyrics && lyrics[lyricIdx]) {
+        let lrc = lyrics[lyricIdx][1];
+        if (lrc === "Loading") lrc = "歌词加载中";
+        else if (lrc === "Not available") lrc = "歌词加载失败";
+        // 只在变化时写，避免无谓的响应式更新
+        if (store.playerLrc !== lrc) {
+          store.setPlayerLrc(lrc);
+        }
+      }
+    }
+    rafId = requestAnimationFrame(syncLrc);
+  };
+
   nextTick(loadPlaylist);
+
+  // 启动歌词同步
+  rafId = requestAnimationFrame(syncLrc);
+});
+
+onBeforeUnmount(() => {
+  if (rafId) cancelAnimationFrame(rafId);
 });
 
 // 播放事件
 const onPlay = () => {
   playIndex.value = player.value.aplayer.index;
   store.setPlayerState(player.value.audioRef.paused);
-  store.setPlayerData(playList.value[playIndex.value].name, playList.value[playIndex.value].artist);
+  store.setPlayerData(
+    playList.value[playIndex.value].name,
+    playList.value[playIndex.value].artist,
+    playList.value[playIndex.value].cover,
+  );
   ElMessage({
     message: store.getPlayerData.name + " - " + store.getPlayerData.artist,
     grouping: true,
@@ -153,15 +184,20 @@ const onPause = () => {
 };
 
 const onTimeUp = () => {
-  store.playerCurrentTime = player.value.audioStatus.playedTime;
-  store.playerDuration = player.value.audioStatus.duration;
-  let lyrics = player.value.aplayer.lyrics[playIndex.value];
-  let idx = player.value.aplayer.lyricIndex;
-  if (!lyrics || !lyrics[idx]) return;
-  let lrc = lyrics[idx][1];
-  if (lrc === "Loading") lrc = "歌词加载中";
-  else if (lrc === "Not available") lrc = "歌词加载失败";
-  store.setPlayerLrc(lrc);
+  // 直接从 audioRef 拿数据
+  const audio = player.value.audioRef;
+  if (!audio) return;
+
+  const duration = audio.duration || 0;
+  const current = audio.currentTime || 0;
+
+  // 给底栏进度条用
+  store.playerCurrentTime = current;
+  store.playerDuration = duration;
+
+  // 给悬浮面板用
+  store.audioCurrent = current;
+  store.audioDuration = duration;
 };
 
 const playToggle = () => player.value.toggle();
