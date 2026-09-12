@@ -39,15 +39,29 @@ const emit = defineEmits(["loadComplete"]);
 
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
-const bgRandom = Math.floor(Math.random() * 4 + 1);
+const bgRandom = Math.floor(Math.random() * 6 + 1);
 const bgRandoms = Math.floor(Math.random() * 12 + 1)
   .toString()
   .padStart(2, "0");
 
+// 判断是否为移动端
+const isMobile = ref(window.innerWidth < 721);
+
+// 获取当前主题对应的默认壁纸路径
+const getDefaultBg = () => {
+  // 移动端优先使用专用壁纸
+  if (isMobile.value) {
+    return "/images/photo/bg1.png";
+  }
+  // 浅色模式专用壁纸 / 深色模式专用壁纸
+  const theme = store.themeType === "dark" ? "dark" : "light";
+  return `/images/${theme}/bg${bgRandom}.png`;
+};
+
 // 更换壁纸链接
 const changeBg = (type) => {
   if (type == 0) {
-    store.bgUrl = `/images/background${bgRandom}.jpg`;
+    store.bgUrl = getDefaultBg();
   } else if (type == 1) {
     store.bgUrl = "https://api.xinyew.cn/api/bing";
   } else if (type == 2) {
@@ -89,7 +103,7 @@ const imgLoadError = () => {
       fill: "#efefef",
     }),
   });
-  store.bgUrl = `/images/background${bgRandom}.jpg`;
+  store.bgUrl = getDefaultBg();
   if (store.webSpeech) {
     setTimeout(() => {
       SpeechLocal("壁纸加载失败.mp3");

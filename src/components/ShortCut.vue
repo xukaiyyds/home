@@ -303,6 +303,11 @@ const confirmDelete = (item) => {
     .catch(() => {});
 };
 
+// 关闭删除确认框
+const closeDeleteConfirm = () => {
+  ElMessageBox.close();
+};
+
 // 跳转
 const jumpLink = (url) => {
   if (!url) return;
@@ -364,6 +369,19 @@ const handleGlobalClick = (e) => {
     closeContextMenu();
   }
 };
+
+// 监听搜索页面关闭状态，同步关闭右键菜单和删除确认框
+watch(
+  () => store.searchOpenState,
+  (newVal) => {
+    if (!newVal) {
+      if (contextMenuVisible.value) {
+        closeContextMenu();
+      }
+      closeDeleteConfirm();
+    }
+  },
+);
 
 // 上传下载
 const fileInputRef = ref(null);
