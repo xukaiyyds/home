@@ -337,7 +337,7 @@ const submitForm = () => {
 // 删除
 const confirmDelete = (item) => {
   ElMessageBox.confirm(
-    `确认删除 <strong><el-text style="color:#409EFF">${item.name}</el-text></strong> 捷径？此操作无法恢复！`,
+    `确认删除 <el-text style="color:#409EFF">${item.name}</el-text> 捷径？此操作<el-text style="color:#E6A23C">无法恢复</el-text>！`,
     "删除捷径",
     {
       dangerouslyUseHTMLString: true,

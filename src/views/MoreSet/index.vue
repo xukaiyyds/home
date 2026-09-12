@@ -38,7 +38,7 @@ const closeShow = ref(false);
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  width: 40%;
+  width: 50%;
   background: var(--main-panel-bg-color);
   border-radius: 6px;
   padding: 40px;

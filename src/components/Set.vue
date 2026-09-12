@@ -90,9 +90,9 @@
         <div class="bg-set">
           <el-radio-group v-model="coverType" text-color="#ffffff" @change="radioChange">
             <el-radio :value="0" size="large" border>默认壁纸</el-radio>
-            <el-radio :value="1" size="large" border>每日一图</el-radio>
-            <el-radio :value="2" size="large" border>淡雅风格</el-radio>
-            <el-radio :value="3" size="large" border>星空风格</el-radio>
+            <el-radio :value="1" size="large" border>淡雅风格</el-radio>
+            <el-radio :value="2" size="large" border>星空风格</el-radio>
+            <el-radio :value="3" size="large" border>每日一图</el-radio>
             <el-radio :value="4" size="large" border>随机风景</el-radio>
             <el-radio :value="5" size="large" border>随机动漫</el-radio>
           </el-radio-group>
@@ -152,24 +152,27 @@
                 <el-button type="primary" size="small" round>去不图床</el-button>
               </a>
             </el-form-item>
-            <el-form-item label="收藏壁纸">
-              <a class="btn-links" href="https://plog.xukaiyyds.cn/wallpaper" target="_blank">
-                <el-button type="primary" size="small" round>壁纸库</el-button>
-              </a>
-            </el-form-item>
             <el-form-item label="使用方法">
               <el-text type="info" size="small"
-                >1. 在各大高清壁纸网站中选好心仪的壁纸，然后下载下来。</el-text
+                >1. 在各大壁纸网站中选好心仪的壁纸，然后下载下来。</el-text
               >
               <el-text type="info" size="small"
                 >2. 将下载好的壁纸上传到你的图床工具网站中。</el-text
               >
-              <el-text type="info" size="small">3. 将上传好的图片链接复制到此处即可。</el-text>
               <el-text type="info" size="small"
-                >4.
-                或者直接从我收藏的壁纸库里挑选心仪的壁纸，然后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text
+                >3. 最后，将上传好的图片链接复制到此处，点击确认即可。</el-text
               >
             </el-form-item>
+            <el-form-item label="其他方法">
+              <el-text type="info" size="small"
+                >直接从我收藏的
+                <a href="https://plog.xukaiyyds.cn/wallpaper" style="color: #409eff" target="_blank"
+                  >壁纸库</a
+                >
+                里挑选心仪的壁纸，然后右键选择新窗口打开图片，复制地址栏里的链接粘贴到这里。</el-text
+              >
+            </el-form-item>
+
             <el-form-item class="btn-right">
               <el-button type="info" @click="dialogFormVisible = false">返回</el-button>
               <el-button type="primary" @click="setCustomCover">确认</el-button>
@@ -179,14 +182,7 @@
       </el-collapse-item>
       <el-collapse-item title="主题与背景" name="4">
         <div class="item">
-          <span class="text">主题模式</span>
-          <el-radio-group v-model="themeType" text-color="#FFFFFF">
-            <el-radio value="light" border>浅色模式</el-radio>
-            <el-radio value="dark" border>深色模式</el-radio>
-          </el-radio-group>
-        </div>
-        <div class="item">
-          <span class="text">背景模糊</span>
+          <span class="text">壁纸模糊程度</span>
           <el-slider
             v-model="backgroundBlur"
             :min="0"
@@ -195,6 +191,13 @@
             show-stops
             :show-tooltip="false"
           />
+        </div>
+        <div class="item">
+          <span class="text">主题模式</span>
+          <el-radio-group v-model="themeType" text-color="#FFFFFF">
+            <el-radio value="light" size="large" border>浅色模式</el-radio>
+            <el-radio value="dark" size="large" border>深色模式</el-radio>
+          </el-radio-group>
         </div>
         <div class="item">
           <span class="text">背景遮罩</span>
@@ -215,12 +218,7 @@
           />
         </div>
         <div class="item">
-          <el-radio-group
-            v-show="showParticle"
-            v-model="particleType"
-            size="small"
-            text-color="#FFFFFF"
-          >
+          <el-radio-group v-show="showParticle" v-model="particleType" text-color="#FFFFFF">
             <el-radio v-for="type in availableParticleTypes" :key="type" :value="type" border>
               {{
                 type === "snow"
@@ -237,7 +235,7 @@
       </el-collapse-item>
       <el-collapse-item title="个性化调整" name="5">
         <div class="item">
-          <span class="text">AI 语音交互</span>
+          <span class="text">语音交互</span>
           <el-switch
             v-model="webSpeech"
             inline-prompt
@@ -246,7 +244,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">Live2D 动画模型</span>
+          <span class="text">动画模型</span>
           <el-switch
             v-model="live2dShow"
             inline-prompt
@@ -261,15 +259,6 @@
             <el-radio @change="refreshPrompt" value="Mark" border>Mark</el-radio>
             <el-radio @change="refreshPrompt" value="Wanko" border>Wanko</el-radio>
           </el-radio-group>
-        </div>
-        <div class="item">
-          <span class="text">悬浮音乐播放器</span>
-          <el-switch
-            v-model="useFloatingPlayer"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
         </div>
         <div class="item">
           <span class="text">底栏歌词</span>
@@ -327,6 +316,15 @@
             :inactive-icon="CloseSmall"
             active-value="random"
             inactive-value="list"
+          />
+        </div>
+        <div class="item">
+          <span class="text">悬浮模式</span>
+          <el-switch
+            v-model="useFloatingPlayer"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
           />
         </div>
         <div class="item">
@@ -401,8 +399,8 @@ import identifyInput from "@/utils/identifyInput";
 
 const store = mainStore();
 const {
-  coverType,
   themeType,
+  coverType,
   backgroundBlur,
   showBackgroundGray,
   showParticle,
@@ -410,28 +408,27 @@ const {
   firefly,
   snowflake,
   bubble,
-  siteStartShow,
+  prioritizeFirst,
   focusSearch,
   clearContent,
-  showLunar,
-  use12HourFormat,
-  prioritizeFirst,
-  messageShow,
-  musicClick,
-  playerLrcShow,
-  footerBlur,
-  footerProgressBar,
-  forceShowIcon,
   playerAutoplay,
-  playerOrder,
   playerLoop,
+  playerOrder,
   playerSwitchId,
   playCustomSong,
   useFloatingPlayer,
-  floatingMusicOpenState,
+  footerBlur,
+  playerLrcShow,
+  footerProgressBar,
+  forceShowIcon,
   shortcutHome,
-  live2dShow,
+  musicClick,
+  use12HourFormat,
+  showLunar,
+  messageShow,
+  siteStartShow,
   webSpeech,
+  live2dShow,
   modelType,
 } = storeToRefs(store);
 
@@ -552,13 +549,23 @@ watch(
   },
 );
 
+// 监听设置页面关闭状态，同步关闭重置/恢复的确认框
+watch(
+  () => store.setOpenState,
+  (newVal) => {
+    if (!newVal) {
+      ElMessageBox.close();
+    }
+  },
+);
+
 // 站点重置
 const resetSite = () => {
   if (store.webSpeech) {
     SpeechLocal("重置.mp3");
   }
   ElMessageBox.confirm(
-    `重置后你所有的 <el-text style="color:#409EFF">捷径数据</el-text> 与 <el-text style="color:#409EFF">站点配置</el-text> 都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经<el-text style="color:#67C23A">做好了备份</el-text>`,
+    `重置后你所有的捷径数据与站点配置都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经做好了备份`,
     "站点重置",
     {
       dangerouslyUseHTMLString: true,
@@ -653,7 +660,7 @@ const recoverSite = async (event) => {
     const data = JSON.parse(jsonData);
     // 恢复数据
     ElMessageBox.confirm(
-      `确认使用该恢复文件？你现有的 <el-text style="color:#409EFF">捷径数据</el-text> 以及 <el-text style="color:#409EFF">站点配置</el-text> 都将被<el-text style="color:#E6A23C">覆盖</el-text>！`,
+      `确认使用该恢复文件？你现有的捷径数据以及站点配置都将被<el-text style="color:#E6A23C">覆盖</el-text>！`,
       "站点恢复",
       {
         dangerouslyUseHTMLString: true,
@@ -795,7 +802,7 @@ onMounted(() => {
 
       .el-slider {
         --el-slider-runway-bg-color: var(--main-cards-header-bg-color);
-        flex-basis: 50%;
+        flex-basis: 45%;
       }
 
       .el-slider__bar {

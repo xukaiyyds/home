@@ -17,7 +17,7 @@
       <Loading
         v-if="!store.playerCanplay"
         theme="filled"
-        size="24"
+        size="20"
         fill="#f7989e"
         :spin="true"
         class="loading-icon"
@@ -200,11 +200,10 @@ onBeforeUnmount(() => {
       position: absolute;
       user-select: none;
       touch-action: none;
-      top: -12px;
+      top: -20px;
       right: -12px;
       width: 24px;
       height: 24px;
-      color: #f7989e;
     }
 
     .progress-icon {

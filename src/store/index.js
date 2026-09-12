@@ -6,73 +6,73 @@ import defaultSiteLinks from "@/assets/siteLinks.json";
 export const mainStore = defineStore("main", {
   state: () => {
     return {
-      imgLoadStatus: false, // 壁纸加载状态
       innerWidth: null, // 当前窗口宽度
-      coverType: 0, // 壁纸种类
-      bgUrl: "", // 壁纸URL
-      backgroundCustom: "", // 壁纸自定义
       themeType: null, // 主题颜色
+      imgLoadStatus: false, // 壁纸加载状态
+      coverType: 0, // 壁纸种类
+      backgroundCustom: "", // 自定义壁纸
+      bgUrl: "", // 自定义壁纸URL
       backgroundBlur: 0, // 壁纸模糊
       savedBackgroundBlur: 0, // 已保存壁纸模糊
-      showBackgroundGray: true, // 壁纸遮罩显示
+      showBackgroundGray: true, // 显示壁纸遮罩
+      backgroundShow: false, // 壁纸预览状态
       showParticle: false, // 显示粒子特效
       currentParticle: "", // 默认特效跟随系统
       darkstar: false, // 星空特效
       firefly: false, // 萤火虫特效
       snowflake: false, // 雪花特效
       bubble: false, // 气泡特效
-      siteStartShow: true, // 建站日期显示
-      searchEngine: "Baidu", // 搜索引擎
-      customEngineUrl: "", // 自定义搜索引擎 URL
-      customEngineName: "", // 自定义引擎名称
-      focusSearch: true, // 聚焦搜索引擎
-      clearContent: true, // 清空输入框
-      showLunar: true, // 显示农历
-      use12HourFormat: false, // 12小时制
-      messageShow: true, // 操作消息显示
-      musicClick: false, // 音乐链接是否跳转
-      musicIsOk: false, // 音乐是否加载完成
-      musicVolume: 0.7, // 音乐音量
-      lastMusicVolume: 0.7, // 静音前备份
-      floatingMusicOpenState: false, // 悬浮音乐面板是否展开
-      useFloatingPlayer: false, // 是否启用悬浮播放器
-      playerCurrentTime: 0, // 底栏进度条用：当前秒数
-      playerDuration: 0, // 底栏进度条用：总秒数
-      audioCurrent: 0, // 悬浮面板用：当前秒数
-      audioDuration: 0, // 悬浮面板用：总秒数
-      musicOpenState: false, // 音乐面板开启状态
-      backgroundShow: false, // 壁纸预览状态
       boxOpenState: false, // 盒子开启状态
       mobileOpenState: false, // 移动端开启状态
       mobileFuncState: false, // 移动端功能区开启状态
+      prioritizeFirst: true, // 搜索和设置页面层级
+      openTimes: {}, // 记录搜索和设置页面打开的时间戳
       setOpenState: false, // 设置页面开启状态
       searchOpenState: false, // 搜索页面开启状态
-      musicListShow: false,   // 音乐列表是否打开
+      searchEngine: "Baidu", // 搜索引擎
+      focusSearch: true, // 自动聚焦搜索引擎
+      clearContent: true, // 清空搜索输入框内容
+      customEngineUrl: "", // 自定义搜索引擎 URL
+      customEngineName: "", // 自定义搜索引擎名称
+      shortcutData: defaultShortCut, // 捷径数据
+      musicOpenState: false, // 音乐播放器开启状态
+      musicListShow: false, // 音乐列表是否打开
+      musicIsOk: false, // 音乐是否加载完成
+      musicVolume: 0.7, // 音乐音量
       playerState: false, // 当前播放状态
-      playerTitle: null, // 当前播放歌曲名
-      playerArtist: null, // 当前播放歌手名
-      playerCover: null, // 当前播放歌曲封面
-      playerLrc: "歌词加载中", // 当前播放歌词
-      playerLrcShow: true, // 是否显示底栏歌词
-      footerBlur: true, // 底栏模糊
-      footerProgressBar: false, // 底栏进度条
-      forceShowIcon: false, // 进度图标常驻
-      audioRef: null,
-      playerCanplay: false,
+      lastMusicVolume: 0.7, // 静音前备份
       playerAutoplay: false, // 是否自动播放
       playerLoop: "all", // 循环播放 "all", "one", "none"
       playerOrder: "list", // 循环顺序 "list", "random"
       playerSwitchId: 0, // 切换歌单
       playerTypeId: "", // 歌单ID
       playCustomSong: "", // 自定义歌单
-      shortcutHome: false, // 是否在首页显示捷径
-      shortcutData: defaultShortCut, // 捷径数据
-      live2dShow: false, // 是否显示live2d模型
+      playerTitle: null, // 当前播放歌曲名
+      playerArtist: null, // 当前播放歌手名
+      playerLrc: "歌词加载中", // 当前播放歌词
+      playerCover: null, // 当前播放歌曲封面
+      useFloatingPlayer: false, // 启用悬浮播放器
+      floatingMusicOpenState: false, // 悬浮播放器面板开启状态
+      footerBlur: true, // 底栏模糊
+      playerLrcShow: true, // 显示底栏歌词
+      audioCurrent: 0, // 悬浮播放器面板用：当前秒数
+      audioDuration: 0, // 悬浮播放器面板用：总秒数
+      footerProgressBar: false, // 显示底栏进度条
+      forceShowIcon: false, // 进度图标常驻
+      playerCurrentTime: 0, // 底栏进度条用：当前秒数
+      playerDuration: 0, // 底栏进度条用：总秒数
+      audioRef: null, // 存储音频元素
+      playerCanplay: false, // 当音频还未准备好播放时，显示加载图标
+      shortcutHome: false, // 在首页显示捷径
+      musicClick: false, // 音乐链接是否跳转
+      use12HourFormat: false, // 显示12小时制时间
+      showLunar: true, // 显示农历
+      messageShow: true, // 操作消息显示
+      siteStartShow: true, // 建站日期显示
+      webSpeech: false, // 语音播报
+      live2dShow: false, // 显示live2d模型
       modelType: "Mao", // live2d模型种类
       modelPath: "", // live2d模型路径
-      webSpeech: false, // 语音播报
-      prioritizeFirst: true, // 页面层级
-      openTimes: {}, // 记录每个页面打开的时间戳
     };
   },
   getters: {
@@ -199,11 +199,10 @@ export const mainStore = defineStore("main", {
     key: "data",
     storage: window.localStorage,
     paths: [
-      "coverType",
-      "bgUrl",
-      "backgroundCustom",
-      "musicVolume",
       "themeType",
+      "coverType",
+      "backgroundCustom",
+      "bgUrl",
       "backgroundBlur",
       "savedBackgroundBlur",
       "showBackgroundGray",
@@ -213,23 +212,14 @@ export const mainStore = defineStore("main", {
       "firefly",
       "snowflake",
       "bubble",
-      "siteStartShow",
+      "prioritizeFirst",
       "searchEngine",
-      "customEngineUrl",
-      "customEngineName",
-      "shortcutHome",
-      "shortcutData",
       "focusSearch",
       "clearContent",
-      "showLunar",
-      "use12HourFormat",
-      "prioritizeFirst",
-      "messageShow",
-      "musicClick",
-      "playerLrcShow",
-      "footerBlur",
-      "footerProgressBar",
-      "forceShowIcon",
+      "customEngineUrl",
+      "customEngineName",
+      "shortcutData",
+      "musicVolume",
       "playerAutoplay",
       "playerLoop",
       "playerOrder",
@@ -237,8 +227,18 @@ export const mainStore = defineStore("main", {
       "playerTypeId",
       "playCustomSong",
       "useFloatingPlayer",
-      "live2dShow",
+      "footerBlur",
+      "playerLrcShow",
+      "footerProgressBar",
+      "forceShowIcon",
+      "shortcutHome",
+      "musicClick",
+      "use12HourFormat",
+      "showLunar",
+      "messageShow",
+      "siteStartShow",
       "webSpeech",
+      "live2dShow",
       "modelType",
       "modelPath",
     ],

@@ -63,11 +63,11 @@ const changeBg = (type) => {
   if (type == 0) {
     store.bgUrl = getDefaultBg();
   } else if (type == 1) {
-    store.bgUrl = "https://api.xinyew.cn/api/bing";
-  } else if (type == 2) {
     store.bgUrl = `https://plog.xukaiyyds.cn/img/wallpaper/淡雅/${bgRandoms}.jpg`;
-  } else if (type == 3) {
+  } else if (type == 2) {
     store.bgUrl = `https://plog.xukaiyyds.cn/img/wallpaper/星空/${bgRandoms}.jpg`;
+  } else if (type == 3) {
+    store.bgUrl = "https://api.xinyew.cn/api/bing";
   } else if (type == 4) {
     store.bgUrl = "https://tu.ltyuanfang.cn/api/fengjing.php";
   } else if (type == 5) {
@@ -220,7 +220,6 @@ watch(
       store.backgroundBlur = store.savedBackgroundBlur;
     }
   },
-  { immediate: true },
 );
 
 onMounted(() => {
