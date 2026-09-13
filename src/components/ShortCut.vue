@@ -61,6 +61,7 @@
             :sm="8"
             :md="6"
             :lg="4"
+            :title="item.name"
             class="shortcut-item-wrapper"
             @contextmenu.prevent="openContextMenu($event, item)"
             @click="jumpLink(item.url)"
@@ -141,6 +142,9 @@
             @keyup.enter="submitForm"
           />
         </el-form-item>
+        <el-text type="info" size="small"
+          >批量添加操作：将浏览器的收藏夹导出，再将导出的收藏夹文件上传到这里。</el-text
+        >
       </el-form>
       <template #footer>
         <el-button type="info" @click="dialogVisible = false">取消</el-button>
@@ -179,8 +183,8 @@ const MENU_MARGIN = 5;
 const PROTOCOL_REGEX = /^(https?:\/\/)/i;
 
 // 书签导出文件配置
-const BOOKMARK_FOLDER_NAME = "XKの主页捷径文件";
-const BOOKMARK_FILE_NAME = "XKの主页-捷径文件.html";
+const BOOKMARK_FOLDER_NAME = "XKの主页捷径数据";
+const BOOKMARK_FILE_NAME = "shortcut.html";
 
 /* ==================== 本地状态 ==================== */
 

@@ -44,12 +44,11 @@ const props = defineProps({
 
 /* ==================== 静态配置 ==================== */
 
-// 歌单 ID 映射（key 为 store.playerSwitchId 的值）
-const SONG_ID_MAP = {
+// 静态歌单映射（不含自定义）
+const STATIC_SONG_IDS = {
   0: import.meta.env.VITE_SONG_ID,
   1: "5059661515",
   2: "2829816518",
-  3: store.playCustomSong,
 };
 
 // APlayer 内置的歌词占位文案 → 本地化替换
@@ -70,8 +69,14 @@ let lrcRafId = null;
 
 const listHeight = computed(() => `${props.listMaxHeight}px`);
 
-// 当前生效的歌单 ID（自定义为空时回退到默认）
-const effectiveSongId = computed(() => SONG_ID_MAP[store.playerSwitchId] || SONG_ID_MAP[0]);
+// 当前生效的歌单 ID（动态读取自定义歌单）
+const effectiveSongId = computed(() => {
+  // 自定义模式：读 store.playCustomSong，为空则回退到默认歌单
+  if (store.playerSwitchId === 3) {
+    return store.playCustomSong || STATIC_SONG_IDS[0];
+  }
+  return STATIC_SONG_IDS[store.playerSwitchId] || STATIC_SONG_IDS[0];
+});
 
 /* ==================== 歌单加载 ==================== */
 
@@ -79,6 +84,13 @@ const loadPlaylist = async () => {
   try {
     // 先清空，强制 APlayer 重置内部状态
     playList.value = [];
+    // 重置播放器状态与歌词，避免残留上一个歌单的信息
+    store.playerState = false;
+    store.playerLrc = "歌词加载中";
+    store.playerTitle = null;
+    store.playerArtist = null;
+    store.playerCover = null;
+
     const res = await getPlayerList(props.songServer, props.songType, effectiveSongId.value);
     store.musicIsOk = true;
     playList.value = res;
@@ -230,8 +242,19 @@ watch([() => store.playerOrder, () => store.playerLoop], ([order, loop]) => {
   ap.loop = loop;
 });
 
-// 切换歌单
+// 切换歌单：立即加载
 watch(() => store.playerSwitchId, loadPlaylist);
+
+// 自定义歌单 ID 变化时：防抖加载（避免输入过程中频繁请求）
+let customSongTimer = null;
+watch(
+  () => store.playCustomSong,
+  () => {
+    if (store.playerSwitchId !== 3) return;
+    if (customSongTimer) clearTimeout(customSongTimer);
+    customSongTimer = setTimeout(loadPlaylist, 800);
+  },
+);
 
 /* ==================== 生命周期 ==================== */
 
@@ -243,6 +266,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   // 修复：原 rafId 声明在 onMounted 内部，这里访问不到
   if (lrcRafId) cancelAnimationFrame(lrcRafId);
+  // 组件卸载时清理定时器
+  if (customSongTimer) clearTimeout(customSongTimer);
 });
 </script>
 

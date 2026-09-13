@@ -301,6 +301,15 @@
 
       <el-collapse-item title="播放器配置" name="6">
         <div class="item">
+          <span class="text">悬浮播放器</span>
+          <el-switch
+            v-model="useFloatingPlayer"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item">
           <span class="text">自动播放</span>
           <el-switch
             v-model="playerAutoplay"
@@ -318,15 +327,6 @@
             :inactive-icon="CloseSmall"
             active-value="random"
             inactive-value="list"
-          />
-        </div>
-        <div class="item">
-          <span class="text">悬浮模式</span>
-          <el-switch
-            v-model="useFloatingPlayer"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
           />
         </div>
         <div class="item">
@@ -348,7 +348,6 @@
           <el-input
             v-model="playCustomSong"
             v-show="playerSwitchId === 3"
-            @change="refreshPrompt"
             type="number"
             class="song-input"
             size="small"
@@ -361,11 +360,11 @@
 
       <el-collapse-item title="备份与恢复" name="7">
         <div class="item">
-          <span class="text">重置站点为默认状态</span>
+          <span class="text">重置站点为默认状态（若站点出现问题，可尝试此操作）</span>
           <el-button @click="resetSite" class="danger" size="small">重置</el-button>
         </div>
         <div class="item">
-          <span class="text">将站点数据进行备份</span>
+          <span class="text">将站点数据进行备份（包含设置偏好、捷径数据、自定义配置等）</span>
           <el-button @click="backupSite" class="success" size="small">备份</el-button>
         </div>
         <div class="item">
@@ -591,7 +590,7 @@ const resetSite = () => {
   speak("重置.mp3");
 
   ElMessageBox.confirm(
-    `重置后你所有的捷径数据与站点配置都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经做好了备份`,
+    `重置后你所有的捷径数据与站点配置都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经做好了<el-text style="color:#67C23A">备份</el-text>`,
     "站点重置",
     {
       dangerouslyUseHTMLString: true,

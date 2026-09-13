@@ -146,7 +146,16 @@ const changeThemeType = (val) => {
   document.querySelector("html")?.setAttribute("theme", val === "dark" ? "dark" : "light");
 };
 
-watch(() => store.themeType, changeThemeType);
+watch(
+  () => store.themeType,
+  (val) => {
+    changeThemeType(val);
+    // 默认壁纸模式下，跟随主题切换壁纸
+    if (store.coverType === 0) {
+      changeBg(0);
+    }
+  },
+);
 
 /* ==================== 壁纸监听 ==================== */
 
