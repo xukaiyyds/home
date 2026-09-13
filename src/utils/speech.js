@@ -1,29 +1,45 @@
-let currentAudio = null;
-let audioQueue = [];
-let isPlaying = false;
-let controller = null;
-let timeoutId = null;
+/* ==================== 静态配置 ==================== */
+
+// 语音文件目录
+const SPEECH_BASE_PATH = "/speechlocal";
+
+/* ==================== 模块级状态 ==================== */
+
+let currentAudio = null; // 当前播放的音频对象
+let currentResolve = null; // 当前音频播放结束时 resolve 的 Promise
+let timeoutId = null; // 延迟播放的定时器
+
+/* ==================== 停止播放 ==================== */
 
 /**
- * 停止当前播放的语音，并清空播放队列。
+ * 停止当前播放的语音，清空待播放状态。
  */
-// export function stopSpeech() {
-//   if (currentAudio) {
-//     currentAudio.pause();
-//     currentAudio = null;
-//   }
-//   audioQueue = [];
-//   isPlaying = false;
-//   if (controller) {
-//     controller.abort();
-//     controller = null;
-//   }
-//   if (timeoutId) {
-//     clearTimeout(timeoutId);
-//     timeoutId = null;
-//   }
-// }
+export function stopSpeech() {
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+    timeoutId = null;
+  }
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  // 上一个 Promise 无人 resolve，显式结束它，避免调用方悬挂
+  if (currentResolve) {
+    currentResolve();
+    currentResolve = null;
+  }
+}
 
+/* ==================== 播放语音 ==================== */
+
+/**
+ * 播放本地语音文件（可延迟）。
+ * 如果上一次调用尚未播放完，会先停止它。
+ *
+ * @param {string} fileName - 语音文件名（如 "欢迎1.mp3"）
+ * @param {number} [delay=0] - 延迟毫秒数
+ * @returns {Promise<void>} - 音频播放结束时 resolve
+ */
 export function SpeechLocal(fileName, delay = 0) {
   return new Promise((resolve, reject) => {
     if (!fileName) {
@@ -31,63 +47,33 @@ export function SpeechLocal(fileName, delay = 0) {
       return;
     }
 
-    const audioUrl = `/speechlocal/${fileName}`;
+    // 先停止上一次的播放与延迟
+    stopSpeech();
 
-    // 如果有现有的等待，取消之前的 timeout
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+    // 记录本次的 resolve，供 stopSpeech 或播放结束时调用
+    currentResolve = resolve;
+
+    timeoutId = setTimeout(() => {
       timeoutId = null;
-    }
-    // 清除之前的音频
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
-    timeoutId = setTimeout(async () => {
-      // 停止当前正在播放的语音
-      audioQueue = [];
-      isPlaying = false;
-      if (controller) {
-        controller.abort();
-        controller = null;
-      }
 
-      // 添加新音频到队列并播放
-      audioQueue.push(audioUrl);
-      if (!isPlaying) {
-        playNext();
-      }
+      const audio = new Audio(`${SPEECH_BASE_PATH}/${fileName}`);
+      currentAudio = audio;
 
-      function playNext() {
-        if (audioQueue.length === 0) {
-          isPlaying = false;
-          return;
-        }
+      audio.oncanplaythrough = () => {
+        audio.play().catch(reject);
+      };
 
-        isPlaying = true;
+      audio.onended = () => {
+        currentAudio = null;
+        currentResolve = null;
+        resolve();
+      };
 
-        const nextAudioUrl = audioQueue.shift();
-        const audio = new Audio();
-        audio.src = nextAudioUrl;
-
-        // 确保新的音频对象没有被中途替换
-        audio.oncanplaythrough = () => {
-          currentAudio = audio;
-          currentAudio.play();
-        };
-
-        // 在音频播放结束时解析 Promise
-        audio.onended = () => {
-          resolve();
-          playNext();
-        };
-
-        // 如果发生错误，拒绝 Promise
-        audio.onerror = (error) => {
-          reject(error);
-          playNext();
-        };
-      }
+      audio.onerror = (error) => {
+        currentAudio = null;
+        currentResolve = null;
+        reject(error);
+      };
     }, delay);
   });
 }

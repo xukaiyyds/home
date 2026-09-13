@@ -4,160 +4,55 @@ import { SpeechLocal } from "@/utils/speech";
 import dayjs from "dayjs";
 import lunar from "lunar-calendar";
 
-// 时钟
-export const getCurrentTime = (use12Hour = false) => {
-  let time = new Date();
-  let year = time.getFullYear();
-  let month = time.getMonth() + 1 < 10 ? "0" + (time.getMonth() + 1) : time.getMonth() + 1;
-  let day = time.getDate() < 10 ? "0" + time.getDate() : time.getDate();
+/* ==================== 静态配置 ==================== */
 
-  // 处理小时
-  let hour = time.getHours();
-  let amPm = "";
-  if (use12Hour) {
-    amPm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12; // 12小时制，0点显示12
-  }
-  hour = hour < 10 ? "0" + hour : hour;
+// 星期名称
+const WEEKDAYS_SHORT = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const WEEKDAYS_FULL = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 
-  let minute = time.getMinutes() < 10 ? "0" + time.getMinutes() : time.getMinutes();
-  let second;
-  let weekday;
-  if (use12Hour) {
-    second = null; // 12小时制不显示秒
-    weekday = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-  } else {
-    second = time.getSeconds() < 10 ? "0" + time.getSeconds() : time.getSeconds();
-    weekday = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-  }
-  let currentTime = {
-    year,
-    month,
-    day,
-    hour,
-    minute,
-    second,
-    weekday: weekday[time.getDay()],
-    amPm,
-  };
-  return currentTime;
+// 时光胶囊名称
+const CAPSULE_LABELS = {
+  day: "今日",
+  week: "本周",
+  month: "本月",
+  year: "本年",
 };
 
-// 时光胶囊
-export const getTimeCapsule = () => {
-  const now = dayjs();
-  const dayText = {
-    day: "今日",
-    week: "本周",
-    month: "本月",
-    year: "本年",
-  };
-  const getDifference = (unit) => {
-    const start = now.startOf(unit);
-    const end = now.endOf(unit);
-    const total = end.diff(start, unit === "day" ? "hour" : "day") + 1;
-    let passed = now.diff(start, unit === "day" ? "hour" : "day");
-    if (unit === "week") {
-      passed = (passed + 6) % 7;
-    }
-    const remaining = total - passed;
-    const percentage = (passed / total) * 100;
-    return {
-      name: dayText[unit],
-      total: total,
-      passed: passed,
-      remaining: remaining,
-      percentage: percentage.toFixed(2),
-    };
-  };
-  return {
-    day: getDifference("day"),
-    week: getDifference("week"),
-    month: getDifference("month"),
-    year: getDifference("year"),
-  };
-};
+// 欢迎语时段（hour < max 即命中）
+const HELLO_TEXT_PERIODS = [
+  { max: 6, text: "凌晨好" },
+  { max: 9, text: "早上好" },
+  { max: 12, text: "上午好" },
+  { max: 14, text: "中午好" },
+  { max: 17, text: "下午好" },
+  { max: 19, text: "傍晚好" },
+  { max: 22, text: "晚上好" },
+  { max: 24, text: "夜深了" },
+];
 
-// 欢迎提示
-export const helloInit = () => {
-  const hour = new Date().getHours();
-  let hello = null;
-  let iconComponent = null;
-  if (hour < 6) {
-    hello = "凌晨好";
-  } else if (hour < 9) {
-    hello = "早上好";
-  } else if (hour < 12) {
-    hello = "上午好";
-  } else if (hour < 14) {
-    hello = "中午好";
-  } else if (hour < 17) {
-    hello = "下午好";
-  } else if (hour < 19) {
-    hello = "傍晚好";
-  } else if (hour < 22) {
-    hello = "晚上好";
-  } else {
-    hello = "夜深了";
-  }
-  if (hour >= 5 && hour < 11) {
-    iconComponent = Sunrise;
-  } else if (hour >= 11 && hour < 17) {
-    iconComponent = Sun;
-  } else if (hour >= 17 && hour < 22) {
-    iconComponent = Moon;
-  } else {
-    iconComponent = Sleep;
-  }
-  ElMessage({
-    message: `${hello}`,
-    icon: h(iconComponent, {
-      fill: "#efefef",
-    }),
-  });
-};
+// 欢迎语图标时段（闭开区间 [min, max)）
+const HELLO_ICON_PERIODS = [
+  { min: 5, max: 11, icon: Sunrise },
+  { min: 11, max: 17, icon: Sun },
+  { min: 17, max: 22, icon: Moon },
+];
 
-export const speechHelloInit = () => {
-  const hour = new Date().getHours();
-  let hellosound = null;
-  if (hour < 5) {
-    hellosound = "欢迎1.mp3";
-  } else if (hour < 7) {
-    hellosound = "欢迎2.mp3";
-  } else if (hour < 9) {
-    hellosound = "欢迎3.mp3";
-  } else if (hour < 11) {
-    hellosound = "欢迎4.mp3";
-  } else if (hour < 14) {
-    hellosound = "欢迎5.mp3";
-  } else if (hour < 17) {
-    hellosound = "欢迎6.mp3";
-  } else if (hour < 18) {
-    hellosound = "欢迎7.mp3";
-  } else if (hour < 22) {
-    hellosound = "欢迎8.mp3";
-  } else if (hour < 23) {
-    hellosound = "欢迎9.mp3";
-  } else {
-    hellosound = "欢迎10.mp3";
-  }
-  SpeechLocal(hellosound);
-};
+// 欢迎语语音文件时段（hour < max 即命中）
+const SPEECH_HELLO_PERIODS = [
+  { max: 5, file: "欢迎1.mp3" },
+  { max: 7, file: "欢迎2.mp3" },
+  { max: 9, file: "欢迎3.mp3" },
+  { max: 11, file: "欢迎4.mp3" },
+  { max: 14, file: "欢迎5.mp3" },
+  { max: 17, file: "欢迎6.mp3" },
+  { max: 18, file: "欢迎7.mp3" },
+  { max: 22, file: "欢迎8.mp3" },
+  { max: 23, file: "欢迎9.mp3" },
+  { max: 24, file: "欢迎10.mp3" },
+];
 
-// 获取农历日期
-export const getLunarDate = () => {
-  const now = new Date();
-  const lunarDate = lunar.solarToLunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
-  return {
-    year: lunarDate.GanZhiYear,
-    month: lunarDate.lunarMonthName,
-    day: lunarDate.lunarDayName,
-    isLeap: lunarDate.isLeap,
-  };
-};
-
-// 节日提醒
-const solarAnniversaries = {
+// 公历节日（M.D 格式）
+const SOLAR_FESTIVALS = {
   1.1: "元旦",
   2.14: "情人节",
   3.8: "妇女节",
@@ -170,7 +65,8 @@ const solarAnniversaries = {
   12.25: "圣诞节",
 };
 
-const lunarAnniversaries = {
+// 农历节日（lunarMonth-lunarDay 格式）
+const LUNAR_FESTIVALS = {
   "1-1": "春节",
   "1-15": "元宵节",
   "2-2": "龙抬头",
@@ -183,38 +79,145 @@ const lunarAnniversaries = {
   "12-30": "除夕",
 };
 
+// 建站日期统计
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const DAYS_PER_MONTH = 30;
+const MONTHS_PER_YEAR = 12;
+
+/* ==================== 工具函数 ==================== */
+
+// 数字补零
+const pad2 = (n) => String(n).padStart(2, "0");
+
+// 按小时查找时段配置
+const findPeriod = (hour, periods, key) => {
+  return periods.find((p) => hour < p.max)?.[key];
+};
+
+/* ==================== 时钟 ==================== */
+
+export const getCurrentTime = (use12Hour = false) => {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = pad2(now.getMonth() + 1);
+  const day = pad2(now.getDate());
+
+  let hour = now.getHours();
+  let amPm = "";
+  if (use12Hour) {
+    amPm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12; // 0 点显示 12
+  }
+  hour = pad2(hour);
+
+  const minute = pad2(now.getMinutes());
+  // 12 小时制不显示秒
+  const second = use12Hour ? null : pad2(now.getSeconds());
+  const weekday = (use12Hour ? WEEKDAYS_SHORT : WEEKDAYS_FULL)[now.getDay()];
+
+  return { year, month, day, hour, minute, second, weekday, amPm };
+};
+
+/* ==================== 时光胶囊 ==================== */
+
+export const getTimeCapsule = () => {
+  const now = dayjs();
+
+  // 计算某个时间单位的进度
+  const getDifference = (unit) => {
+    const start = now.startOf(unit);
+    const end = now.endOf(unit);
+    // "day" 单位按小时粒度统计，其余按天粒度
+    const diffUnit = unit === "day" ? "hour" : "day";
+
+    const total = end.diff(start, diffUnit) + 1;
+    let passed = now.diff(start, diffUnit);
+    // 周进度：以周一为一周开始
+    if (unit === "week") passed = (passed + 6) % 7;
+
+    return {
+      name: CAPSULE_LABELS[unit],
+      total,
+      passed,
+      remaining: total - passed,
+      percentage: ((passed / total) * 100).toFixed(2),
+    };
+  };
+
+  return {
+    day: getDifference("day"),
+    week: getDifference("week"),
+    month: getDifference("month"),
+    year: getDifference("year"),
+  };
+};
+
+/* ==================== 欢迎提示 ==================== */
+
+export const helloInit = () => {
+  const hour = new Date().getHours();
+
+  const text = findPeriod(hour, HELLO_TEXT_PERIODS, "text") ?? "你好";
+  const icon = HELLO_ICON_PERIODS.find((p) => hour >= p.min && hour < p.max)?.icon ?? Sleep;
+
+  ElMessage({
+    message: text,
+    icon: h(icon, { fill: "#efefef" }),
+  });
+};
+
+export const speechHelloInit = () => {
+  const hour = new Date().getHours();
+  const file = findPeriod(hour, SPEECH_HELLO_PERIODS, "file");
+  if (file) SpeechLocal(file);
+};
+
+/* ==================== 农历 ==================== */
+
+export const getLunarDate = () => {
+  const now = new Date();
+  const lunarDate = lunar.solarToLunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+  return {
+    year: lunarDate.GanZhiYear,
+    month: lunarDate.lunarMonthName,
+    day: lunarDate.lunarDayName,
+    isLeap: lunarDate.isLeap,
+  };
+};
+
+/* ==================== 节日提醒 ==================== */
+
 const showFestivalMessage = (name) => {
   ElMessage({
     dangerouslyUseHTMLString: true,
     duration: 5000,
     message: `今天是 <strong>${name}</strong>`,
-    icon: h(Calendar, {
-      fill: "#efefef",
-    }),
+    icon: h(Calendar, { fill: "#efefef" }),
   });
 };
 
 export const checkDays = () => {
   const now = dayjs();
 
-  // 检查公历节日
-  const solarKey = now.format("M.D");
-  if (solarAnniversaries[solarKey]) {
-    showFestivalMessage(solarAnniversaries[solarKey]);
-  }
+  // 公历节日
+  const solarName = SOLAR_FESTIVALS[now.format("M.D")];
+  if (solarName) showFestivalMessage(solarName);
 
-  // 检查农历节日
+  // 农历节日
   try {
-    const solarDate = now.toDate();
-    const lunarDate = lunar.solarToLunar(
-      solarDate.getFullYear(),
-      solarDate.getMonth() + 1,
-      solarDate.getDate(),
+    const today = now.toDate();
+    const lunarToday = lunar.solarToLunar(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      today.getDate(),
     );
-    const lunarMonth = lunarDate.lunarMonth; // 数字 1-12
-    const lunarDay = lunarDate.lunarDay; // 数字 1-30
 
-    // 特殊处理除夕（腊月廿九或三十，且明天是正月初一）
+    const month = lunarToday.lunarMonth;
+    const day = lunarToday.lunarDay;
+
+    // 除夕特殊处理：腊月廿九或三十，且明天是正月初一
     const tomorrow = dayjs().add(1, "day").toDate();
     const lunarTomorrow = lunar.solarToLunar(
       tomorrow.getFullYear(),
@@ -222,40 +225,32 @@ export const checkDays = () => {
       tomorrow.getDate(),
     );
     const isNewYearEve =
-      lunarMonth === 12 &&
-      (lunarDay === 29 || lunarDay === 30) &&
+      month === 12 &&
+      (day === 29 || day === 30) &&
       lunarTomorrow.lunarMonth === 1 &&
       lunarTomorrow.lunarDay === 1;
 
-    let lunarKey = `${lunarMonth}-${lunarDay}`;
-    if (isNewYearEve) {
-      lunarKey = "12-30";
-    }
-
-    if (lunarAnniversaries[lunarKey]) {
-      showFestivalMessage(lunarAnniversaries[lunarKey]);
-    }
-  } catch (e) {
-    console.warn("农历转换失败:", e);
+    const key = isNewYearEve ? "12-30" : `${month}-${day}`;
+    const lunarName = LUNAR_FESTIVALS[key];
+    if (lunarName) showFestivalMessage(lunarName);
+  } catch (error) {
+    console.warn("农历转换失败:", error);
   }
 };
 
-// 建站日期统计
+/* ==================== 建站日期统计 ==================== */
+
 export const siteDateStatistics = (startDate) => {
-  const currentDate = new Date();
-  const differenceInTime = currentDate.getTime() - startDate.getTime();
-  const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-  const differenceInMonths = differenceInDays / 30;
-  const differenceInYears = differenceInMonths / 12;
-  if (differenceInYears >= 1) {
-    return `本站已经苟活了 ${Math.floor(differenceInYears)} 年 ${Math.floor(
-      differenceInMonths % 12,
-    )} 月 ${Math.round(differenceInDays % 30)} 天`;
-  } else if (differenceInMonths >= 1) {
-    return `本站已经苟活了 ${Math.floor(differenceInMonths)} 月 ${Math.round(
-      differenceInDays % 30,
-    )} 天`;
-  } else {
-    return `本站已经苟活了 ${Math.round(differenceInDays)} 天`;
+  const elapsedMs = Date.now() - startDate.getTime();
+  const days = elapsedMs / MS_PER_DAY;
+  const months = days / DAYS_PER_MONTH;
+  const years = months / MONTHS_PER_YEAR;
+
+  if (years >= 1) {
+    return `本站已经苟活了 ${Math.floor(years)} 年 ${Math.floor(months % MONTHS_PER_YEAR)} 月 ${Math.round(days % DAYS_PER_MONTH)} 天`;
   }
+  if (months >= 1) {
+    return `本站已经苟活了 ${Math.floor(months)} 月 ${Math.round(days % DAYS_PER_MONTH)} 天`;
+  }
+  return `本站已经苟活了 ${Math.round(days)} 天`;
 };

@@ -3,7 +3,7 @@
     <el-collapse class="collapse" v-model="activeName" accordion>
       <el-collapse-item title="基础设置" name="1">
         <div class="item">
-          <span class="text">按下快捷键后弹出提示消息</span>
+          <span class="text">按下快捷键后弹出操作反馈</span>
           <el-switch
             v-model="messageShow"
             inline-prompt
@@ -12,7 +12,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">当天气获取失败时显示农历</span>
+          <span class="text">当天气获取失败时显示农历日期</span>
           <el-switch
             v-model="showLunar"
             inline-prompt
@@ -30,9 +30,10 @@
           />
         </div>
       </el-collapse-item>
+
       <el-collapse-item title="高级设置" name="2">
         <div class="item">
-          <span class="text">使用精简版十二小时制时间</span>
+          <span class="text">使用十二小时制时间</span>
           <el-switch
             v-model="use12HourFormat"
             inline-prompt
@@ -41,7 +42,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">在首页显示简洁版捷径列表</span>
+          <span class="text">在首页显示捷径列表</span>
           <el-switch
             v-model="shortcutHome"
             inline-prompt
@@ -50,7 +51,7 @@
           />
         </div>
         <div class="item" v-show="!shortcutHome">
-          <span class="text">点击网抑音乐打开音乐列表</span>
+          <span class="text subitem">点击网抑音乐打开音乐列表</span>
           <el-switch
             v-model="musicClick"
             inline-prompt
@@ -59,16 +60,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">搜索和设置页可以同时打开</span>
-          <el-switch
-            v-model="prioritizeFirst"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
-        <div class="item">
-          <span class="text">打开搜索自动聚焦搜索引擎</span>
+          <span class="text">打开搜索页自动聚焦搜索引擎</span>
           <el-switch
             v-model="focusSearch"
             inline-prompt
@@ -77,7 +69,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">搜索后自动清空输入框内容</span>
+          <span class="text">搜索后自动清空输入框的内容</span>
           <el-switch
             v-model="clearContent"
             inline-prompt
@@ -85,7 +77,17 @@
             :inactive-icon="CloseSmall"
           />
         </div>
+        <div class="item">
+          <span class="text">搜索页和设置页可以同时打开</span>
+          <el-switch
+            v-model="prioritizeFirst"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
       </el-collapse-item>
+
       <el-collapse-item title="个性壁纸" name="3">
         <div class="bg-set">
           <el-radio-group v-model="coverType" text-color="#ffffff" @change="radioChange">
@@ -180,6 +182,7 @@
           </el-form>
         </el-dialog>
       </el-collapse-item>
+
       <el-collapse-item title="主题与背景" name="4">
         <div class="item">
           <span class="text">壁纸模糊程度</span>
@@ -195,8 +198,8 @@
         <div class="item">
           <span class="text">主题模式</span>
           <el-radio-group v-model="themeType" text-color="#FFFFFF">
-            <el-radio value="light" size="large" border>浅色模式</el-radio>
-            <el-radio value="dark" size="large" border>深色模式</el-radio>
+            <el-radio value="light" border>浅色模式</el-radio>
+            <el-radio value="dark" border>深色模式</el-radio>
           </el-radio-group>
         </div>
         <div class="item">
@@ -218,21 +221,19 @@
           />
         </div>
         <div class="item">
-          <el-radio-group v-show="showParticle" v-model="particleType" text-color="#FFFFFF">
+          <el-radio-group
+            v-show="showParticle"
+            v-model="particleType"
+            size="small"
+            text-color="#FFFFFF"
+          >
             <el-radio v-for="type in availableParticleTypes" :key="type" :value="type" border>
-              {{
-                type === "snow"
-                  ? "雪花"
-                  : type === "bubble"
-                    ? "气泡"
-                    : type === "star"
-                      ? "星空"
-                      : "萤火虫"
-              }}
+              {{ PARTICLE_LABELS[type] }}
             </el-radio>
           </el-radio-group>
         </div>
       </el-collapse-item>
+
       <el-collapse-item title="个性化调整" name="5">
         <div class="item">
           <span class="text">语音交互</span>
@@ -270,7 +271,7 @@
           />
         </div>
         <div class="item" v-show="playerLrcShow">
-          <span class="text">底栏进度条</span>
+          <span class="text subitem">进度条</span>
           <el-switch
             v-model="footerProgressBar"
             inline-prompt
@@ -279,7 +280,7 @@
           />
         </div>
         <div class="item" v-if="playerLrcShow" v-show="footerProgressBar">
-          <span class="text">进度图标常驻</span>
+          <span class="text subsubitem">进度图标常驻</span>
           <el-switch
             v-model="forceShowIcon"
             inline-prompt
@@ -297,6 +298,7 @@
           />
         </div>
       </el-collapse-item>
+
       <el-collapse-item title="播放器配置" name="6">
         <div class="item">
           <span class="text">自动播放</span>
@@ -356,6 +358,7 @@
           />
         </div>
       </el-collapse-item>
+
       <el-collapse-item title="备份与恢复" name="7">
         <div class="item">
           <span class="text">重置站点为默认状态</span>
@@ -398,6 +401,7 @@ import { SpeechLocal } from "@/utils/speech";
 import identifyInput from "@/utils/identifyInput";
 
 const store = mainStore();
+
 const {
   themeType,
   coverType,
@@ -432,40 +436,94 @@ const {
   modelType,
 } = storeToRefs(store);
 
-// 默认选中项
-const activeName = ref("3");
+/* ==================== 静态配置 ==================== */
 
-// 壁纸切换
+// 粒子类型中文标签
+const PARTICLE_LABELS = {
+  star: "星空",
+  snow: "雪花",
+  firefly: "萤火虫",
+  bubble: "气泡",
+};
+
+// 粒子类型 → 对应的 store ref
+const PARTICLE_REFS = {
+  star: darkstar,
+  snow: snowflake,
+  firefly,
+  bubble,
+};
+
+// 主题 → 可用粒子类型
+const PARTICLE_BY_THEME = {
+  light: ["snow", "bubble"],
+  dark: ["star", "firefly"],
+};
+
+// 重置/恢复的时间常量
+const SUCCESS_DELAY = 2500;
+const RELOAD_DELAY = 4000;
+
+/* ==================== 本地状态 ==================== */
+
+const activeName = ref("3");
+const dialogFormVisible = ref(false);
+const customCoverUrl = ref("");
+const particleType = ref("star");
+const recoverRef = ref(null);
+
+/* ==================== 工具函数 ==================== */
+
+// 统一的消息提示
+const showMessage = (message, icon, options = {}) => {
+  ElMessage({
+    message,
+    icon: h(icon, { theme: "filled", fill: "#efefef" }),
+    ...options,
+  });
+};
+
+// 语音播报（开启语音交互时）
+const speak = (file) => {
+  if (store.webSpeech) SpeechLocal(file);
+};
+
+// 通用的"成功提示 + 延迟刷新"流程
+const refreshAfterDelay = (successMessage, onBeforeRefresh) => {
+  setTimeout(() => {
+    onBeforeRefresh?.();
+    showMessage(successMessage, Correct);
+  }, SUCCESS_DELAY);
+
+  const loading = ElLoading.service({
+    lock: true,
+    text: "Loading",
+    background: "rgba(0, 0, 0, 0.7)",
+  });
+  setTimeout(() => {
+    loading.close();
+    window.location.reload();
+  }, RELOAD_DELAY);
+};
+
+/* ==================== 壁纸切换 ==================== */
+
 const radioChange = () => {
   ElMessage({
     message: "壁纸更换成功",
-    icon: h(SuccessPicture, {
-      fill: "#efefef",
-    }),
+    icon: h(SuccessPicture, { fill: "#efefef" }),
   });
-  if (store.webSpeech) {
-    SpeechLocal("更换壁纸成功.mp3");
-  }
+  speak("更换壁纸成功.mp3");
 };
 
-// 自定义壁纸
-const dialogFormVisible = ref(false);
-const customCoverUrl = ref("");
+/* ==================== 自定义壁纸 ==================== */
 
 const setCustomCover = () => {
   const url = customCoverUrl.value;
 
   if (identifyInput(url) !== "url") {
-    ElMessage({
-      message: "请输入正确的网址",
-      icon: h(Error, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
-    });
-    if (store.webSpeech) {
-      SpeechLocal("壁纸ID设置失败.mp3");
-    }
+    showMessage("请输入正确的网址", Error);
+    speak("壁纸ID设置失败.mp3");
     return;
   }
 
@@ -476,94 +534,62 @@ const setCustomCover = () => {
     store.bgUrl = url;
     ElMessage({
       message: "自定义壁纸更换成功",
-      icon: h(SuccessPicture, {
-        fill: "#efefef",
-      }),
+      icon: h(SuccessPicture, { fill: "#efefef" }),
     });
-    if (store.webSpeech) {
-      SpeechLocal("壁纸ID设置成功.mp3");
-    }
+    speak("壁纸ID设置成功.mp3");
   }
 
   dialogFormVisible.value = false;
 };
 
-// 粒子特效
-const particleType = ref("star");
+/* ==================== 粒子特效 ==================== */
 
-// 监听粒子类型变化
-watch(particleType, (newVal) => {
-  store.currentParticle = newVal;
-  // 先将所有特效关闭
-  darkstar.value = false;
-  snowflake.value = false;
-  firefly.value = false;
-  bubble.value = false;
+// 可用粒子类型（依赖当前主题）
+const availableParticleTypes = computed(() => PARTICLE_BY_THEME[themeType.value] ?? []);
 
-  // 再开启选中的特效
-  if (newVal === "star") darkstar.value = true;
-  else if (newVal === "snow") snowflake.value = true;
-  else if (newVal === "firefly") firefly.value = true;
-  else if (newVal === "bubble") bubble.value = true;
-});
-
-watch(darkstar, (val) => {
-  if (val) particleType.value = "star";
-});
-watch(snowflake, (val) => {
-  if (val) particleType.value = "snow";
-});
-watch(firefly, (val) => {
-  if (val) particleType.value = "firefly";
-});
-watch(bubble, (val) => {
-  if (val) particleType.value = "bubble";
-});
-
-const availableParticleTypes = computed(() => {
-  if (themeType.value === "light") {
-    return ["snow", "bubble"]; // 浅色模式只允许雪花和气泡
-  } else {
-    return ["star", "firefly"]; // 深色模式只允许星空和萤火虫
+// 应用粒子：关闭所有其他特效，只开启指定类型
+const applyParticle = (type) => {
+  for (const key in PARTICLE_REFS) {
+    PARTICLE_REFS[key].value = key === type;
   }
-});
+  store.currentParticle = type;
+};
 
-watch(themeType, (newVal) => {
-  const available = newVal === "light" ? ["snow", "bubble"] : ["star", "firefly"];
+// 用户在设置面板中切换粒子类型
+watch(particleType, applyParticle);
+
+// 主题切换后，如果当前粒子类型不可用，回退到第一个可用类型
+watch(themeType, (newTheme) => {
+  const available = PARTICLE_BY_THEME[newTheme] ?? [];
   if (!available.includes(particleType.value)) {
     particleType.value = available[0];
   }
 });
 
-// 悬浮播放器
+/* ==================== 悬浮播放器 ==================== */
+
 watch(
   () => store.useFloatingPlayer,
   (val) => {
-    if (val) {
-      // 关掉卡片里的音乐面板
-      store.musicOpenState = false;
-    } else {
-      // 关掉悬浮面板
-      store.floatingMusicOpenState = false;
-    }
+    if (val) store.musicOpenState = false;
+    else store.floatingMusicOpenState = false;
   },
 );
 
-// 监听设置页面关闭状态，同步关闭重置/恢复的确认框
+/* ==================== 设置页关闭时清理确认框 ==================== */
+
 watch(
   () => store.setOpenState,
   (newVal) => {
-    if (!newVal) {
-      ElMessageBox.close();
-    }
+    if (!newVal) ElMessageBox.close();
   },
 );
 
-// 站点重置
+/* ==================== 站点重置 ==================== */
+
 const resetSite = () => {
-  if (store.webSpeech) {
-    SpeechLocal("重置.mp3");
-  }
+  speak("重置.mp3");
+
   ElMessageBox.confirm(
     `重置后你所有的捷径数据与站点配置都将<el-text style="color:#E6A23C">丢失</el-text>！操作前请确保你已经做好了备份`,
     "站点重置",
@@ -577,88 +603,46 @@ const resetSite = () => {
     },
   )
     .then(() => {
-      if (store.webSpeech) {
-        SpeechLocal("重置中.mp3");
-      }
-      setTimeout(() => {
-        localStorage.clear();
-        ElMessage({
-          message: "重置成功，即将刷新",
-          icon: h(Correct, {
-            theme: "filled",
-            fill: "#efefef",
-          }),
-        });
-      }, 2500);
-      const loading = ElLoading.service({
-        lock: true,
-        text: "Loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
-      setTimeout(() => {
-        loading.close();
-        window.location.reload();
-      }, 4000);
+      speak("重置中.mp3");
+      refreshAfterDelay("重置成功，即将刷新", () => localStorage.clear());
     })
     .catch(() => {});
 };
 
-// 站点备份
+/* ==================== 站点备份 ==================== */
+
 const backupSite = () => {
   try {
-    const date = new Date();
-    const dateString = date.toISOString().replace(/[:.]/g, "-");
-    const fileName = `Site_Backup_${dateString}.json`;
+    const dateString = new Date().toISOString().replace(/[:.]/g, "-");
     const jsonData = JSON.stringify(store.$state);
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = fileName;
+    a.download = `Site_Backup_${dateString}.json`;
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    // 备份完成
-    ElMessage({
-      message: "站点数据备份成功",
-      icon: h(Correct, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
-    });
+    showMessage("站点数据备份成功", Correct);
   } catch (error) {
-    ElMessage({
-      message: "站点数据备份失败",
-      icon: h(Error, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
-    });
+    showMessage("站点数据备份失败", Error);
     console.error("站点数据备份失败：", error);
   }
 };
 
-// 站点恢复
-const recoverRef = ref(null);
+/* ==================== 站点恢复 ==================== */
+
 const recoverSite = async (event) => {
   try {
     const fileInput = event.target;
     if (!fileInput?.files.length) {
-      ElMessage({
-        message: "请选择要恢复的备份文件",
-        icon: h(Error, {
-          theme: "filled",
-          fill: "#efefef",
-        }),
-      });
-      return false;
+      showMessage("请选择要恢复的备份文件", Error);
+      return;
     }
-    const file = fileInput.files[0];
-    const jsonData = await file.text();
-    const data = JSON.parse(jsonData);
-    // 恢复数据
+    const data = JSON.parse(await fileInput.files[0].text());
+
     ElMessageBox.confirm(
       `确认使用该恢复文件？你现有的捷径数据以及站点配置都将被<el-text style="color:#E6A23C">覆盖</el-text>！`,
       "站点恢复",
@@ -673,82 +657,40 @@ const recoverSite = async (event) => {
     )
       .then(() => {
         const isSuccess = store.recoverSiteData(data);
-        if (isSuccess) {
-          if (store.webSpeech) {
-            SpeechLocal("恢复中.mp3");
-          }
-          setTimeout(() => {
-            ElMessage({
-              message: "恢复成功，即将刷新",
-              icon: h(Correct, {
-                theme: "filled",
-                fill: "#efefef",
-              }),
-            });
-          }, 2500);
-          const loading = ElLoading.service({
-            lock: true,
-            text: "Loading",
-            background: "rgba(0, 0, 0, 0.7)",
-          });
-          setTimeout(() => {
-            loading.close();
-            window.location.reload();
-          }, 4000);
-        } else {
-          ElMessage({
-            message: "站点数据恢复失败，请重试",
-            icon: h(Error, {
-              theme: "filled",
-              fill: "#efefef",
-            }),
-          });
+        if (!isSuccess) {
+          showMessage("站点数据恢复失败，请重试", Error);
+          return;
         }
+        speak("恢复中.mp3");
+        refreshAfterDelay("恢复成功，即将刷新");
       })
       .catch(() => {
         recoverRef.value.value = null;
       });
   } catch (error) {
-    ElMessage({
-      message: "站点数据恢复失败，请重试",
-      icon: h(Error, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
-    });
+    showMessage("站点数据恢复失败，请重试", Error);
     console.error("站点数据恢复失败：", error);
   }
 };
 
-// 刷新提示
-const refreshPrompt = () => {
-  ElMessage({
-    message: "刷新后生效",
-    icon: h(Redo, {
-      theme: "filled",
-      fill: "#efefef",
-    }),
-  });
-};
+/* ==================== 刷新提示 ==================== */
+
+const refreshPrompt = () => showMessage("刷新后生效", Redo);
+
+/* ==================== 生命周期 ==================== */
 
 onMounted(() => {
-  // 根据已有状态设置单选按钮
-  if (darkstar.value) particleType.value = "star";
-  else if (snowflake.value) particleType.value = "snow";
-  else if (firefly.value) particleType.value = "firefly";
-  else if (bubble.value) particleType.value = "bubble";
-  else {
-    // 根据当前主题设置默认粒子类型
-    const defaultParticle = themeType.value === "light" ? "snow" : "star";
-    particleType.value = defaultParticle;
-    if (defaultParticle === "snow") {
-      snowflake.value = true;
-    } else if (defaultParticle === "star") {
-      darkstar.value = true;
-    }
+  // 从 store 已有状态恢复 particleType；无则按主题选默认
+  const activeType = Object.keys(PARTICLE_REFS).find((key) => PARTICLE_REFS[key].value);
+  if (activeType) {
+    particleType.value = activeType;
+  } else {
+    particleType.value = availableParticleTypes.value[0];
+    PARTICLE_REFS[particleType.value].value = true;
   }
   store.currentParticle = particleType.value;
-  // 检测是否存在自定义壁纸
+
+  // 恢复自定义壁纸 URL
   if (store.backgroundCustom) customCoverUrl.value = store.backgroundCustom;
 });
 </script>
@@ -802,7 +744,7 @@ onMounted(() => {
 
       .el-slider {
         --el-slider-runway-bg-color: var(--main-cards-header-bg-color);
-        flex-basis: 45%;
+        flex-basis: 43%;
       }
 
       .el-slider__bar {
@@ -833,6 +775,14 @@ onMounted(() => {
           justify-content: space-between;
           flex-wrap: wrap;
           font-size: 14px;
+
+          .subitem {
+            margin-left: 14px;
+          }
+
+          .subsubitem {
+            margin-left: 28px;
+          }
 
           .el-switch__core {
             border-color: transparent;

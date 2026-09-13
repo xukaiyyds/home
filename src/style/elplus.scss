@@ -61,9 +61,14 @@
 }
 
 // MessageBox 样式
+.el-overlay {
+  backdrop-filter: blur(10px);
+  will-change: opacity, backdrop-filter;
+  transform: translateZ(0);
+}
 .el-message-box {
   background: var(--main-panel-bg-color) !important;
-  backdrop-filter: blur(10px) !important;
+  will-change: auto;
   .el-button {
     border-color: transparent !important;
   }

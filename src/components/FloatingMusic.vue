@@ -2,23 +2,10 @@
   <div class="floating-music">
     <!-- 展开后的面板 -->
     <Transition name="fade-up">
-      <div
-        class="music-panel"
-        v-show="store.floatingMusicOpenState"
-        @mouseenter="volumeShow = true"
-        @mouseleave="volumeShow = false"
-      >
+      <div class="music-panel" v-show="store.floatingMusicOpenState">
         <!-- 顶部信息 -->
         <div class="panel-header">
-          <span class="song-name">
-            {{
-              store.getPlayerData.name
-                ? store.getPlayerData.name + " - " + store.getPlayerData.artist
-                : store.musicIsOk
-                  ? "未播放音乐"
-                  : "Loading..."
-            }}
-          </span>
+          <span class="song-name">{{ displayName }}</span>
           <div class="header-actions">
             <close-small
               theme="filled"
@@ -33,12 +20,7 @@
         <!-- 封面与旋转 -->
         <div class="cover-container">
           <div :class="['cover', { rotating: store.playerState }]">
-            <img
-              :src="store.getPlayerData.cover || defaultCover"
-              alt="cover"
-              class="cover-img"
-              @error="imgError"
-            />
+            <img :src="coverSrc" alt="cover" class="cover-img" @error="imgError" />
             <div class="center-hole"></div>
           </div>
         </div>
@@ -65,16 +47,9 @@
 
         <!-- 控制区 -->
         <div class="control">
-          <!-- 播放模式 -->
+          <!-- 播放模式：单按钮循环切换 -->
           <div class="mode-btn" @click="changePlayMode">
-            <loop-once theme="filled" size="20" fill="#efefef" v-if="store.playerLoop === 'one'" />
-            <shuffle-one
-              theme="filled"
-              size="20"
-              fill="#efefef"
-              v-else-if="store.playerOrder === 'random'"
-            />
-            <play-cycle theme="filled" size="20" fill="#efefef" v-else />
+            <component :is="currentMode.icon" theme="filled" size="20" fill="#efefef" />
           </div>
 
           <go-start
@@ -84,10 +59,12 @@
             fill="#efefef"
             @click="changeMusicIndex(0)"
           />
+
           <div class="play-btn" @click="changePlayState">
-            <play-one theme="filled" size="38" fill="#efefef" v-show="!store.playerState" />
-            <pause theme="filled" size="38" fill="#efefef" v-show="store.playerState" />
+            <play-one v-if="!store.playerState" theme="filled" size="38" fill="#efefef" />
+            <pause v-else theme="filled" size="38" fill="#efefef" />
           </div>
+
           <go-end
             class="control-btn"
             theme="filled"
@@ -96,8 +73,8 @@
             @click="changeMusicIndex(1)"
           />
 
-          <!-- 列表按钮：打开全局音乐列表 -->
-          <div class="list-btn" @click="openMusicList">
+          <!-- 列表按钮：打开/关闭全局音乐列表 -->
+          <div class="list-btn" @click="toggleMusicList">
             <music-list theme="filled" size="20" fill="#efefef" />
           </div>
         </div>
@@ -106,14 +83,7 @@
         <div class="tools">
           <div class="volume-control">
             <div class="icon" @click="toggleMute">
-              <volume-mute theme="filled" size="18" fill="#efefef" v-if="store.musicVolume == 0" />
-              <volume-small
-                theme="filled"
-                size="18"
-                fill="#efefef"
-                v-else-if="store.musicVolume > 0 && store.musicVolume < 0.7"
-              />
-              <volume-notice theme="filled" size="18" fill="#efefef" v-else />
+              <component :is="volumeIcon" theme="filled" size="18" fill="#efefef" />
             </div>
             <el-slider
               v-model="store.musicVolume"
@@ -161,79 +131,97 @@ const store = mainStore();
 
 const defaultCover = "/images/icon/album_300.png";
 
-// 面板悬停显隐（跟音量数值无关）
-const volumeShow = ref(false);
+/* ==================== 静态配置 ==================== */
 
-// 进度
+// 播放模式表：按顺序循环切换
+const PLAY_MODES = [
+  { label: "列表循环", icon: PlayCycle, loop: "all", order: "list" },
+  { label: "单曲循环", icon: LoopOnce, loop: "one", order: "list" },
+  { label: "随机播放", icon: ShuffleOne, loop: "none", order: "random" },
+];
+
+/* ==================== 本地状态 ==================== */
+
+// 进度条状态
 const currentProgress = ref(0);
 const currentTime = ref(0);
 const isDragging = ref(false);
 const totalDuration = computed(() => store.audioDuration || 0);
 
-// 从 store 同步进度（Player.vue 每 500ms 会写一次）
+/* ==================== 计算属性 ==================== */
+
+// 歌曲名显示（只访问具体 state，避免 getter 重复创建对象）
+const displayName = computed(() => {
+  if (store.playerTitle) return `${store.playerTitle} - ${store.playerArtist}`;
+  return store.musicIsOk ? "未播放音乐" : "Loading...";
+});
+
+// 封面（缺省时用默认图）
+const coverSrc = computed(() => store.playerCover || defaultCover);
+
+// 当前播放模式索引
+const currentModeIndex = computed(() => {
+  if (store.playerLoop === "one") return 1;
+  if (store.playerOrder === "random") return 2;
+  return 0;
+});
+const currentMode = computed(() => PLAY_MODES[currentModeIndex.value]);
+
+// 音量图标（三态）
+const volumeIcon = computed(() => {
+  if (store.musicVolume === 0) return VolumeMute;
+  if (store.musicVolume < 0.7) return VolumeSmall;
+  return VolumeNotice;
+});
+
+/* ==================== 进度同步 ==================== */
+
+// 从 store 同步进度（Player.vue 定时写入）
+// 拖动中不同步，避免把用户拖动的位置覆盖掉
 watch(
   () => store.audioCurrent,
   (val) => {
-    if (!isDragging.value) {
-      currentTime.value = val;
-      currentProgress.value = val;
-    }
+    if (isDragging.value) return;
+    currentTime.value = val;
+    currentProgress.value = val;
   },
   { immediate: true },
 );
 
-// 格式化时间
+/* ==================== 工具函数 ==================== */
+
 const formatTime = (time) => {
   if (!time) return "00:00";
   const m = Math.floor(time / 60);
   const s = Math.floor(time % 60);
-  return `${m < 10 ? "0" + m : m}:${s < 10 ? "0" + s : s}`;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 
-// 拖动进度
+/* ==================== 事件处理 ==================== */
+
+// 拖动结束：写入播放进度
 const changeProgress = (val) => {
   window.$playerSeek?.(val);
   isDragging.value = false;
 };
 
-// 封面
+// 封面加载失败
 const imgError = (e) => {
   e.target.src = defaultCover;
 };
 
-// 播放模式
+// 播放模式循环切换
 const changePlayMode = () => {
-  if (store.playerLoop === "one") {
-    store.playerLoop = "none";
-    store.playerOrder = "random";
-    ElMessage({
-      message: "随机播放",
-      icon: h(ShuffleOne, {
-        fill: "#efefef",
-      }),
-    });
-  } else if (store.playerOrder === "random") {
-    store.playerLoop = "all";
-    store.playerOrder = "list";
-    ElMessage({
-      message: "列表循环",
-      icon: h(PlayCycle, {
-        fill: "#efefef",
-      }),
-    });
-  } else {
-    store.playerLoop = "one";
-    store.playerOrder = "list";
-    ElMessage({
-      message: "单曲循环",
-      icon: h(LoopOnce, {
-        fill: "#efefef",
-      }),
-    });
-  }
+  const next = PLAY_MODES[(currentModeIndex.value + 1) % PLAY_MODES.length];
+  store.playerLoop = next.loop;
+  store.playerOrder = next.order;
+  ElMessage({
+    message: next.label,
+    icon: h(next.icon, { fill: "#efefef" }),
+  });
 };
 
-// 静音：改 store，Music.vue 里的 watch 会自动同步到播放器
+// 静音切换（改 store，Music.vue 的 watch 会自动同步到播放器）
 const toggleMute = () => {
   if (store.musicVolume > 0) {
     store.lastMusicVolume = store.musicVolume;
@@ -243,24 +231,19 @@ const toggleMute = () => {
   }
 };
 
-// 打开全局音乐列表
-const openMusicList = () => {
-  if (store.musicListShow) {
-    window.$closeList?.();
-  } else {
-    window.$openList?.();
-  }
+// 打开/关闭全局音乐列表
+const toggleMusicList = () => {
+  if (store.musicListShow) window.$closeList?.();
+  else window.$openList?.();
 };
 
-// 如果音乐列表开着，一起关掉
+// 关闭面板（同时收起音乐列表）
 const closePanel = () => {
   store.floatingMusicOpenState = false;
-  if (store.musicListShow) {
-    window.$closeList?.();
-  }
+  if (store.musicListShow) window.$closeList?.();
 };
 
-// 控制唯一实例
+// 播放控制（统一走全局实例方法）
 const changePlayState = () => window.$playerToggle?.();
 const changeMusicIndex = (type) => window.$playerChange?.(type);
 </script>

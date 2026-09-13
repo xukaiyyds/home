@@ -74,7 +74,6 @@ a:hover {
     backdrop-filter 0.3s,
     transform 0.3s;
   &:hover {
-    box-shadow: var(--main-small-box-shadow);
     transform: scale(1.01);
   }
   &:active {

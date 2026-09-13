@@ -22,22 +22,11 @@
     </div>
     <div class="menu">
       <div class="name" v-show="!volumeShow">
-        <span>{{
-          store.getPlayerData.name
-            ? store.getPlayerData.name + " - " + store.getPlayerData.artist
-            : "未播放音乐"
-        }}</span>
+        <span>{{ displaySong }}</span>
       </div>
       <div class="volume" v-show="volumeShow">
         <div class="icon">
-          <volume-mute theme="filled" size="24" fill="#efefef" v-if="store.musicVolume == 0" />
-          <volume-small
-            theme="filled"
-            size="24"
-            fill="#efefef"
-            v-else-if="store.musicVolume > 0 && store.musicVolume < 0.7"
-          />
-          <volume-notice theme="filled" size="24" fill="#efefef" v-else />
+          <component :is="volumeIcon" theme="filled" size="24" fill="#efefef" />
         </div>
         <el-slider
           v-model="store.musicVolume"
@@ -49,6 +38,7 @@
       </div>
     </div>
   </div>
+
   <!-- 音乐列表弹窗 -->
   <Transition name="fade" mode="out-in">
     <div class="music-list" v-show="store.musicListShow" @click="closeMusicList()">
@@ -91,248 +81,212 @@ import {
 import Player from "@/components/Player.vue";
 import { SpeechLocal } from "@/utils/speech";
 import { mainStore } from "@/store";
+
 const store = mainStore();
 
-// 音量条数据
-const volumeShow = ref(false);
+/* ==================== 静态配置 ==================== */
 
-// 播放列表数据
-const playerRef = ref(null);
-const playerData = reactive({
+// 音量步进值
+const VOLUME_STEP = 0.05;
+
+// 播放列表配置（构建时确定，无需响应式）
+const playerData = {
   server: import.meta.env.VITE_SONG_SERVER,
   type: import.meta.env.VITE_SONG_TYPE,
   id: import.meta.env.VITE_SONG_ID,
+};
+
+/* ==================== 本地状态 ==================== */
+
+// 音量条显隐（hover 触发）
+const volumeShow = ref(false);
+
+// 播放器实例引用
+const playerRef = ref(null);
+
+/* ==================== 计算属性 ==================== */
+
+// 歌曲名（避免模板里多次访问 getter）
+const displaySong = computed(() => {
+  if (store.playerTitle) return `${store.playerTitle} - ${store.playerArtist}`;
+  return "未播放音乐";
 });
 
-// 开启播放列表
+// 音量图标（三态）
+const volumeIcon = computed(() => {
+  if (store.musicVolume === 0) return VolumeMute;
+  if (store.musicVolume < 0.7) return VolumeSmall;
+  return VolumeNotice;
+});
+
+/* ==================== 播放列表控制 ==================== */
+
 const openMusicList = () => {
   store.musicListShow = true;
-  playerRef.value.toggleList();
-  if (store.webSpeech) {
-    SpeechLocal("好耶.mp3");
-  }
+  playerRef.value?.toggleList();
+  if (store.webSpeech) SpeechLocal("好耶.mp3");
 };
 
-// 关闭播放列表
 const closeMusicList = () => {
   store.musicListShow = false;
-  playerRef.value.toggleList();
+  playerRef.value?.toggleList();
 };
 
-// 音乐播放暂停
-const changePlayState = () => {
-  playerRef.value.playToggle();
+/* ==================== 播放控制 ==================== */
+
+const changePlayState = () => playerRef.value?.playToggle();
+const changeMusicIndex = (type) => playerRef.value?.changeSong(type);
+
+/* ==================== 通用工具 ==================== */
+
+// 当前是否聚焦在输入框（避免快捷键劫持输入）
+const isInputFocused = () => {
+  const el = document.activeElement;
+  return el && (el.tagName === "INPUT" || el.isContentEditable);
 };
 
-// 音乐上下曲
-const changeMusicIndex = (type) => {
-  playerRef.value.changeSong(type);
+// 显示操作提示消息
+const showMessage = (message, icon) => {
+  if (store.messageShow) {
+    ElMessage({ duration: 2000, message, icon: h(icon, { fill: "#efefef" }) });
+  }
 };
 
-// 监听音量变化
-watch(
-  () => store.musicVolume,
-  (v) => {
-    playerRef.value?.changeVolume(v);
-  },
-  { immediate: true },
-);
+/* ==================== 键盘事件处理 ==================== */
 
-// 当设置和搜索页面打开时，自动关闭音乐列表
-watch(
-  () => store.setOpenState,
-  (newVal) => {
-    if (newVal && store.musicListShow) {
-      closeMusicList();
-    }
-  },
-);
-
-watch(
-  () => store.searchOpenState,
-  (newVal) => {
-    if (newVal && store.musicListShow) {
-      closeMusicList();
-    }
-  },
-);
-
-// 上一首/下一首
+// 左右方向键：上一首 / 下一首
 const handleHorizontalArrow = (event) => {
-  const activeEl = document.activeElement;
-  if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
-    return;
-  }
-
-  if (event.key === "ArrowLeft") {
-    event.preventDefault();
-    changeMusicIndex(0); // 上一首
-  } else if (event.key === "ArrowRight") {
-    event.preventDefault();
-    changeMusicIndex(1); // 下一首
-  }
-};
-
-// 调节音量
-const handleVerticalArrow = (event) => {
-  const activeEl = document.activeElement;
-  if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
-    return;
-  }
-
+  if (isInputFocused()) return;
   if (event.key === "ArrowLeft") {
     event.preventDefault();
     changeMusicIndex(0);
   } else if (event.key === "ArrowRight") {
     event.preventDefault();
     changeMusicIndex(1);
-  } else if (event.key === "ArrowUp") {
+  }
+};
+
+// 上下方向键：调节音量
+const handleVerticalArrow = (event) => {
+  if (isInputFocused()) return;
+  if (event.key === "ArrowUp") {
     event.preventDefault();
-    store.musicVolume = Math.min(1, store.musicVolume + 0.05);
+    store.musicVolume = Math.min(1, store.musicVolume + VOLUME_STEP);
   } else if (event.key === "ArrowDown") {
     event.preventDefault();
-    store.musicVolume = Math.max(0, store.musicVolume - 0.05);
+    store.musicVolume = Math.max(0, store.musicVolume - VOLUME_STEP);
   }
 };
 
-// 回到首页
+// Alt + H：回到首页（关闭所有浮层）
 const handleHToggle = (event) => {
-  if (event.altKey && (event.key === "h" || event.key === "H")) {
-    event.preventDefault();
-    // 如果有任何浮层打开，则关闭它们
-    if (store.boxOpenState || store.setOpenState || store.searchOpenState || store.musicListShow) {
-      store.boxOpenState = false;
-      store.setOpenState = false;
-      store.searchOpenState = false;
-      if (store.floatingMusicOpenState) {
-        store.floatingMusicOpenState = false;
-      }
-      if (store.musicListShow) {
-        closeMusicList();
-      }
-      if (store.messageShow) {
-        ElMessage({
-          duration: 2000,
-          message: "已回到首页",
-          icon: h(HomeTwo, {
-            fill: "#efefef",
-          }),
-        });
-      }
+  if (!event.altKey || event.key.toLowerCase() !== "h") return;
+  event.preventDefault();
+  const anyOpen =
+    store.boxOpenState || store.setOpenState || store.searchOpenState || store.musicListShow;
+  if (!anyOpen) return;
+
+  store.boxOpenState = false;
+  store.setOpenState = false;
+  store.searchOpenState = false;
+  if (store.floatingMusicOpenState) store.floatingMusicOpenState = false;
+  if (store.musicListShow) closeMusicList();
+  showMessage("已回到首页", HomeTwo);
+};
+
+// M 键：切换音乐面板 / 悬浮播放器
+const handleMKey = (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (event.key.toLowerCase() !== "m") return;
+  if (isInputFocused()) return;
+  event.preventDefault();
+
+  if (store.useFloatingPlayer) {
+    store.floatingMusicOpenState = !store.floatingMusicOpenState;
+    showMessage(`已${store.floatingMusicOpenState ? "打开" : "关闭"}音乐播放器`, MusicMenu);
+    if (!store.floatingMusicOpenState && store.musicListShow) {
+      window.$closeList?.();
     }
+  } else {
+    store.musicOpenState = !store.musicOpenState;
+    // 修改：原代码误用 floatingMusicOpenState、且图标 MusicListMenu 未定义
+    showMessage(`已${store.musicOpenState ? "打开" : "关闭"}音乐播放器`, MusicMenu);
   }
 };
+
+// Alt + M：切换音乐列表
+const handleAltMKey = (event) => {
+  if (!event.altKey || event.key.toLowerCase() !== "m") return;
+  event.preventDefault();
+  store.boxOpenState = false;
+  if (store.setOpenState || store.searchOpenState) {
+    store.setOpenState = false;
+    store.searchOpenState = false;
+  }
+
+  if (store.musicListShow) {
+    closeMusicList();
+    showMessage(`已关闭音乐列表`, MusicList);
+  } else {
+    openMusicList();
+    showMessage(`已打开音乐列表`, MusicList);
+  }
+};
+
+// 空格键：播放 / 暂停
+const handleSpaceKey = (event) => {
+  if (!store.musicIsOk) return;
+  if (event.code !== "Space") return;
+  if (isInputFocused()) return;
+  event.preventDefault();
+  changePlayState();
+};
+
+// 首次交互：自动播放（仅触发一次）
+const handleFirstInteraction = () => {
+  if (store.playerAutoplay && !store.playerState && playerRef.value) {
+    playerRef.value.playToggle();
+  }
+  removeFirstInteractionListeners();
+};
+
+const removeFirstInteractionListeners = () => {
+  document.removeEventListener("click", handleFirstInteraction);
+  document.removeEventListener("keydown", handleFirstInteraction);
+};
+
+/* ==================== 监听 ==================== */
+
+// 音量变化同步到播放器
+watch(
+  () => store.musicVolume,
+  (v) => playerRef.value?.changeVolume(v),
+  { immediate: true },
+);
+
+// 设置页 / 搜索页打开时，自动关闭音乐列表
+watch([() => store.setOpenState, () => store.searchOpenState], ([setOpen, searchOpen]) => {
+  if ((setOpen || searchOpen) && store.musicListShow) {
+    closeMusicList();
+  }
+});
+
+/* ==================== 生命周期 ==================== */
 
 onMounted(() => {
-  // 监听用户首次交互
-  const handleFirstInteraction = () => {
-    if (store.playerAutoplay) {
-      // 如果播放器未播放，则尝试播放
-      if (!store.playerState && playerRef.value) {
-        playerRef.value.playToggle();
-      }
-    }
-    // 移除监听，只触发一次
-    document.removeEventListener("click", handleFirstInteraction);
-    document.removeEventListener("keydown", handleFirstInteraction);
-  };
+  // 首次交互监听（自清理）
   document.addEventListener("click", handleFirstInteraction);
   document.addEventListener("keydown", handleFirstInteraction);
 
-  // 左右方向键事件
+  // 快捷键监听
   document.addEventListener("keydown", handleHorizontalArrow);
-
-  // 上下方向键事件
   document.addEventListener("keydown", handleVerticalArrow);
-
-  // Alt+H键事件
   document.addEventListener("keydown", handleHToggle);
+  document.addEventListener("keydown", handleMKey);
+  document.addEventListener("keydown", handleAltMKey);
+  document.addEventListener("keydown", handleSpaceKey);
 
-  // M键事件
-  window.addEventListener("keydown", (e) => {
-    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-    if (e.key !== "m" && e.key !== "M") return;
-    const activeEl = document.activeElement;
-    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) return;
-    if (store.useFloatingPlayer) {
-      store.floatingMusicOpenState = !store.floatingMusicOpenState;
-      if (store.messageShow) {
-        ElMessage({
-          duration: 2000,
-          message: `已${store.floatingMusicOpenState ? "打开" : "关闭"}音乐播放器`,
-          icon: h(MusicMenu, {
-            fill: "#efefef",
-          }),
-        });
-      }
-      if (!store.floatingMusicOpenState && store.musicListShow) {
-        window.$closeList?.();
-      }
-    } else {
-      store.musicOpenState = !store.musicOpenState;
-      if (store.messageShow) {
-        ElMessage({
-          duration: 2000,
-          message: `已${store.floatingMusicOpenState ? "打开" : "关闭"}音乐播放器`,
-          icon: h(MusicListMenu, {
-            fill: "#efefef",
-          }),
-        });
-      }
-    }
-    e.preventDefault();
-  });
-
-  // Alt+M键事件
-  window.addEventListener("keydown", (event) => {
-    if (event.altKey && event.key.toLowerCase() === "m") {
-      event.preventDefault();
-      store.boxOpenState = false;
-      if (store.setOpenState || store.searchOpenState) {
-        store.setOpenState = false;
-        store.searchOpenState = false;
-      }
-      if (store.musicListShow) {
-        closeMusicList();
-        if (store.messageShow) {
-          ElMessage({
-            duration: 2000,
-            message: `已${store.musicListShow ? "打开" : "关闭"}音乐列表`,
-            icon: h(MusicList, {
-              fill: "#efefef",
-            }),
-          });
-        }
-      } else {
-        openMusicList();
-        if (store.messageShow) {
-          ElMessage({
-            duration: 2000,
-            message: `已${store.musicListShow ? "打开" : "关闭"}音乐列表`,
-            icon: h(MusicList, {
-              fill: "#efefef",
-            }),
-          });
-        }
-      }
-    }
-  });
-
-  // 空格键事件
-  window.addEventListener("keydown", (e) => {
-    if (!store.musicIsOk) {
-      return;
-    }
-    if (e.code == "Space") {
-      const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable)) {
-        return;
-      }
-      e.preventDefault();
-      changePlayState();
-    }
-  });
-  // 挂载方法至 window
+  // 暴露全局方法（供其他组件调用）
   window.$openList = openMusicList;
   window.$closeList = closeMusicList;
   window.$playerToggle = changePlayState;
@@ -341,15 +295,17 @@ onMounted(() => {
     const audio = playerRef.value?.getAudioRef?.();
     if (audio) audio.currentTime = val;
   };
-  window.$setVolume = (v) => {
-    if (playerRef.value) playerRef.value.changeVolume(v);
-  };
+  window.$setVolume = (v) => playerRef.value?.changeVolume(v);
 });
 
 onBeforeUnmount(() => {
+  removeFirstInteractionListeners();
   document.removeEventListener("keydown", handleHorizontalArrow);
   document.removeEventListener("keydown", handleVerticalArrow);
   document.removeEventListener("keydown", handleHToggle);
+  document.removeEventListener("keydown", handleMKey);
+  document.removeEventListener("keydown", handleAltMKey);
+  document.removeEventListener("keydown", handleSpaceKey);
 });
 </script>
 

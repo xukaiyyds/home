@@ -1,37 +1,25 @@
+/* ==================== 静态正则（模块级只创建一次） ==================== */
+
+// 网址：包含 http:// 或 https:// 协议头
+const URL_REGEX = /https?:\/\/[\w.-]+/i;
+
+// IPv4 地址（每段 0-255）
+const IPV4_REGEX =
+  /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+// 邮箱（宽松校验）
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* ==================== 主函数 ==================== */
+
 /**
- * 判断输入的字符串是网址、邮件地址还是普通文本。
- *
- * @param {string} input - 输入的字符串
- * @returns {(string | boolean)} - 返回 "url" 表示网址，"email" 表示邮件地址，true 表示普通文本
+ * 判断输入字符串的类型。
+ * @param {string} input - 待判断的字符串
+ * @returns {"url" | "email" | "text"} - "url" 网址 / "email" 邮箱 / "text" 普通文本
  */
 const identifyInput = (input) => {
-  /**
-   * 网址正则
-   * @type {RegExp}
-   */
-  const urlRegex = new RegExp("https?://[\\w.-]+", "i");
-
-  /**
-   * IP 正则
-   * @type {RegExp}
-   */
-  const ipv4Regex = new RegExp(
-    "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-  );
-
-  /**
-   * 邮箱正则
-   * @type {RegExp}
-   */
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  // 判断是否为网址
-  if (urlRegex.test(input) || ipv4Regex.test(input)) return "url";
-
-  // 判断是否为邮件地址
-  if (emailRegex.test(input)) return "email";
-
-  // 默认返回普通文本
+  if (URL_REGEX.test(input) || IPV4_REGEX.test(input)) return "url";
+  if (EMAIL_REGEX.test(input)) return "email";
   return "text";
 };
 

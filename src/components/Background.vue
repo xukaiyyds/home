@@ -34,186 +34,128 @@ import initBubble from "@/utils/bubbles";
 import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
-const imgTimeout = ref(null);
 const emit = defineEmits(["loadComplete"]);
 
-// 壁纸随机数
+/* ==================== 静态配置 ==================== */
+
+// 壁纸随机数（组件生命周期内固定）
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
 const bgRandom = Math.floor(Math.random() * 6 + 1);
 const bgRandoms = Math.floor(Math.random() * 12 + 1)
   .toString()
   .padStart(2, "0");
 
-// 判断是否为移动端
+// 粒子特效映射表（key → { 存储字段, 初始化函数 }）
+const PARTICLE_MAP = {
+  star: { key: "universe", init: initUniverse },
+  snow: { key: "snowfall", init: initSnowfall },
+  firefly: { key: "firefly", init: initFirefly },
+  bubble: { key: "bubble", init: initBubble },
+};
+
+/* ==================== 本地状态 ==================== */
+
 const isMobile = ref(window.innerWidth < 721);
+const imgTimeout = ref(null);
 
-// 获取当前主题对应的默认壁纸路径
-const getDefaultBg = () => {
-  // 移动端优先使用专用壁纸
-  if (isMobile.value) {
-    return "/images/photo/bg1.png";
-  }
-  // 浅色模式专用壁纸 / 深色模式专用壁纸
-  const theme = store.themeType === "dark" ? "dark" : "light";
-  return `/images/${theme}/bg${bgRandom}.png`;
-};
-
-// 更换壁纸链接
-const changeBg = (type) => {
-  if (type == 0) {
-    store.bgUrl = getDefaultBg();
-  } else if (type == 1) {
-    store.bgUrl = `https://plog.xukaiyyds.cn/img/wallpaper/淡雅/${bgRandoms}.jpg`;
-  } else if (type == 2) {
-    store.bgUrl = `https://plog.xukaiyyds.cn/img/wallpaper/星空/${bgRandoms}.jpg`;
-  } else if (type == 3) {
-    store.bgUrl = "https://api.xinyew.cn/api/bing";
-  } else if (type == 4) {
-    store.bgUrl = "https://tu.ltyuanfang.cn/api/fengjing.php";
-  } else if (type == 5) {
-    store.bgUrl = "https://t.alcy.cc/ycy";
-  } else if (type == 6) {
-    store.bgUrl = store.backgroundCustom;
-  }
-};
-
-// 图片加载完成
-const imgLoadComplete = () => {
-  imgTimeout.value = setTimeout(
-    () => {
-      store.setImgLoadStatus(true);
-    },
-    Math.floor(Math.random() * (600 - 300 + 1)) + 300,
-  );
-};
-
-// 图片动画完成
-const imgAnimationEnd = () => {
-  // 加载完成事件
-  emit("loadComplete");
-};
-
-// 图片显示失败
-const imgLoadError = () => {
-  console.error("壁纸加载失败：", store.bgUrl);
-  ElMessage({
-    message: "壁纸加载失败，已临时切换回默认",
-    icon: h(Error, {
-      theme: "filled",
-      fill: "#efefef",
-    }),
-  });
-  store.bgUrl = getDefaultBg();
-  if (store.webSpeech) {
-    setTimeout(() => {
-      SpeechLocal("壁纸加载失败.mp3");
-    }, 2000);
-  }
-};
-
-// 监听壁纸切换
-watch(
-  () => store.coverType,
-  (value) => {
-    changeBg(value);
-  },
-);
-
-// 特效管理
-const cleanup = ref({
+// 特效清理函数容器（普通对象即可，无需响应式）
+const cleanupFns = {
   universe: null,
   firefly: null,
   snowfall: null,
   bubble: null,
-});
+};
 
-// 根据当前粒子类型切换特效
-const switchParticle = (type) => {
-  // 先关闭所有特效
-  Object.keys(cleanup.value).forEach((key) => {
-    if (cleanup.value[key]) {
-      cleanup.value[key]();
-      cleanup.value[key] = null;
-    }
+/* ==================== 壁纸逻辑 ==================== */
+
+// 获取当前主题对应的默认壁纸路径
+const getDefaultBg = () => {
+  if (isMobile.value) return "/images/photo/bg1.png";
+  const theme = store.themeType === "dark" ? "dark" : "light";
+  return `/images/${theme}/bg${bgRandom}.png`;
+};
+
+// 非默认壁纸的 URL 生成器（查表替代 if-else）
+const BG_URL_BUILDERS = {
+  1: () => `https://plog.xukaiyyds.cn/img/wallpaper/淡雅/${bgRandoms}.jpg`,
+  2: () => `https://plog.xukaiyyds.cn/img/wallpaper/星空/${bgRandoms}.jpg`,
+  3: () => "https://api.xinyew.cn/api/bing",
+  4: () => "https://tu.ltyuanfang.cn/api/fengjing.php",
+  5: () => "https://t.alcy.cc/ycy",
+  6: () => store.backgroundCustom,
+};
+
+const changeBg = (type) => {
+  if (type === 0) {
+    store.bgUrl = getDefaultBg();
+    return;
+  }
+  const builder = BG_URL_BUILDERS[type];
+  if (builder) store.bgUrl = builder();
+};
+
+/* ==================== 图片事件 ==================== */
+
+const imgLoadComplete = () => {
+  const delay = Math.floor(Math.random() * 301) + 300;
+  imgTimeout.value = setTimeout(() => store.setImgLoadStatus(true), delay);
+};
+
+const imgAnimationEnd = () => emit("loadComplete");
+
+const imgLoadError = () => {
+  console.error("壁纸加载失败：", store.bgUrl);
+  ElMessage({
+    message: "壁纸加载失败，已临时切换回默认",
+    icon: h(Error, { theme: "filled", fill: "#efefef" }),
   });
-  // 再开启选中的
-  if (type) {
-    const typeMap = {
-      star: "universe",
-      snow: "snowfall",
-      firefly: "firefly",
-      bubble: "bubble",
-    };
-    const effectType = typeMap[type];
-    if (effectType) {
-      let initFn = null;
-      if (effectType === "snowfall") initFn = initSnowfall;
-      else if (effectType === "universe") initFn = initUniverse;
-      else if (effectType === "firefly") initFn = initFirefly;
-      else if (effectType === "bubble") initFn = initBubble;
-      if (initFn) {
-        cleanup.value[effectType] = initFn();
-      }
-    }
+  store.bgUrl = getDefaultBg();
+  if (store.webSpeech) {
+    setTimeout(() => SpeechLocal("壁纸加载失败.mp3"), 2000);
   }
 };
 
+/* ==================== 粒子特效管理 ==================== */
+
+const stopAllEffects = () => {
+  Object.keys(cleanupFns).forEach((key) => {
+    cleanupFns[key]?.();
+    cleanupFns[key] = null;
+  });
+};
+
+const applyParticle = (type) => {
+  stopAllEffects();
+  const config = PARTICLE_MAP[type];
+  if (config) cleanupFns[config.key] = config.init();
+};
+
+// 合并监听 showParticle 和 currentParticle，避免重复触发
 watch(
-  () => store.showParticle,
-  (val) => {
-    if (!val) {
-      // 关闭所有特效
-      Object.keys(cleanup.value).forEach((key) => {
-        if (cleanup.value[key]) {
-          cleanup.value[key]();
-          cleanup.value[key] = null;
-        }
-      });
-    } else {
-      switchParticle(store.currentParticle);
-    }
+  [() => store.showParticle, () => store.currentParticle],
+  ([show, particle]) => {
+    if (show) applyParticle(particle);
+    else stopAllEffects();
   },
   { immediate: true },
 );
 
-// 监听粒子类型变化
-watch(
-  () => store.currentParticle,
-  (newVal) => {
-    if (store.showParticle) {
-      switchParticle(newVal);
-    }
-  },
-);
+/* ==================== 主题切换 ==================== */
 
-// 组件销毁时清理
-onUnmounted(() => {
-  Object.keys(cleanup.value).forEach((key) => {
-    if (cleanup.value[key]) {
-      cleanup.value[key]();
-      cleanup.value[key] = null;
-    }
-  });
-});
-
-// 切换主题
 const changeThemeType = (val) => {
-  const htmlElement = document.querySelector("html");
-  const themeType = val === "dark" ? "dark" : "light";
-  htmlElement.setAttribute("theme", themeType);
+  document.querySelector("html")?.setAttribute("theme", val === "dark" ? "dark" : "light");
 };
 
-// 监听主题变化
-watch(
-  () => store.themeType,
-  (val) => changeThemeType(val),
-);
+watch(() => store.themeType, changeThemeType);
 
-// 监听壁纸模糊变化
+/* ==================== 壁纸监听 ==================== */
+
+watch(() => store.coverType, changeBg);
+
 watch(
   () => store.backgroundShow,
-  (newVal) => {
-    if (newVal) {
+  (show) => {
+    if (show) {
       store.savedBackgroundBlur = store.backgroundBlur;
       store.backgroundBlur = 0;
     } else {
@@ -222,18 +164,30 @@ watch(
   },
 );
 
+/* ==================== 窗口尺寸响应 ==================== */
+
+const handleResize = () => {
+  const mobile = window.innerWidth < 721;
+  if (mobile !== isMobile.value) {
+    isMobile.value = mobile;
+    // 默认壁纸模式下，跨过 721px 阈值时切换壁纸源
+    if (store.coverType === 0) changeBg(0);
+  }
+};
+
+/* ==================== 生命周期 ==================== */
+
 onMounted(() => {
-  // 加载壁纸
   changeBg(store.coverType);
-  // 加载主题
   changeThemeType(store.themeType);
+  window.addEventListener("resize", handleResize);
 });
 
 onBeforeUnmount(() => {
   clearTimeout(imgTimeout.value);
-  if (store.backgroundShow) {
-    store.backgroundBlur = store.savedBackgroundBlur;
-  }
+  stopAllEffects();
+  if (store.backgroundShow) store.backgroundBlur = store.savedBackgroundBlur;
+  window.removeEventListener("resize", handleResize);
 });
 </script>
 

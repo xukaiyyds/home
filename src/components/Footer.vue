@@ -6,23 +6,19 @@
     @mouseleave="isFooterHover = false"
   >
     <Transition name="fade" mode="out-in">
-      <div v-if="!store.playerState || !store.playerLrcShow" class="power">
+      <!-- 版权信息 -->
+      <div v-if="showCopyright" class="power">
         <span>
           <span :class="startYear < fullYear ? 'c-hidden' : 'hidden'">Copyright&nbsp;</span>
           &copy;
-          <span v-if="startYear < fullYear" class="site-start">
-            {{ startYear }}
-            -
-          </span>
+          <span v-if="startYear < fullYear" class="site-start">{{ startYear }} -</span>
           {{ fullYear }}
           <a :href="siteUrl">{{ siteAuthor }}</a>
         </span>
         <!-- 以下信息请不要修改哦 -->
         <span class="hidden">
           &amp;&nbsp;Made&nbsp;by
-          <a :href="config.github" target="_blank">
-            {{ config.author }}
-          </a>
+          <a :href="config.github" target="_blank">{{ config.author }}</a>
         </span>
         <!-- 站点备案 -->
         <span>
@@ -42,12 +38,13 @@
           </a>
         </span>
       </div>
+      <!-- 歌词 -->
       <div v-else class="lrc" @dblclick="toggleForceIcon">
         <ProgressBar :footerHover="isFooterHover" />
         <Transition name="fade" mode="out-in">
-          <div class="lrc-all" :key="store.getPlayerLrc">
+          <div class="lrc-all" :key="playerLrc">
             <WavesLeft theme="filled" size="18" fill="#efefef" />
-            <span class="lrc-text text-hidden" v-html="store.getPlayerLrc" />
+            <span class="lrc-text text-hidden" v-html="playerLrc" />
             <WavesRight theme="filled" size="18" fill="#efefef" />
           </div>
         </Transition>
@@ -65,64 +62,77 @@ import { SpeechLocal } from "@/utils/speech";
 import { toggleHelp } from "@/utils/help";
 
 const store = mainStore();
-const fullYear = new Date().getFullYear();
-const isFooterHover = ref(false);
-let chuover = 0;
 
-// 加载配置数据
-const startYear = ref(
-  import.meta.env.VITE_SITE_START?.length >= 4
-    ? import.meta.env.VITE_SITE_START.substring(0, 4)
-    : null,
-);
-const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
-const siteAuthor = ref(import.meta.env.VITE_SITE_AUTHOR);
+/* ==================== 静态配置 ==================== */
+
+const fullYear = new Date().getFullYear();
+
+// 环境变量集中读取（只读一次）
+const SITE_CONFIG = {
+  start: import.meta.env.VITE_SITE_START,
+  icp: import.meta.env.VITE_SITE_ICP,
+  author: import.meta.env.VITE_SITE_AUTHOR,
+  url: import.meta.env.VITE_SITE_URL,
+};
+
+const startYear = SITE_CONFIG.start?.length >= 4 ? SITE_CONFIG.start.substring(0, 4) : null;
+const siteIcp = SITE_CONFIG.icp;
+const siteAuthor = SITE_CONFIG.author;
+
+// 站点 URL 规范化：缺省用默认值，无协议时补 //
 const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
+  const url = SITE_CONFIG.url;
   if (!url) return "https://www.xukaiyyds.cn";
-  // 判断协议前缀
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    return "//" + url;
-  }
-  return url;
+  return /^https?:\/\//i.test(url) ? url : `//${url}`;
 });
 
+/* ==================== 本地状态 ==================== */
+
+const isFooterHover = ref(false);
+const isAltPressed = ref(false);
+
+// 双击进度图标计数（用于触发"戳戳"音效）
+let forceIconClickCount = 0;
+
+/* ==================== 计算属性 ==================== */
+
+// 播放中且开启底栏歌词时显示歌词，否则显示版权
+const showCopyright = computed(() => !store.playerState || !store.playerLrcShow);
+
+// 歌词内容（避免模板里多次触发 getter）
+const playerLrc = computed(() => store.getPlayerLrc);
+
+/* ==================== 事件处理 ==================== */
+
+// 双击进度图标：切换"进度图标常驻"
 const toggleForceIcon = () => {
   store.forceShowIcon = !store.forceShowIcon;
   if (store.messageShow) {
     ElMessage({
       duration: 2000,
       message: `${store.forceShowIcon ? "已启用" : "已禁用"}进度图标常驻`,
-      icon: h(Cat, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
+      icon: h(Cat, { theme: "filled", fill: "#efefef" }),
     });
   }
   if (store.webSpeech) {
-    if (store.forceShowIcon) {
-      SpeechLocal("启用进度图标常驻.mp3");
-    } else {
-      SpeechLocal("禁用进度图标常驻.mp3");
-    }
-    chuover += 1;
-    if (chuover > 3) {
+    SpeechLocal(store.forceShowIcon ? "启用进度图标常驻.mp3" : "禁用进度图标常驻.mp3");
+    // 连续点击超过 3 次时触发"戳戳"提示
+    forceIconClickCount += 1;
+    if (forceIconClickCount > 3) {
       SpeechLocal("戳戳.mp3");
-      setTimeout(() => {
-        chuover = 0;
-      }, 10000);
+      setTimeout(() => (forceIconClickCount = 0), 10000);
     }
   }
 };
 
-const isAltPressed = ref(false);
-
+// Alt 键按下状态（用于显示快捷键提示）
 const handleAltKey = (event) => {
-  if (event.key === "Alt") {
-    isAltPressed.value = event.type === "keydown";
-    event.preventDefault();
-  }
+  if (event.key !== "Alt") return;
+  isAltPressed.value = event.type === "keydown";
+  event.preventDefault();
 };
+
+/* ==================== 生命周期 ==================== */
 
 onMounted(() => {
   document.addEventListener("keydown", handleAltKey);

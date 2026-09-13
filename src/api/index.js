@@ -95,8 +95,9 @@ export const preloadPlayerList = async (server, type, id) => {
  */
 
 // 获取一言数据
-export const getHitokoto = async () => {
-  const res = await fetch("https://v1.hitokoto.cn");
+export const getHitokoto = async (useFloatingPlayer = false) => {
+  const url = useFloatingPlayer ? "https://v1.hitokoto.cn" : "https://v1.hitokoto.cn/?c=j";
+  const res = await fetch(url);
   return await res.json();
 };
 

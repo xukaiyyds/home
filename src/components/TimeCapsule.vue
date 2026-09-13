@@ -22,6 +22,7 @@
           :percentage="parseFloat(item.percentage)"
         />
       </div>
+
       <!-- 建站日期 -->
       <div v-if="store.siteStartShow" class="capsule-item start">
         <div class="item-title">{{ startDateText }}</div>
@@ -34,23 +35,47 @@
 import { HourglassFull } from "@icon-park/vue-next";
 import { getTimeCapsule, siteDateStatistics } from "@/utils/getTime.js";
 import { mainStore } from "@/store";
+
 const store = mainStore();
 
-// 进度条数据
+/* ==================== 静态配置 ==================== */
+
+// 刷新间隔（毫秒）
+const REFRESH_INTERVAL = 1000;
+
+// 建站日期（来自环境变量，构建后不变）
+const SITE_START_DATE = import.meta.env.VITE_SITE_START
+  ? new Date(import.meta.env.VITE_SITE_START)
+  : null;
+
+/* ==================== 本地状态 ==================== */
+
+// 时光胶囊数据
 const timeData = ref(getTimeCapsule());
-const startDate = ref(import.meta.env.VITE_SITE_START);
-const startDateText = ref(null);
-const timeInterval = ref(null);
+
+// 建站日期文案（初始就计算好，避免首屏短暂空白）
+const startDateText = ref(SITE_START_DATE ? siteDateStatistics(SITE_START_DATE) : null);
+
+/* ==================== 刷新逻辑 ==================== */
+
+const refresh = () => {
+  timeData.value = getTimeCapsule();
+  if (SITE_START_DATE) {
+    startDateText.value = siteDateStatistics(SITE_START_DATE);
+  }
+};
+
+/* ==================== 生命周期 ==================== */
+
+let timeInterval = null;
 
 onMounted(() => {
-  timeInterval.value = setInterval(() => {
-    timeData.value = getTimeCapsule();
-    if (startDate.value) startDateText.value = siteDateStatistics(new Date(startDate.value));
-  }, 1000);
+  refresh();
+  timeInterval = setInterval(refresh, REFRESH_INTERVAL);
 });
 
 onBeforeUnmount(() => {
-  clearInterval(timeInterval.value);
+  if (timeInterval) clearInterval(timeInterval);
 });
 </script>
 

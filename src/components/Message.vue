@@ -11,21 +11,18 @@
         <span class="sm">.{{ siteUrl[1] }}</span>
       </div>
     </div>
+
     <!-- 简介 -->
     <div class="description cards" @click="changeBox">
       <div class="content">
-        <Icon size="16">
-          <QuoteLeft />
-        </Icon>
+        <Icon size="16"><QuoteLeft /></Icon>
         <Transition name="fade" mode="out-in">
           <div :key="descriptionText.hello + descriptionText.text" class="text">
             <p>{{ descriptionText.hello }}</p>
             <p>{{ descriptionText.text }}</p>
           </div>
         </Transition>
-        <Icon size="16">
-          <QuoteRight />
-        </Icon>
+        <Icon size="16"><QuoteRight /></Icon>
       </div>
     </div>
   </div>
@@ -38,67 +35,70 @@ import { Error } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
 import { SpeechLocal } from "@/utils/speech";
+
 const store = mainStore();
 
-// 主页站点logo
+/* ==================== 静态配置 ==================== */
+
+// 移动端宽度阈值
+const MOBILE_WIDTH = 721;
+
+// 站点 logo
 const siteLogo = import.meta.env.VITE_SITE_MAIN_LOGO;
 
-// 点击站点logo跳转到其他网站
-const jumpTo = (url) => {
-  window.open(url);
-};
+// 站点域名（写死，拆成 [主域, 后缀] 便于模板分别展示）
+const siteUrl = ["yyds", "cn"];
 
-// 站点链接
-const siteUrl = computed(() => {
-  const url = "yyds.cn";
-  if (!url) return "yyds.cn".split(".");
-  // 判断协议前缀
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    const urlFormat = url.replace(/^(https?:\/\/)/, "");
-    return urlFormat.split(".");
-  }
-  return url.split(".");
-});
-
-// 简介区域文字
-const descriptionText = reactive({
+// 简介文案：盒子关闭 / 打开两种状态
+const DESC_DEFAULT = {
   hello: import.meta.env.VITE_DESC_HELLO,
   text: import.meta.env.VITE_DESC_TEXT,
-});
+};
+const DESC_OTHER = {
+  hello: import.meta.env.VITE_DESC_HELLO_OTHER,
+  text: import.meta.env.VITE_DESC_TEXT_OTHER,
+};
 
-// 切换右侧功能区
+/* ==================== 本地状态 ==================== */
+
+// 简介区域文字（响应式，随盒子状态切换）
+const descriptionText = reactive({ ...DESC_DEFAULT });
+
+/* ==================== 事件处理 ==================== */
+
+// 点击 logo 跳转
+const jumpTo = (url) => window.open(url);
+
+// 窄屏提示
+const showMobileTip = () => {
+  ElMessage({
+    message: "当前页面宽度不足以开启盒子",
+    grouping: true,
+    icon: h(Error, { theme: "filled", fill: "#efefef" }),
+  });
+  if (store.webSpeech) SpeechLocal("分辨率不足.mp3");
+};
+
+// 点击简介：桌面端切换时光胶囊，移动端给出提示
 const changeBox = () => {
-  if (store.getInnerWidth >= 721) {
+  if (store.innerWidth >= MOBILE_WIDTH) {
     store.boxOpenState = !store.boxOpenState;
   } else {
-    ElMessage({
-      message: "当前页面宽度不足以开启盒子",
-      grouping: true,
-      icon: h(Error, {
-        theme: "filled",
-        fill: "#efefef",
-      }),
-    });
-    if (store.webSpeech) {
-      SpeechLocal("分辨率不足.mp3");
-    }
+    showMobileTip();
   }
 };
 
-// 监听状态变化
+/* ==================== 监听 ==================== */
+
+// 盒子状态变化时切换简介文案
 watch(
   () => store.boxOpenState,
-  (value) => {
-    if (value) {
-      descriptionText.hello = import.meta.env.VITE_DESC_HELLO_OTHER;
-      descriptionText.text = import.meta.env.VITE_DESC_TEXT_OTHER;
-      if (store.webSpeech) {
-        SpeechLocal("惊讶.mp3");
-      }
-    } else {
-      descriptionText.hello = import.meta.env.VITE_DESC_HELLO;
-      descriptionText.text = import.meta.env.VITE_DESC_TEXT;
-    }
+  (isOpen) => {
+    const target = isOpen ? DESC_OTHER : DESC_DEFAULT;
+    descriptionText.hello = target.hello;
+    descriptionText.text = target.text;
+
+    if (isOpen && store.webSpeech) SpeechLocal("惊讶.mp3");
   },
 );
 </script>

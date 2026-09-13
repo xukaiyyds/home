@@ -31,6 +31,7 @@
           <SearchInp />
         </section>
       </div>
+
       <!-- 移动端菜单按钮 -->
       <Icon
         class="menu"
@@ -40,6 +41,7 @@
       >
         <component :is="store.mobileOpenState ? CloseSmall : HamburgerButton" />
       </Icon>
+
       <!-- 页脚 -->
       <Transition name="fade" mode="out-in">
         <Footer class="f-ter" v-show="!store.backgroundShow && !store.setOpenState" />
@@ -79,56 +81,58 @@ import * as live2d from "live2d-render";
 
 const store = mainStore();
 
-// 页面宽度
-const getWidth = () => {
-  store.setInnerWidth(window.innerWidth);
+/* ==================== 静态配置 ==================== */
+
+// 移动端宽度阈值
+const MOBILE_WIDTH = 721;
+
+// Live2D 模型入口路径映射
+const LIVE2D_BASE_PATH = import.meta.env.MODE === "production" ? "" : ".";
+const LIVE2D_MODEL_PATHS = {
+  Mao: `${LIVE2D_BASE_PATH}/live2d/Mao/Mao.model3.json`,
+  Hiyori: `${LIVE2D_BASE_PATH}/live2d/Hiyori/Hiyori.model3.json`,
+  Mark: `${LIVE2D_BASE_PATH}/live2d/Mark/Mark.model3.json`,
+  Wanko: `${LIVE2D_BASE_PATH}/live2d/Wanko/Wanko.model3.json`,
 };
+const LIVE2D_DEFAULT_MODEL = "Mao";
 
-// 加载完成事件
-const loadComplete = () => {
-  nextTick(() => {
-    // 欢迎提示
-    helloInit();
-    if (store.webSpeech) {
-      speechHelloInit();
-    }
-    // 节日提醒
-    checkDays();
-  });
-};
+// Live2D 显示控制的重试延迟（等待 DOM 渲染完成）
+const LIVE2D_DISPLAY_RETRY = [0, 300, 600];
 
-// 监听宽度变化
-const monitorWidthChanges = (value) => {
-  if (value < 721) {
-    store.boxOpenState = false;
-    store.setOpenState = false;
-    store.searchOpenState = false;
-  }
-};
+/* ==================== 计算属性 ==================== */
 
-watch(
-  () => store.innerWidth,
-  (value) => monitorWidthChanges(value),
-);
-
-// 检测并设置系统主题
-let systemThemeListener = null;
-
-// 监听页面层级
 const settingsZIndex = computed(() => store.getZIndex("settings"));
 const searchZIndex = computed(() => store.getZIndex("search"));
+
+/* ==================== 页面宽度 ==================== */
+
+const getWidth = () => store.setInnerWidth(window.innerWidth);
+
+// 窄屏时关闭所有浮层
+watch(
+  () => store.innerWidth,
+  (value) => {
+    if (value < MOBILE_WIDTH) {
+      store.boxOpenState = false;
+      store.setOpenState = false;
+      store.searchOpenState = false;
+    }
+  },
+);
+
+/* ==================== 页面层级注册 ==================== */
+
+// 通用：注册/注销页面层级 + 打开时语音提示
+const registerPage = (key, speechFile) => {
+  store.registerPage(key);
+  if (store.webSpeech) SpeechLocal(speechFile);
+};
 
 watch(
   () => store.setOpenState,
   (val) => {
-    if (val) {
-      store.registerPage("settings");
-      if (store.webSpeech) {
-        SpeechLocal("果咩纳塞.mp3");
-      }
-    } else {
-      store.unregisterPage("settings");
-    }
+    if (val) registerPage("settings", "果咩纳塞.mp3");
+    else store.unregisterPage("settings");
   },
   { immediate: true },
 );
@@ -136,159 +140,112 @@ watch(
 watch(
   () => store.searchOpenState,
   (val) => {
-    if (val) {
-      store.registerPage("search");
-      if (store.webSpeech) {
-        SpeechLocal("找东西.mp3");
-      }
-    } else {
-      store.unregisterPage("search");
-    }
+    if (val) registerPage("search", "找东西.mp3");
+    else store.unregisterPage("search");
   },
   { immediate: true },
 );
 
-// 初始化Live2D
+/* ==================== 页面加载完成 ==================== */
+
+const loadComplete = () => {
+  nextTick(() => {
+    helloInit();
+    if (store.webSpeech) speechHelloInit();
+    checkDays();
+  });
+};
+
+/* ==================== Live2D ==================== */
+
+// 控制 Live2D 模型和工具箱的显隐
+const toggleLive2dDisplay = (show) => {
+  const applyDisplay = () => {
+    // 模型本体
+    const live2dEl = document.getElementById("live2d");
+    if (live2dEl) live2dEl.style.display = show ? "" : "none";
+
+    // 工具箱（向上找最近的 fixed 容器）
+    const toolItem = document.querySelector(".__live2d-toolbox-item");
+    if (!toolItem) return;
+    let container = toolItem.parentElement;
+    while (container && getComputedStyle(container).position !== "fixed") {
+      container = container.parentElement;
+    }
+    if (container) container.style.display = show ? "" : "none";
+  };
+
+  // 立即执行 + 延迟重试（初始化阶段元素可能尚未渲染）
+  LIVE2D_DISPLAY_RETRY.forEach((delay) => {
+    if (delay === 0) applyDisplay();
+    else setTimeout(applyDisplay, delay);
+  });
+};
+
+watch(() => store.live2dShow, toggleLive2dDisplay, { immediate: true });
+
+// 初始化 Live2D
 const initLive2D = async (type) => {
-  // 路由配置
-  const basePath = import.meta.env.MODE === "production" ? "" : ".";
-  // 根据 type 设置入口文件
-  if (type === "Mao") {
-    store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
-  } else if (type === "Hiyori") {
-    store.modelPath = `${basePath}/live2d/Hiyori/Hiyori.model3.json`;
-  } else if (type === "Mark") {
-    store.modelPath = `${basePath}/live2d/Mark/Mark.model3.json`;
-  } else if (type === "Wanko") {
-    store.modelPath = `${basePath}/live2d/Wanko/Wanko.model3.json`;
-  } else {
-    store.modelPath = `${basePath}/live2d/Mao/Mao.model3.json`;
-  }
+  store.modelPath = LIVE2D_MODEL_PATHS[type] ?? LIVE2D_MODEL_PATHS[LIVE2D_DEFAULT_MODEL];
 
   await live2d.initializeLive2D({
-    ResourcesPath: store.modelPath, // 入口文件
-    BackgroundRGBA: [0.0, 0.0, 0.0, 0.0], // 背景颜色
-    CanvasSize: { height: 250, width: 200 }, // 调整大小
+    ResourcesPath: store.modelPath,
+    BackgroundRGBA: [0.0, 0.0, 0.0, 0.0],
+    CanvasSize: { height: 250, width: 200 },
     ShowToolBox: true,
     LoadFromCache: true,
   });
   toggleLive2dDisplay(store.live2dShow);
 };
 
-// 控制 Live2D 模型和工具箱的显示/隐藏
-const toggleLive2dDisplay = (show) => {
-  const applyDisplay = () => {
-    // 控制模型
-    const live2dEl = document.getElementById("live2d");
-    if (live2dEl) {
-      live2dEl.style.display = show ? "" : "none";
-    }
+/* ==================== 键盘事件处理 ==================== */
 
-    // 控制工具箱
-    const item = document.querySelector(".__live2d-toolbox-item");
-    if (item) {
-      let container = item.parentElement;
-      while (container && getComputedStyle(container).position !== "fixed") {
-        container = container.parentElement;
-      }
-      if (container) {
-        container.style.display = show ? "" : "none";
-      }
-    }
-  };
-
-  // 立即执行一次
-  applyDisplay();
-  // 如果元素尚未渲染，延迟重试（针对初始化阶段）
-  setTimeout(applyDisplay, 300);
-  setTimeout(applyDisplay, 600);
+// 判断当前焦点是否在输入框内
+const isInputFocused = () => {
+  const el = document.activeElement;
+  return el && (el.tagName === "INPUT" || el.isContentEditable);
 };
 
-// 监听模型变化
-watch(
-  () => store.live2dShow,
-  (newVal) => {
-    toggleLive2dDisplay(newVal);
-  },
-  { immediate: true },
-);
+// 显示操作消息
+const showMessage = (message, icon) => {
+  if (store.messageShow) {
+    ElMessage({ duration: 2000, message, icon: h(icon, { fill: "#efefef" }) });
+  }
+};
 
-// live2d模型
-onMounted(async () => {
-  await initLive2D(store.modelType);
-});
-
-// 全局键盘事件
+// Tab：切换时光胶囊
 const handleGlobalKeydown = (event) => {
-  const activeEl = document.activeElement;
-  const isInputFocused = activeEl && (activeEl.tagName === "INPUT" || activeEl.isContentEditable);
-  if (event.key === "Tab") {
-    if (isInputFocused) {
-      return;
-    }
-    event.preventDefault();
-    store.boxOpenState = !store.boxOpenState;
-    if (store.messageShow) {
-      let iconComponent = null;
-      store.boxOpenState ? (iconComponent = HourglassFull) : (iconComponent = HourglassNull);
-      ElMessage({
-        duration: 2000,
-        message: `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
-        icon: h(iconComponent, {
-          fill: "#efefef",
-        }),
-      });
-    }
-    return;
-  }
+  if (event.key !== "Tab" || isInputFocused()) return;
+  event.preventDefault();
+  store.boxOpenState = !store.boxOpenState;
+  showMessage(
+    `已${store.boxOpenState ? "打开" : "关闭"}时光胶囊`,
+    store.boxOpenState ? HourglassFull : HourglassNull,
+  );
 };
 
+// Alt + D：切换主题
 const handleThemeSwitch = (event) => {
-  if (event.altKey && (event.key === "d" || event.key === "D")) {
-    event.preventDefault();
-    // 如果之前有系统监听，移除它
-    if (systemThemeListener) {
-      const media = window.matchMedia("(prefers-color-scheme: dark)");
-      media.removeEventListener("change", systemThemeListener);
-      systemThemeListener = null;
-    }
-    store.themeType = store.themeType === "dark" ? "light" : "dark";
-    if (store.messageShow) {
-      ElMessage({
-        duration: 2000,
-        message: `已切换至${store.themeType === "dark" ? "深色" : "浅色"}模式`,
-        icon: h(Brightness, {
-          fill: "#efefef",
-        }),
-      });
-    }
-  }
+  if (!event.altKey || event.key.toLowerCase() !== "d") return;
+  event.preventDefault();
+  removeSystemThemeListener();
+  store.themeType = store.themeType === "dark" ? "light" : "dark";
+  showMessage(`已切换至${store.themeType === "dark" ? "深色" : "浅色"}模式`, Brightness);
 };
 
+// Alt + S：切换全网搜索
 const handleSearchToggle = (event) => {
-  if (event.altKey && event.key.toLowerCase() === "s") {
-    event.preventDefault();
-    if (!store.prioritizeFirst) {
-      if (store.setOpenState) {
-        store.setOpenState = false;
-      }
-    }
-    store.searchOpenState = !store.searchOpenState;
-    if (store.messageShow) {
-      ElMessage({
-        duration: 2000,
-        message: `已${store.searchOpenState ? "打开" : "关闭"}全网搜索`,
-        icon: h(Search, {
-          fill: "#efefef",
-        }),
-      });
-    }
-  }
+  if (!event.altKey || event.key.toLowerCase() !== "s") return;
+  event.preventDefault();
+  if (!store.prioritizeFirst && store.setOpenState) store.setOpenState = false;
+  store.searchOpenState = !store.searchOpenState;
+  showMessage(`已${store.searchOpenState ? "打开" : "关闭"}全网搜索`, Search);
 };
 
+// 右键：切换全局设置（移动端禁用）
 const handleContextMenu = (event) => {
+  // 捷径项上的右键放行（交给 ShortCut 组件处理）
   const target = event.target;
-  // 如果点击在捷径项上，放行
   if (
     target.closest?.(".item") ||
     target.closest?.(".shortcut-item-wrapper") ||
@@ -296,129 +253,107 @@ const handleContextMenu = (event) => {
   ) {
     return true;
   }
-  // 如果有 monitorWidthChanges 函数则调用
-  if (typeof monitorWidthChanges === "function") {
-    monitorWidthChanges(store.innerWidth);
-  }
-  // 开启多页面
-  if (!store.prioritizeFirst) {
-    if (store.searchOpenState) {
-      store.searchOpenState = false;
-    }
-  }
+
   // 移动端禁用右键
-  if (store.innerWidth < 721) {
-    ElMessage({
-      message: "为了浏览体验，已禁用右键",
-      grouping: true,
-      duration: 2000,
-    });
-    if (store.webSpeech) {
-      SpeechLocal("鼠标右键.mp3");
-    }
+  if (store.innerWidth < MOBILE_WIDTH) {
+    ElMessage({ message: "为了浏览体验，已禁用右键", grouping: true, duration: 2000 });
+    if (store.webSpeech) SpeechLocal("鼠标右键.mp3");
     event.preventDefault();
     return false;
   }
-  // 切换全局设置面板
+
+  // 非多页面模式下，打开设置前先关闭搜索
+  if (!store.prioritizeFirst && store.searchOpenState) store.searchOpenState = false;
+
   store.setOpenState = !store.setOpenState;
-  if (store.messageShow) {
-    ElMessage({
-      duration: 2000,
-      message: `已${store.setOpenState ? "打开" : "关闭"}全局设置`,
-      icon: h(Setting, {
-        fill: "#efefef",
-      }),
-    });
-  }
+  showMessage(`已${store.setOpenState ? "打开" : "关闭"}全局设置`, Setting);
   event.preventDefault();
   return false;
 };
 
+// 中键：切换壁纸预览
 const handleMiddleClick = (event) => {
   if (event.button !== 1) return;
   store.backgroundShow = !store.backgroundShow;
-  if (store.messageShow) {
-    let iconComponent = null;
-    store.backgroundShow ? (iconComponent = PreviewOpen) : (iconComponent = PreviewClose);
-    ElMessage({
-      duration: 2000,
-      message: `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
-      icon: h(iconComponent, {
-        fill: "#efefef",
-      }),
-    });
-  }
+  showMessage(
+    `已${store.backgroundShow ? "启用" : "退出"}壁纸预览状态`,
+    store.backgroundShow ? PreviewOpen : PreviewClose,
+  );
   if (store.webSpeech) {
     SpeechLocal(store.backgroundShow ? "壁纸预览已启用.mp3" : "壁纸预览已退出.mp3");
   }
 };
 
+// Alt + A：打开帮助
 const handleHelpToggle = (event) => {
-  if (event.altKey && (event.key === "a" || event.key === "A")) {
-    event.preventDefault();
-    toggleHelp();
-  }
+  if (!event.altKey || event.key.toLowerCase() !== "a") return;
+  event.preventDefault();
+  toggleHelp();
 };
 
-onMounted(() => {
+/* ==================== 系统主题监听 ==================== */
+
+let systemThemeListener = null;
+
+// 移除系统主题监听（如果存在）
+const removeSystemThemeListener = () => {
+  if (!systemThemeListener) return;
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .removeEventListener("change", systemThemeListener);
+  systemThemeListener = null;
+};
+
+// 首次启动时跟随系统主题（仅在用户从未设置过主题时）
+const initSystemTheme = () => {
+  if (store.themeType !== null) return;
+
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  store.themeType = media.matches ? "dark" : "light";
+  systemThemeListener = (e) => {
+    store.themeType = e.matches ? "dark" : "light";
+  };
+  media.addEventListener("change", systemThemeListener);
+};
+
+/* ==================== 生命周期 ==================== */
+
+onMounted(async () => {
   // 自定义鼠标
   cursorInit();
 
-  // 时光胶囊
+  // 键盘 / 鼠标快捷键
   document.addEventListener("keydown", handleGlobalKeydown);
-
-  // 主题模式
   document.addEventListener("keydown", handleThemeSwitch);
-
-  // 全网搜索
   document.addEventListener("keydown", handleSearchToggle);
-
-  // 全局设置
+  document.addEventListener("keydown", handleHelpToggle);
   document.addEventListener("contextmenu", handleContextMenu);
-
-  // 预览壁纸
   document.addEventListener("mousedown", handleMiddleClick);
 
-  // 获取帮助
-  document.addEventListener("keydown", handleHelpToggle);
-
-  // 监听当前页面宽度
+  // 页面宽度
   getWidth();
   window.addEventListener("resize", getWidth);
 
-  // 监听系统主题变化
-  if (store.themeType === null) {
-    // 首次设置系统主题
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    store.themeType = isDark ? "dark" : "light";
+  // 系统主题
+  initSystemTheme();
 
-    // 监听系统主题变化（只有用户从未手动设置时才监听）
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    systemThemeListener = (e) => {
-      store.themeType = e.matches ? "dark" : "light";
-    };
-    media.addEventListener("change", systemThemeListener);
-  } else {
-    // 已有用户设置，不覆盖，不添加系统监听
-  }
+  // Live2D
+  await initLive2D(store.modelType);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", getWidth);
   document.removeEventListener("keydown", handleGlobalKeydown);
   document.removeEventListener("keydown", handleThemeSwitch);
   document.removeEventListener("keydown", handleSearchToggle);
+  document.removeEventListener("keydown", handleHelpToggle);
   document.removeEventListener("contextmenu", handleContextMenu);
   document.removeEventListener("mousedown", handleMiddleClick);
-  document.removeEventListener("keydown", handleHelpToggle);
-  if (isHelpOpen) {
-    ElMessageBox.close();
-    isHelpOpen = false;
-  }
-  if (systemThemeListener) {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    media.removeEventListener("change", systemThemeListener);
-  }
+  window.removeEventListener("resize", getWidth);
+
+  removeSystemThemeListener();
+
+  // 关闭可能打开的帮助弹窗
+  ElMessageBox.close();
 });
 </script>
 

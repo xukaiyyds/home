@@ -6,16 +6,13 @@
       </Icon>
       <span class="title">{{ store.shortcutHome ? "捷径列表" : "网站列表" }}</span>
     </div>
+
     <Swiper
       :key="store.shortcutHome ? 'shortcut' : 'site'"
       :modules="[Pagination, Mousewheel]"
       :slides-per-view="1"
       :space-between="40"
-      :pagination="{
-        el: '.swiper-pagination',
-        clickable: true,
-        bulletElement: 'div',
-      }"
+      :pagination="{ el: '.swiper-pagination', clickable: true, bulletElement: 'div' }"
       :mousewheel="true"
       :observer="true"
       :observeParents="true"
@@ -33,9 +30,7 @@
               <Icon size="26">
                 <component :is="siteIcon[item.icon] || Compass" />
               </Icon>
-              <span class="name text-hidden">
-                {{ item.name === "网抑音乐" && store.musicClick ? "音乐列表" : item.name }}
-              </span>
+              <span class="name text-hidden">{{ getItemName(item) }}</span>
             </div>
             <!-- 添加项 -->
             <div v-else class="item cards" @click="openAddModal">
@@ -49,6 +44,7 @@
       </SwiperSlide>
       <div class="swiper-pagination" />
     </Swiper>
+
     <!-- 添加/编辑弹窗 -->
     <el-dialog
       v-model="dialogVisible"
@@ -68,6 +64,7 @@
             word-limit-position="outside"
             :clear-icon="CloseSmall"
             clearable
+            @keyup.enter="submitForm"
           />
         </el-form-item>
         <el-form-item label="站点链接" prop="url">
@@ -76,14 +73,15 @@
             placeholder="例如：https://www.baidu.com"
             :clear-icon="CloseSmall"
             clearable
+            @keyup.enter="submitForm"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button type="info" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm">{{
-          dialogType === "edit" ? "更新" : "确认"
-        }}</el-button>
+        <el-button type="primary" @click="submitForm">
+          {{ dialogType === "edit" ? "更新" : "确认" }}
+        </el-button>
       </template>
     </el-dialog>
 
@@ -92,27 +90,20 @@
       <div
         v-if="contextMenuVisible"
         class="custom-context-menu"
-        :style="{
-          left: contextMenuX + 'px',
-          top: contextMenuY + 'px',
-        }"
+        :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
         @contextmenu.prevent
       >
         <div class="menu-item" @click="handleContextAction('edit')">
-          <span>
-            <Icon size="12">
-              <Edit />
-            </Icon>
-          </span>
+          <span
+            ><Icon size="12"><Edit /></Icon
+          ></span>
           <span class="menu-text">编辑</span>
         </div>
         <div class="menu-item danger" @click="handleContextAction('delete')">
-          <span>
-            <Icon size="12">
-              <TrashAlt />
-            </Icon>
-          </span>
+          <span
+            ><Icon size="12"><TrashAlt /></Icon
+          ></span>
           <span class="menu-text">删除</span>
         </div>
       </div>
@@ -146,38 +137,24 @@ import { Pagination, Mousewheel } from "swiper/modules";
 import identifyInput from "@/utils/identifyInput";
 
 const store = mainStore();
-const editItem = ref(null);
 
-// 计算分页，并在最后一页末尾添加添加项
-const siteLinksList = computed(() => {
-  const data = store.siteLinks;
-  const result = [];
-  const itemsPerPage = 6;
-  for (let i = 0; i < data.length; i += itemsPerPage) {
-    const page = data.slice(i, i + itemsPerPage);
-    result.push(page);
-  }
+/* ==================== 静态配置 ==================== */
 
-  // 仅在捷径模式下，在最后一页追加添加项
-  if (store.shortcutHome) {
-    const lastPage = result[result.length - 1];
-    if (lastPage) {
-      // 如果最后一页已经满6个，则新建一页放添加项
-      if (lastPage.length === itemsPerPage) {
-        result.push([{ id: -1, name: "添加捷径", url: "", isAdd: true }]);
-      } else {
-        lastPage.push({ id: -1, name: "添加捷径", url: "", isAdd: true });
-      }
-    } else {
-      // 数据为空的情况，直接创建第一页并添加
-      result.push([{ id: -1, name: "添加捷径", url: "", isAdd: true }]);
-    }
-  }
+// 每页显示数量
+const ITEMS_PER_PAGE = 6;
 
-  return result;
-});
+// 右键菜单尺寸（用于边界检测）
+const MENU_WIDTH = 160;
+const MENU_HEIGHT = 80;
+const MENU_MARGIN = 5;
 
-// 网站链接图标
+// 特殊的"音乐列表"捷径名（与 store.musicClick 联动）
+const MUSIC_ITEM_NAME = "网抑音乐";
+
+// 添加项模板
+const ADD_ITEM = { id: -1, name: "添加捷径", url: "", isAdd: true };
+
+// 网站链接图标映射
 const siteIcon = {
   Book,
   Image,
@@ -191,34 +168,69 @@ const siteIcon = {
   Compass,
 };
 
-// 链接跳转
-const jumpLink = (data) => {
-  if (data.name === "网抑音乐" && store.musicClick) {
-    if (typeof $openList === "function") $openList();
-  } else {
-    window.open(data.url, "_blank");
+/* ==================== 本地状态 ==================== */
+
+const editItem = ref(null);
+const contextItem = ref(null); // 改为 ref，避免散落的裸变量
+
+/* ==================== 分页列表 ==================== */
+
+const siteLinksList = computed(() => {
+  const data = store.siteLinks;
+  const result = [];
+
+  for (let i = 0; i < data.length; i += ITEMS_PER_PAGE) {
+    result.push(data.slice(i, i + ITEMS_PER_PAGE));
   }
+
+  // 仅在捷径模式下，在最后一页追加"添加项"
+  if (!store.shortcutHome) return result;
+
+  const lastPage = result[result.length - 1];
+  if (!lastPage || lastPage.length === ITEMS_PER_PAGE) {
+    result.push([{ ...ADD_ITEM }]);
+  } else {
+    lastPage.push({ ...ADD_ITEM });
+  }
+  return result;
+});
+
+/* ==================== 展示逻辑 ==================== */
+
+// 显示名称（音乐项在开启"点击打开列表"时改名）
+const getItemName = (item) => {
+  if (item.name === MUSIC_ITEM_NAME && store.musicClick) return "音乐列表";
+  return item.name;
 };
 
-// 右键菜单
+/* ==================== 链接跳转 ==================== */
+
+const jumpLink = (data) => {
+  if (data.name === MUSIC_ITEM_NAME && store.musicClick) {
+    if (typeof $openList === "function") $openList();
+    return;
+  }
+  window.open(data.url, "_blank");
+};
+
+/* ==================== 右键菜单 ==================== */
+
 const contextMenuVisible = ref(false);
 const contextMenuX = ref(0);
 const contextMenuY = ref(0);
-let contextItem = null;
+
+// 把坐标限制在视口内
+const clampPosition = (x, y) => {
+  const maxX = window.innerWidth - MENU_WIDTH - MENU_MARGIN;
+  const maxY = window.innerHeight - MENU_HEIGHT - MENU_MARGIN;
+  return [Math.max(0, Math.min(x, maxX)), Math.max(0, Math.min(y, maxY))];
+};
 
 const openContextMenu = (event, item) => {
-  if (!store.shortcutHome) return;
-  if (item.isAdd) return; // 添加项不显示菜单
+  if (!store.shortcutHome || item.isAdd) return;
   event.stopPropagation();
-  contextItem = { ...item };
-  let x = event.clientX;
-  let y = event.clientY;
-  const menuWidth = 160;
-  const menuHeight = 80;
-  if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - 5;
-  if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - 5;
-  if (x < 0) x = 0;
-  if (y < 0) y = 0;
+  contextItem.value = { ...item };
+  const [x, y] = clampPosition(event.clientX, event.clientY);
   contextMenuX.value = x;
   contextMenuY.value = y;
   contextMenuVisible.value = true;
@@ -226,34 +238,38 @@ const openContextMenu = (event, item) => {
 
 const closeContextMenu = () => {
   contextMenuVisible.value = false;
-  contextItem = null;
+  contextItem.value = null;
 };
 
 const handleContextAction = (action) => {
-  if (!contextItem) return;
-  const item = contextItem;
+  if (!contextItem.value) return;
+  const item = contextItem.value;
   closeContextMenu();
-  if (action === "edit") {
-    openEditModal(item);
-  } else if (action === "delete") {
-    confirmDelete(item);
-  }
+  if (action === "edit") openEditModal(item);
+  else if (action === "delete") confirmDelete(item);
 };
 
 // 点击外部关闭菜单
 const handleGlobalClick = (e) => {
   if (!contextMenuVisible.value) return;
   const menu = document.querySelector(".custom-context-menu");
-  if (menu && !menu.contains(e.target)) {
-    closeContextMenu();
-  }
+  if (menu && !menu.contains(e.target)) closeContextMenu();
 };
 
-// 添加/编辑弹窗
+// 设置页/搜索页打开时，自动关闭右键菜单
+watch([() => store.setOpenState, () => store.searchOpenState], ([setOpen, searchOpen]) => {
+  if ((setOpen || searchOpen) && contextMenuVisible.value) {
+    closeContextMenu();
+  }
+});
+
+/* ==================== 添加/编辑弹窗 ==================== */
+
 const dialogVisible = ref(false);
 const dialogType = ref("add");
 const formRef = ref(null);
 const formData = reactive({ name: "", url: "" });
+
 const formRules = {
   name: [{ required: true, message: "请输入捷径名称", trigger: "blur" }],
   url: [
@@ -286,17 +302,22 @@ const openEditModal = (item) => {
   dialogVisible.value = true;
 };
 
+// 校验捷径是否重复（排除 excludeIndex 自身）
+const isDuplicate = (name, url, excludeIndex = -1) => {
+  return store.shortcutData.some(
+    (d, idx) => idx !== excludeIndex && (d.name === name || d.url === url),
+  );
+};
+
 const submitForm = () => {
   formRef.value?.validate((valid) => {
     if (!valid) {
       ElMessage.error("请检查输入");
       return;
     }
+
     if (dialogType.value === "add") {
-      const duplicate = store.shortcutData.some(
-        (item) => item.name === formData.name || item.url === formData.url,
-      );
-      if (duplicate) {
+      if (isDuplicate(formData.name, formData.url)) {
         ElMessage.error("名称或链接已存在");
         return;
       }
@@ -318,10 +339,7 @@ const submitForm = () => {
         ElMessage.error("数据不存在");
         return;
       }
-      const duplicate = store.shortcutData.some(
-        (d, idx) => idx !== index && (d.name === formData.name || d.url === formData.url),
-      );
-      if (duplicate) {
+      if (isDuplicate(formData.name, formData.url, index)) {
         ElMessage.error("名称或链接已存在");
         return;
       }
@@ -329,12 +347,14 @@ const submitForm = () => {
       store.shortcutData[index].url = formData.url;
       ElMessage.success("编辑成功");
     }
+
     dialogVisible.value = false;
-    contextItem = null;
+    contextItem.value = null;
   });
 };
 
-// 删除
+/* ==================== 删除 ==================== */
+
 const confirmDelete = (item) => {
   ElMessageBox.confirm(
     `确认删除 <el-text style="color:#409EFF">${item.name}</el-text> 捷径？此操作<el-text style="color:#E6A23C">无法恢复</el-text>！`,
@@ -350,18 +370,21 @@ const confirmDelete = (item) => {
   )
     .then(() => {
       const index = store.shortcutData.findIndex((d) => d.id === item.id);
-      if (index !== -1) {
-        store.shortcutData.splice(index, 1);
-        store.shortcutData.forEach((d, i) => (d.id = i));
-        ElMessage.success("删除成功");
-      }
+      if (index === -1) return;
+      store.shortcutData.splice(index, 1);
+      // 重新编号，保证 id 连续
+      store.shortcutData.forEach((d, i) => (d.id = i));
+      ElMessage.success("删除成功");
     })
     .catch(() => {});
 };
 
+/* ==================== 生命周期 ==================== */
+
 onMounted(() => {
   document.addEventListener("click", handleGlobalClick);
 });
+
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleGlobalClick);
 });
@@ -436,6 +459,7 @@ onBeforeUnmount(() => {
       &:hover {
         transform: scale(1.02);
         background: var(--main-links-hover-bg-color);
+        box-shadow: var(--main-small-box-shadow);
         transition: 0.3s;
       }
 

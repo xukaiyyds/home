@@ -30,9 +30,7 @@ import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
 
-const player = ref(null);
-const playList = ref([]);
-const playIndex = ref(0);
+/* ==================== Props ==================== */
 
 const props = defineProps({
   theme: { type: String, default: "#efefef" },
@@ -44,42 +42,58 @@ const props = defineProps({
   listMaxHeight: { type: Number, default: 420 },
 });
 
-const listHeight = computed(() => props.listMaxHeight + "px");
+/* ==================== 静态配置 ==================== */
 
-// 歌单ID映射
-const songIdMap = {
+// 歌单 ID 映射（key 为 store.playerSwitchId 的值）
+const SONG_ID_MAP = {
   0: import.meta.env.VITE_SONG_ID,
   1: "5059661515",
   2: "2829816518",
   3: store.playCustomSong,
 };
 
-const effectiveSongId = computed(() => {
-  return songIdMap[store.playerSwitchId] || songIdMap[0];
-});
+// APlayer 内置的歌词占位文案 → 本地化替换
+const LRC_TEXT_MAP = {
+  Loading: "歌词加载中",
+  "Not available": "歌词加载失败",
+};
+
+/* ==================== 本地状态 ==================== */
+
+const player = ref(null);
+const playList = ref([]);
+
+// 歌词同步的 RAF 句柄（提到 setup 作用域，供 onBeforeUnmount 访问）
+let lrcRafId = null;
+
+/* ==================== 计算属性 ==================== */
+
+const listHeight = computed(() => `${props.listMaxHeight}px`);
+
+// 当前生效的歌单 ID（自定义为空时回退到默认）
+const effectiveSongId = computed(() => SONG_ID_MAP[store.playerSwitchId] || SONG_ID_MAP[0]);
+
+/* ==================== 歌单加载 ==================== */
 
 const loadPlaylist = async () => {
   try {
-    // 先清空播放列表，强制 APlayer 重置
+    // 先清空，强制 APlayer 重置内部状态
     playList.value = [];
     const res = await getPlayerList(props.songServer, props.songType, effectiveSongId.value);
     store.musicIsOk = true;
-    // 赋值新歌单
     playList.value = res;
 
-    // 等待 DOM 更新后重置索引
+    // DOM 更新后重置索引 & 按需自动播放
     nextTick(() => {
-      if (player.value && player.value.aplayer) {
-        // 重置索引到 0
-        player.value.aplayer.index = 0;
-        // 如果自动播放开启，尝试播放
-        if (store.playerAutoplay) {
-          player.value.play().catch(() => {});
-        }
+      const ap = player.value?.aplayer;
+      if (!ap) return;
+      ap.index = 0;
+      if (store.playerAutoplay) {
+        player.value.play().catch(() => {});
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error("播放列表加载失败：", err);
     store.musicIsOk = false;
     ElMessage({
       message: "播放器加载失败",
@@ -87,168 +101,149 @@ const loadPlaylist = async () => {
       icon: h(PlayWrong, { theme: "filled", fill: "#efefef" }),
     });
     if (store.webSpeech) {
-      setTimeout(() => {
-        SpeechLocal("播放器加载失败.mp3");
-      }, 15000);
+      setTimeout(() => SpeechLocal("播放器加载失败.mp3"), 15000);
     }
   }
 };
 
-// 监听播放列表变化，当列表更新且不为空时，确保索引为0
-watch(
-  playList,
-  (newVal) => {
-    if (newVal.length && player.value && player.value.aplayer) {
-      // 如果当前索引不是0，重置
-      if (player.value.aplayer.index !== 0) {
-        player.value.aplayer.index = 0;
-      }
+/* ==================== 歌词同步 ==================== */
+
+const syncLrc = () => {
+  const ap = player.value?.aplayer;
+  if (ap && playList.value.length) {
+    const lyrics = ap.lyrics?.[ap.index];
+    const current = lyrics?.[ap.lyricIndex];
+    if (current) {
+      const raw = current[1];
+      const lrc = LRC_TEXT_MAP[raw] ?? raw;
+      // 只在变化时写，避免无谓的响应式更新
+      if (store.playerLrc !== lrc) store.setPlayerLrc(lrc);
     }
-  },
-  { deep: false },
-);
+  }
+  lrcRafId = requestAnimationFrame(syncLrc);
+};
 
-// 监听随机播放
-watch(
-  () => store.playerOrder,
-  (newOrder) => {
-    if (!player.value) return;
-    player.value.aplayer.order = newOrder;
-  },
-);
+/* ==================== 播放事件 ==================== */
 
-// 监听循环模式
-watch(
-  () => store.playerLoop,
-  (newLoop) => {
-    if (!player.value) return;
-    if (player.value) {
-      player.value.aplayer.loop = newLoop;
-    }
-  },
-);
-
-// 监听歌单切换
-watch(() => store.playerSwitchId, loadPlaylist);
-
-onMounted(() => {
-  // 歌词同步函数
-  let rafId = null;
-  const syncLrc = () => {
-    const ap = player.value?.aplayer;
-    if (ap && playList.value.length) {
-      const idx = ap.index;
-      const lyricIdx = ap.lyricIndex;
-      const lyrics = ap.lyrics?.[idx];
-      if (lyrics && lyrics[lyricIdx]) {
-        let lrc = lyrics[lyricIdx][1];
-        if (lrc === "Loading") lrc = "歌词加载中";
-        else if (lrc === "Not available") lrc = "歌词加载失败";
-        // 只在变化时写，避免无谓的响应式更新
-        if (store.playerLrc !== lrc) {
-          store.setPlayerLrc(lrc);
-        }
-      }
-    }
-    rafId = requestAnimationFrame(syncLrc);
-  };
-
-  nextTick(loadPlaylist);
-
-  // 启动歌词同步
-  rafId = requestAnimationFrame(syncLrc);
-});
-
-onBeforeUnmount(() => {
-  if (rafId) cancelAnimationFrame(rafId);
-});
-
-// 播放事件
 const onPlay = () => {
-  playIndex.value = player.value.aplayer.index;
+  const ap = player.value?.aplayer;
+  if (!ap) return;
+  const index = ap.index;
+  const song = playList.value[index];
+  if (!song) return;
+
   store.setPlayerState(player.value.audioRef.paused);
-  store.setPlayerData(
-    playList.value[playIndex.value].name,
-    playList.value[playIndex.value].artist,
-    playList.value[playIndex.value].cover,
-  );
+  store.setPlayerData(song.name, song.artist, song.cover);
+  // 修改：直接用 song 数据，避免再访问 getter
   ElMessage({
-    message: store.getPlayerData.name + " - " + store.getPlayerData.artist,
+    message: `${song.name} - ${song.artist}`,
     grouping: true,
     icon: h(MusicOne, { theme: "filled", fill: "#efefef" }),
   });
 };
 
 const onPause = () => {
-  store.setPlayerState(player.value.audioRef.paused);
+  const audio = player.value?.audioRef;
+  if (audio) store.setPlayerState(audio.paused);
 };
 
 const onTimeUp = () => {
-  // 直接从 audioRef 拿数据
-  const audio = player.value.audioRef;
+  const audio = player.value?.audioRef;
   if (!audio) return;
 
   const duration = audio.duration || 0;
   const current = audio.currentTime || 0;
 
-  // 给底栏进度条用
+  // 底栏进度条
   store.playerCurrentTime = current;
   store.playerDuration = duration;
-
-  // 给悬浮面板用
+  // 悬浮面板
   store.audioCurrent = current;
   store.audioDuration = duration;
 };
 
-const playToggle = () => player.value.toggle();
-const changeVolume = (value) => player.value.setVolume(value, false);
-const changeSong = (type) => {
-  type === 0 ? player.value.skipBack() : player.value.skipForward();
-  nextTick(() => player.value.play());
+const onCanplay = () => {
+  store.setPlayerCanplay(true);
+  if (player.value?.audioRef) store.audioRef = player.value.audioRef;
+  updatePositionState();
 };
-const toggleList = () => player.value.toggleList();
 
 const loadMusicError = () => {
-  let notice =
-    playList.value.length > 1 ? "播放歌曲出现错误，播放器将在 2s 后进行下一首" : "播放歌曲出现错误";
+  const hasNext = playList.value.length > 1;
   ElMessage({
-    message: notice,
+    message: hasNext ? "播放歌曲出现错误，播放器将在 2s 后进行下一首" : "播放歌曲出现错误",
     grouping: true,
     icon: h(PlayWrong, { theme: "filled", fill: "#EFEFEF" }),
     duration: 2000,
   });
   if (store.webSpeech) {
-    if (playList.value.length > 1) {
-      SpeechLocal("歌曲加载失败.mp3");
-    } else {
-      SpeechLocal("播放器未知异常.mp3");
-    }
+    SpeechLocal(hasNext ? "歌曲加载失败.mp3" : "播放器未知异常.mp3");
   }
-  console.error("播放歌曲错误: " + player.value.aplayer.audio[player.value.aplayer.index].name);
+  // 添加空值保护，避免 player 状态异常时再次报错
+  const audioList = player.value?.aplayer?.audio;
+  const currentIndex = player.value?.aplayer?.index;
+  if (audioList && audioList[currentIndex]) {
+    console.error("播放歌曲错误: " + audioList[currentIndex].name);
+  }
 };
 
-const getAudioRef = () => {
-  return player.value?.audioRef || null;
+// 媒体会话位置状态（部分浏览器支持）
+const updatePositionState = () => {
+  if (!("mediaSession" in navigator)) return;
+  const status = player.value?.audioStatus;
+  if (!status) return;
+  navigator.mediaSession.setPositionState({
+    duration: status.duration,
+    position: status.playedTime,
+  });
 };
 
-function updatePositionState() {
-  if ("mediaSession" in navigator) {
-    navigator.mediaSession.setPositionState({
-      duration: player.value.audioStatus.duration,
-      position: player.value.audioStatus.playedTime,
-    });
-  }
-}
+/* ==================== 对外暴露的播放器控制 ==================== */
 
-const onCanplay = () => {
-  store.setPlayerCanplay(true);
-  if (player.value?.audioRef) {
-    store.audioRef = player.value.audioRef;
-  }
-  updatePositionState();
+const playToggle = () => player.value?.toggle();
+const changeVolume = (value) => player.value?.setVolume(value, false);
+const toggleList = () => player.value?.toggleList();
+const getAudioRef = () => player.value?.audioRef || null;
+
+const changeSong = (type) => {
+  if (!player.value) return;
+  if (type === 0) player.value.skipBack();
+  else player.value.skipForward();
+  nextTick(() => player.value?.play());
 };
 
 defineExpose({ playToggle, changeVolume, changeSong, toggleList, getAudioRef });
+
+/* ==================== 监听 ==================== */
+
+// 播放列表更新后，确保索引归零
+watch(playList, (newVal) => {
+  const ap = player.value?.aplayer;
+  if (newVal.length && ap && ap.index !== 0) ap.index = 0;
+});
+
+// 随机模式 / 循环模式：直接同步给 APlayer 实例
+watch([() => store.playerOrder, () => store.playerLoop], ([order, loop]) => {
+  const ap = player.value?.aplayer;
+  if (!ap) return;
+  ap.order = order;
+  ap.loop = loop;
+});
+
+// 切换歌单
+watch(() => store.playerSwitchId, loadPlaylist);
+
+/* ==================== 生命周期 ==================== */
+
+onMounted(() => {
+  nextTick(loadPlaylist);
+  lrcRafId = requestAnimationFrame(syncLrc);
+});
+
+onBeforeUnmount(() => {
+  // 修复：原 rafId 声明在 onMounted 内部，这里访问不到
+  if (lrcRafId) cancelAnimationFrame(lrcRafId);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -294,13 +289,13 @@ defineExpose({ playToggle, changeVolume, changeSong, toggleList, getAudioRef });
           #fff 15%,
           #fff 85%,
           hsla(0deg, 0%, 100%, 0.6) 90%,
-          hsla(0deg, 0%, 100%, 0)
+          hsla(0deg, 0%, 100%, 0) 100%
         );
         -webkit-mask: linear-gradient(
           #fff 15%,
           #fff 85%,
           hsla(0deg, 0%, 100%, 0.6) 90%,
-          hsla(0deg, 0%, 100%, 0)
+          hsla(0deg, 0%, 100%, 0) 100%
         );
 
         &::before,

@@ -21,6 +21,15 @@ const store = mainStore();
 
 // 配置
 const siteName = import.meta.env.VITE_SITE_NAME;
+
+// 加载期间给 <html> 挂 is-loading，用于全局隐藏粒子特效
+watch(
+  () => store.imgLoadStatus,
+  (loaded) => {
+    document.documentElement.classList.toggle("is-loading", !loaded);
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>
@@ -161,5 +170,12 @@ const siteName = import.meta.env.VITE_SITE_NAME;
   100% {
     transform: rotate(-360deg);
   }
+}
+</style>
+
+<!-- 全局样式：加载期间隐藏粒子特效的 canvas -->
+<style lang="scss">
+html.is-loading canvas {
+  display: none !important;
 }
 </style>

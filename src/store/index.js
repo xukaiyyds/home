@@ -3,107 +3,136 @@ import searchEngineList from "@/assets/searchEngineList.json";
 import defaultShortCut from "@/assets/defaultShortCut.json";
 import defaultSiteLinks from "@/assets/siteLinks.json";
 
+/* ==================== 模块级常量 ==================== */
+
+// 展平后的搜索引擎列表（避免 getter 每次调用都 flatMap）
+const ALL_ENGINES = searchEngineList.flatMap((group) => group.options);
+
+// 非优先级模式下各页面的固定层级
+const FIXED_Z_INDEX = { settings: 3, search: 2 };
+
+// 优先级模式下层级计算的基准值与步长
+const Z_INDEX_BASE = 1000;
+const Z_INDEX_STEP = 10;
+const Z_INDEX_OFFSET = 5;
+
+/* ==================== Store ==================== */
+
 export const mainStore = defineStore("main", {
-  state: () => {
-    return {
-      innerWidth: null, // 当前窗口宽度
-      themeType: null, // 主题颜色
-      imgLoadStatus: false, // 壁纸加载状态
-      coverType: 0, // 壁纸种类
-      backgroundCustom: "", // 自定义壁纸
-      bgUrl: "", // 自定义壁纸URL
-      backgroundBlur: 0, // 壁纸模糊
-      savedBackgroundBlur: 0, // 已保存壁纸模糊
-      showBackgroundGray: true, // 显示壁纸遮罩
-      backgroundShow: false, // 壁纸预览状态
-      showParticle: false, // 显示粒子特效
-      currentParticle: "", // 默认特效跟随系统
-      darkstar: false, // 星空特效
-      firefly: false, // 萤火虫特效
-      snowflake: false, // 雪花特效
-      bubble: false, // 气泡特效
-      boxOpenState: false, // 盒子开启状态
-      mobileOpenState: false, // 移动端开启状态
-      mobileFuncState: false, // 移动端功能区开启状态
-      prioritizeFirst: true, // 搜索和设置页面层级
-      openTimes: {}, // 记录搜索和设置页面打开的时间戳
-      setOpenState: false, // 设置页面开启状态
-      searchOpenState: false, // 搜索页面开启状态
-      searchEngine: "Baidu", // 搜索引擎
-      focusSearch: true, // 自动聚焦搜索引擎
-      clearContent: true, // 清空搜索输入框内容
-      customEngineUrl: "", // 自定义搜索引擎 URL
-      customEngineName: "", // 自定义搜索引擎名称
-      shortcutData: defaultShortCut, // 捷径数据
-      musicOpenState: false, // 音乐播放器开启状态
-      musicListShow: false, // 音乐列表是否打开
-      musicIsOk: false, // 音乐是否加载完成
-      musicVolume: 0.7, // 音乐音量
-      playerState: false, // 当前播放状态
-      lastMusicVolume: 0.7, // 静音前备份
-      playerAutoplay: false, // 是否自动播放
-      playerLoop: "all", // 循环播放 "all", "one", "none"
-      playerOrder: "list", // 循环顺序 "list", "random"
-      playerSwitchId: 0, // 切换歌单
-      playerTypeId: "", // 歌单ID
-      playCustomSong: "", // 自定义歌单
-      playerTitle: null, // 当前播放歌曲名
-      playerArtist: null, // 当前播放歌手名
-      playerLrc: "歌词加载中", // 当前播放歌词
-      playerCover: null, // 当前播放歌曲封面
-      useFloatingPlayer: false, // 启用悬浮播放器
-      floatingMusicOpenState: false, // 悬浮播放器面板开启状态
-      footerBlur: true, // 底栏模糊
-      playerLrcShow: true, // 显示底栏歌词
-      audioCurrent: 0, // 悬浮播放器面板用：当前秒数
-      audioDuration: 0, // 悬浮播放器面板用：总秒数
-      footerProgressBar: false, // 显示底栏进度条
-      forceShowIcon: false, // 进度图标常驻
-      playerCurrentTime: 0, // 底栏进度条用：当前秒数
-      playerDuration: 0, // 底栏进度条用：总秒数
-      audioRef: null, // 存储音频元素
-      playerCanplay: false, // 当音频还未准备好播放时，显示加载图标
-      shortcutHome: false, // 在首页显示捷径
-      musicClick: false, // 音乐链接是否跳转
-      use12HourFormat: false, // 显示12小时制时间
-      showLunar: true, // 显示农历
-      messageShow: true, // 操作消息显示
-      siteStartShow: true, // 建站日期显示
-      webSpeech: false, // 语音播报
-      live2dShow: false, // 显示live2d模型
-      modelType: "Mao", // live2d模型种类
-      modelPath: "", // live2d模型路径
-    };
-  },
+  state: () => ({
+    // ---- 窗口与主题 ----
+    innerWidth: 0, // 当前窗口宽度
+    themeType: null, // 主题颜色（null 表示用户未设置，首次启动跟随系统）
+
+    // ---- 壁纸 ----
+    imgLoadStatus: false, // 壁纸加载状态
+    coverType: 0, // 壁纸种类
+    backgroundCustom: "", // 自定义壁纸
+    bgUrl: "", // 壁纸 URL
+    backgroundBlur: 0, // 壁纸模糊
+    savedBackgroundBlur: 0, // 已保存壁纸模糊
+    showBackgroundGray: true, // 显示壁纸遮罩
+    backgroundShow: false, // 壁纸预览状态
+
+    // ---- 粒子特效 ----
+    showParticle: false, // 显示粒子特效
+    currentParticle: "", // 当前粒子类型
+    darkstar: false, // 星空特效
+    firefly: false, // 萤火虫特效
+    snowflake: false, // 雪花特效
+    bubble: false, // 气泡特效
+
+    // ---- 页面浮层状态 ----
+    boxOpenState: false, // 盒子开启状态
+    mobileOpenState: false, // 移动端菜单开启状态
+    mobileFuncState: false, // 移动端功能区开启状态
+    setOpenState: false, // 设置页面开启状态
+    searchOpenState: false, // 搜索页面开启状态
+    prioritizeFirst: true, // 搜索和设置页面是否可同时打开
+    openTimes: {}, // 各浮层打开时间戳（用于层级排序）
+
+    // ---- 搜索引擎 ----
+    searchEngine: "Baidu", // 当前搜索引擎
+    focusSearch: true, // 打开搜索页自动聚焦
+    clearContent: true, // 搜索后清空输入框
+    customEngineUrl: "", // 自定义搜索引擎 URL
+    customEngineName: "", // 自定义搜索引擎名称
+
+    // ---- 捷径与站点链接 ----
+    shortcutData: defaultShortCut, // 捷径数据
+    shortcutHome: false, // 首页显示捷径列表
+    musicClick: false, // 点击网抑音乐打开音乐列表
+
+    // ---- 音乐播放器 ----
+    musicOpenState: false, // 音乐面板开启状态
+    musicListShow: false, // 音乐列表是否打开
+    musicIsOk: false, // 音乐是否加载完成
+    musicVolume: 0.7, // 音乐音量
+    lastMusicVolume: 0.7, // 静音前备份
+    playerState: false, // 当前是否正在播放
+    playerAutoplay: false, // 是否自动播放
+    playerLoop: "all", // 循环模式 "all" | "one" | "none"
+    playerOrder: "list", // 播放顺序 "list" | "random"
+    playerSwitchId: 0, // 切换歌单
+    playerTypeId: "", // 歌单 ID
+    playCustomSong: "", // 自定义歌单 ID
+    playerTitle: null, // 当前播放歌曲名
+    playerArtist: null, // 当前播放歌手名
+    playerLrc: "歌词加载中", // 当前播放歌词
+    playerCover: null, // 当前播放歌曲封面
+    useFloatingPlayer: false, // 启用悬浮播放器
+    floatingMusicOpenState: false, // 悬浮播放器面板开启状态
+    audioCurrent: 0, // 悬浮面板用：当前秒数
+    audioDuration: 0, // 悬浮面板用：总秒数
+    playerCurrentTime: 0, // 底栏进度条用：当前秒数
+    playerDuration: 0, // 底栏进度条用：总秒数
+    audioRef: null, // 音频元素引用
+    playerCanplay: false, // 音频是否已可播放
+
+    // ---- 底栏 ----
+    footerBlur: true, // 底栏模糊
+    playerLrcShow: true, // 显示底栏歌词
+    footerProgressBar: false, // 显示底栏进度条
+    forceShowIcon: false, // 进度图标常驻
+
+    // ---- 时间与提示 ----
+    use12HourFormat: false, // 使用 12 小时制
+    showLunar: true, // 天气失败时显示农历
+    messageShow: true, // 操作消息显示
+    siteStartShow: true, // 建站日期显示
+
+    // ---- 个性化 ----
+    webSpeech: false, // 语音播报
+    live2dShow: false, // 显示 live2d 模型
+    modelType: "Mao", // live2d 模型种类
+    modelPath: "", // live2d 模型路径
+  }),
+
   getters: {
     // 获取歌词
-    getPlayerLrc(state) {
-      return state.playerLrc;
-    },
+    getPlayerLrc: (state) => state.playerLrc,
+
     // 获取歌曲信息
-    getPlayerData(state) {
-      return {
-        name: state.playerTitle,
-        artist: state.playerArtist,
-        cover: state.playerCover,
-      };
-    },
+    getPlayerData: (state) => ({
+      name: state.playerTitle,
+      artist: state.playerArtist,
+      cover: state.playerCover,
+    }),
+
     // 获取页面宽度
-    getInnerWidth(state) {
-      return state.innerWidth;
-    },
-    // 获取当前搜索引擎
-    getCurrentEngine: (state) => {
-      const allEngines = searchEngineList.flatMap((group) => group.options);
-      return allEngines.find((engine) => engine.key === state.searchEngine) || allEngines[0];
-    },
-    // 获取网站链接
-    siteLinks: (state) => {
-      return state.shortcutHome ? state.shortcutData : defaultSiteLinks;
-    },
+    getInnerWidth: (state) => state.innerWidth,
+
+    // 获取当前搜索引擎（使用模块级 ALL_ENGINES，避免重复 flatMap）
+    getCurrentEngine: (state) =>
+      ALL_ENGINES.find((engine) => engine.key === state.searchEngine) || ALL_ENGINES[0],
+
+    // 获取网站链接（捷径模式返回自定义数据，否则返回默认站点列表）
+    siteLinks: (state) => (state.shortcutHome ? state.shortcutData : defaultSiteLinks),
   },
+
   actions: {
-    // 更改当前页面宽度
+    /* ---------- 窗口与主题 ---------- */
+
     setInnerWidth(value) {
       this.innerWidth = value;
       if (value >= 720) {
@@ -111,94 +140,107 @@ export const mainStore = defineStore("main", {
         this.mobileFuncState = false;
       }
     },
-    // 更改播放状态
-    setPlayerState(value) {
-      if (value) {
-        this.playerState = false;
-      } else {
-        this.playerState = true;
-      }
+
+    /* ---------- 壁纸 ---------- */
+
+    setImgLoadStatus(value) {
+      this.imgLoadStatus = value;
     },
-    // 更改歌词
+
+    /* ---------- 播放器状态 ---------- */
+
+    // 修改：参数改为"是否暂停"，内部取反得到播放状态
+    // 调用方传入 audio.paused 即可
+    setPlayerState(paused) {
+      this.playerState = !paused;
+    },
+
     setPlayerLrc(value) {
       this.playerLrc = value;
     },
-    // 更改歌曲进度
+
     setPlayerCanplay(value) {
       this.playerCanplay = value;
     },
-    // 更改歌曲数据
+
     setPlayerData(title, artist, cover) {
       this.playerTitle = title;
       this.playerArtist = artist;
       this.playerCover = cover;
     },
-    // 更改壁纸加载状态
-    setImgLoadStatus(value) {
-      this.imgLoadStatus = value;
-    },
-    // 更改搜索引擎
+
+    /* ---------- 搜索引擎 ---------- */
+
+    // 修复：原实现用 searchEngineList.some(...) 遍历的是分组，分组没有 key 属性，
+    // 导致任何引擎都校验不通过。改为使用展平后的 ALL_ENGINES。
     setSearchEngine(engineKey) {
-      if (searchEngineList.some((engine) => engine.key === engineKey)) {
+      if (ALL_ENGINES.some((engine) => engine.key === engineKey)) {
         this.searchEngine = engineKey;
       }
     },
-    // 更改自定义搜索引擎
+
     setCustomEngine(url, name = "自定义") {
       this.customEngineUrl = url;
       this.customEngineName = name;
       this.searchEngine = "custom";
     },
-    // 更改捷径数据
+
+    /* ---------- 捷径 ---------- */
+
     setShortcutData(value) {
       this.shortcutData = value;
     },
-    /* 更改页面层级 */
+
+    /* ---------- 页面层级 ---------- */
+
     registerPage(id) {
       if (!this.openTimes[id]) {
         this.openTimes[id] = Date.now();
       }
     },
+
     unregisterPage(id) {
       delete this.openTimes[id];
     },
+
     getZIndex(id) {
-      const time = this.openTimes[id];
-      if (time === undefined) return 0;
-      if (!this.prioritizeFirst) {
-        const fixedMap = { settings: 3, search: 2 };
-        return fixedMap[id] || 0;
-      }
-      const entries = Object.entries(this.openTimes);
-      const sorted = entries.slice().sort((a, b) => a[1] - b[1]);
+      if (this.openTimes[id] === undefined) return 0;
+
+      // 非优先级模式：使用固定层级
+      if (!this.prioritizeFirst) return FIXED_Z_INDEX[id] || 0;
+
+      // 优先级模式：按打开时间升序分配层级
+      const sorted = Object.entries(this.openTimes).sort((a, b) => a[1] - b[1]);
       const index = sorted.findIndex(([key]) => key === id);
-      return 1000 + index * 10 + 5;
+      return Z_INDEX_BASE + index * Z_INDEX_STEP + Z_INDEX_OFFSET;
     },
+
     togglePrioritizeFirst() {
       this.prioritizeFirst = !this.prioritizeFirst;
     },
-    // 恢复数据
+
+    /* ---------- 数据恢复 ---------- */
+
     recoverSiteData(data) {
-      let isSuccess = false;
       try {
         for (const key in data) {
-          if (Object.hasOwnProperty.call(data, key)) {
-            const item = data[key];
-            this[key] = item;
+          if (Object.prototype.hasOwnProperty.call(data, key)) {
+            this[key] = data[key];
           }
         }
-        isSuccess = true;
+        return true;
       } catch (error) {
         console.error("站点数据恢复时处理失败：", error);
-        isSuccess = false;
+        return false;
       }
-      return isSuccess;
     },
   },
+
   persist: {
     key: "data",
     storage: window.localStorage,
     paths: [
+      /* 主题与壁纸 */
       "themeType",
       "coverType",
       "backgroundCustom",
@@ -206,19 +248,31 @@ export const mainStore = defineStore("main", {
       "backgroundBlur",
       "savedBackgroundBlur",
       "showBackgroundGray",
+
+      /* 粒子特效 */
       "showParticle",
       "currentParticle",
       "darkstar",
       "firefly",
       "snowflake",
       "bubble",
+
+      /* 页面层级 */
       "prioritizeFirst",
+
+      /* 搜索引擎 */
       "searchEngine",
       "focusSearch",
       "clearContent",
       "customEngineUrl",
       "customEngineName",
+
+      /* 捷径与站点 */
       "shortcutData",
+      "shortcutHome",
+      "musicClick",
+
+      /* 音乐播放器 */
       "musicVolume",
       "playerAutoplay",
       "playerLoop",
@@ -227,16 +281,20 @@ export const mainStore = defineStore("main", {
       "playerTypeId",
       "playCustomSong",
       "useFloatingPlayer",
+
+      /* 底栏 */
       "footerBlur",
       "playerLrcShow",
       "footerProgressBar",
       "forceShowIcon",
-      "shortcutHome",
-      "musicClick",
+
+      /* 时间与提示 */
       "use12HourFormat",
       "showLunar",
       "messageShow",
       "siteStartShow",
+
+      /* 个性化 */
       "webSpeech",
       "live2dShow",
       "modelType",
