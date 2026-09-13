@@ -51,12 +51,6 @@ const STATIC_SONG_IDS = {
   2: "2829816518",
 };
 
-// APlayer 内置的歌词占位文案 → 本地化替换
-const LRC_TEXT_MAP = {
-  Loading: "歌词加载中",
-  "Not available": "歌词加载失败",
-};
-
 /* ==================== 本地状态 ==================== */
 
 const player = ref(null);
@@ -145,25 +139,36 @@ const parseLrc = (lrcText) => {
   return lines.sort((a, b) => a.time - b.time);
 };
 
-// 加载当前歌曲的歌词（用 meting-api 的 lrc 接口）
-const loadCurrentLrc = async (song) => {
-  currentLrcLines = [];
-  if (!song) return;
+// 加载当前歌曲的歌词（从 audio.src 提取 id，避免索引错位）
+let lrcRequestToken = 0;
 
-  // 优先用 song.id，没有就从 song.url 里提取
-  let songId = song.id;
-  if (!songId && song.url) {
-    const m = song.url.match(/[?&]id=(\d+)/);
-    if (m) songId = m[1];
+const loadCurrentLrc = async () => {
+  const token = ++lrcRequestToken; // 标记本次请求
+
+  // 从正在播放的 audio 上直接取 src
+  const audio = player.value?.audioRef;
+  if (!audio?.src) return;
+
+  const m = audio.src.match(/[?&]id=(\d+)/);
+  if (!m) {
+    if (token === lrcRequestToken) currentLrcLines = [];
+    return;
   }
-  if (!songId) return;
+  const songId = m[1];
 
   try {
     const url = `${import.meta.env.VITE_SONG_API}?server=${props.songServer}&type=lrc&id=${songId}`;
     const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
+
+    // 竞态保护：如果请求期间又切歌了，丢弃本次结果
+    if (token !== lrcRequestToken) return;
+
     currentLrcLines = parseLrc(text);
   } catch (err) {
+    if (token !== lrcRequestToken) return;
+    console.error("[歌词] 加载失败:", err);
     currentLrcLines = [];
   }
 };
@@ -210,10 +215,10 @@ const onPlay = async () => {
     icon: h(MusicOne, { theme: "filled", fill: "#efefef" }),
   });
 
-  // 关键：先显示占位，再异步加载歌词
+  // 占位 + 异步加载（id 从 audio.src 取）
   store.setPlayerLrc("歌词加载中");
-  await loadCurrentLrc(song);
-  // 加载完成后立刻刷一次，不用等 RAF
+  currentLrcLines = []; // 清空旧歌词，避免短暂显示上一首
+  await loadCurrentLrc();
   updateLrc();
 };
 
@@ -266,11 +271,13 @@ const loadMusicError = () => {
 const updatePositionState = () => {
   if (!("mediaSession" in navigator)) return;
   const status = player.value?.audioStatus;
-  if (!status) return;
-  navigator.mediaSession.setPositionState({
-    duration: status.duration,
-    position: status.playedTime,
-  });
+  if (!status || !status.duration || status.duration <= 0) return; // ← 加 !duration 判断
+  try {
+    navigator.mediaSession.setPositionState({
+      duration: status.duration,
+      position: status.playedTime,
+    });
+  } catch {}
 };
 
 /* ==================== 对外暴露的播放器控制 ==================== */
@@ -332,6 +339,7 @@ onBeforeUnmount(() => {
   // 组件卸载时清理定时器
   if (customSongTimer) clearTimeout(customSongTimer);
   currentLrcLines = [];
+  lrcRequestToken++; // 让未完成的请求结果被丢弃
 });
 </script>
 
