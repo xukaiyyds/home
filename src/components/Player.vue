@@ -120,24 +120,82 @@ const loadPlaylist = async () => {
 
 /* ==================== 歌词同步 ==================== */
 
-const syncLrc = () => {
-  const ap = player.value?.aplayer;
-  if (ap && playList.value.length) {
-    const lyrics = ap.lyrics?.[ap.index];
-    const current = lyrics?.[ap.lyricIndex];
-    if (current) {
-      const raw = current[1];
-      const lrc = LRC_TEXT_MAP[raw] ?? raw;
-      // 只在变化时写，避免无谓的响应式更新
-      if (store.playerLrc !== lrc) store.setPlayerLrc(lrc);
+// 当前歌曲解析后的歌词行 [{ time, text }]
+let currentLrcLines = [];
+
+// 解析 LRC 文本为 [{ time, text }]
+const parseLrc = (lrcText) => {
+  if (!lrcText || typeof lrcText !== "string") return [];
+  const lines = [];
+  const timeReg = /\[(\d+):(\d+)(?:[.:](\d+))?\]/g;
+
+  lrcText.split("\n").forEach((line) => {
+    const matches = [...line.matchAll(timeReg)];
+    if (!matches.length) return;
+    const text = line.replace(timeReg, "").trim();
+    if (!text) return;
+    matches.forEach((m) => {
+      const min = parseInt(m[1]);
+      const sec = parseInt(m[2]);
+      const ms = m[3] ? parseInt(m[3].padEnd(3, "0")) : 0;
+      lines.push({ time: min * 60 + sec + ms / 1000, text });
+    });
+  });
+
+  return lines.sort((a, b) => a.time - b.time);
+};
+
+// 加载当前歌曲的歌词（用 meting-api 的 lrc 接口）
+const loadCurrentLrc = async (song) => {
+  currentLrcLines = [];
+  if (!song) return;
+
+  // 优先用 song.id，没有就从 song.url 里提取
+  let songId = song.id;
+  if (!songId && song.url) {
+    const m = song.url.match(/[?&]id=(\d+)/);
+    if (m) songId = m[1];
+  }
+  if (!songId) return;
+
+  try {
+    const url = `${import.meta.env.VITE_SONG_API}?server=${props.songServer}&type=lrc&id=${songId}`;
+    const res = await fetch(url);
+    const text = await res.text();
+    currentLrcLines = parseLrc(text);
+  } catch (err) {
+    currentLrcLines = [];
+  }
+};
+
+// 根据播放时间找当前歌词行，同步到底栏
+const updateLrc = () => {
+  if (!currentLrcLines.length) return;
+  const audio = player.value?.audioRef;
+  if (!audio) return;
+
+  const t = audio.currentTime;
+  let line = currentLrcLines[0];
+  for (let i = currentLrcLines.length - 1; i >= 0; i--) {
+    if (currentLrcLines[i].time <= t) {
+      line = currentLrcLines[i];
+      break;
     }
   }
+  if (line && store.playerLrc !== line.text) {
+    store.setPlayerLrc(line.text);
+  }
+};
+
+// RAF 循环驱动
+const syncLrc = () => {
+  updateLrc();
   lrcRafId = requestAnimationFrame(syncLrc);
 };
 
 /* ==================== 播放事件 ==================== */
 
-const onPlay = () => {
+const onPlay = async () => {
   const ap = player.value?.aplayer;
   if (!ap) return;
   const index = ap.index;
@@ -146,12 +204,17 @@ const onPlay = () => {
 
   store.setPlayerState(player.value.audioRef.paused);
   store.setPlayerData(song.name, song.artist, song.cover);
-  // 修改：直接用 song 数据，避免再访问 getter
   ElMessage({
     message: `${song.name} - ${song.artist}`,
     grouping: true,
     icon: h(MusicOne, { theme: "filled", fill: "#efefef" }),
   });
+
+  // 关键：先显示占位，再异步加载歌词
+  store.setPlayerLrc("歌词加载中");
+  await loadCurrentLrc(song);
+  // 加载完成后立刻刷一次，不用等 RAF
+  updateLrc();
 };
 
 const onPause = () => {
@@ -268,6 +331,7 @@ onBeforeUnmount(() => {
   if (lrcRafId) cancelAnimationFrame(lrcRafId);
   // 组件卸载时清理定时器
   if (customSongTimer) clearTimeout(customSongTimer);
+  currentLrcLines = [];
 });
 </script>
 

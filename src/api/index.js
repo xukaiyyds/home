@@ -54,6 +54,7 @@ export const getPlayerList = async (server, type, id) => {
         jsonpData.req_0.data.sip[0]
       ).replace("http://", "https://");
       normalized = data.map((v, i) => ({
+        id: v.id,
         name: v.name || v.title,
         artist: v.artist || v.author,
         url: domain + jsonpData.req_0.data.midurlinfo[i].purl,
@@ -62,6 +63,7 @@ export const getPlayerList = async (server, type, id) => {
       }));
     } else {
       normalized = data.map((v) => ({
+        id: v.id,
         name: v.name || v.title,
         artist: v.artist || v.author,
         url: v.url,
