@@ -3,7 +3,7 @@
     <el-collapse class="collapse" v-model="activeName" accordion>
       <el-collapse-item title="基础设置" name="1">
         <div class="item">
-          <span class="text">按下快捷键后弹出操作反馈</span>
+          <span class="text">按下快捷键后弹出操作反馈消息</span>
           <el-switch
             v-model="messageShow"
             inline-prompt
@@ -21,7 +21,7 @@
           />
         </div>
         <div class="item">
-          <span class="text">在时光胶囊下显示建站日期</span>
+          <span class="text">在时光胶囊下显示站点建站日期</span>
           <el-switch
             v-model="siteStartShow"
             inline-prompt
@@ -507,7 +507,11 @@ const refreshAfterDelay = (successMessage, onBeforeRefresh) => {
 
 /* ==================== 壁纸切换 ==================== */
 
-const radioChange = () => {
+const radioChange = (val) => {
+  // 根据壁纸风格自动切换主题（1 = 淡雅风格 → 浅色；2 = 星空风格 → 深色）
+  if (val === 1) store.themeType = "light";
+  else if (val === 2) store.themeType = "dark";
+
   ElMessage({
     message: "壁纸更换成功",
     icon: h(SuccessPicture, { fill: "#efefef" }),

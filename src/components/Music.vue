@@ -244,15 +244,14 @@ const handleSpaceKey = (event) => {
 
 // 首次交互：自动播放（仅触发一次）
 const handleFirstInteraction = () => {
-  if (store.playerAutoplay && !store.playerState && playerRef.value) {
-    playerRef.value.playToggle();
-  }
+  playerRef.value?.tryAutoPlay?.();
   removeFirstInteractionListeners();
 };
 
 const removeFirstInteractionListeners = () => {
   document.removeEventListener("click", handleFirstInteraction);
   document.removeEventListener("keydown", handleFirstInteraction);
+  document.removeEventListener("touchstart", handleFirstInteraction);
 };
 
 /* ==================== 监听 ==================== */
@@ -277,6 +276,7 @@ onMounted(() => {
   // 首次交互监听（自清理）
   document.addEventListener("click", handleFirstInteraction);
   document.addEventListener("keydown", handleFirstInteraction);
+  document.addEventListener("touchstart", handleFirstInteraction);
 
   // 快捷键监听
   document.addEventListener("keydown", handleHorizontalArrow);

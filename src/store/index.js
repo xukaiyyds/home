@@ -72,7 +72,7 @@ export const mainStore = defineStore("main", {
     playerState: false, // 当前是否正在播放
     playerAutoplay: false, // 是否自动播放
     playerLoop: "all", // 循环模式 "all" | "one" | "none"
-    playerOrder: "list", // 播放顺序 "list" | "random"
+    playerOrder: "random", // 播放顺序 "list" | "random"
     playerSwitchId: 0, // 切换歌单
     playerTypeId: "", // 歌单 ID
     playCustomSong: "", // 自定义歌单 ID
@@ -92,7 +92,7 @@ export const mainStore = defineStore("main", {
     // ---- 底栏 ----
     footerBlur: true, // 底栏模糊
     playerLrcShow: true, // 显示底栏歌词
-    footerProgressBar: false, // 显示底栏进度条
+    footerProgressBar: true, // 显示底栏进度条
     forceShowIcon: false, // 进度图标常驻
 
     // ---- 时间与提示 ----
@@ -102,7 +102,7 @@ export const mainStore = defineStore("main", {
     siteStartShow: true, // 建站日期显示
 
     // ---- 个性化 ----
-    webSpeech: false, // 语音播报
+    webSpeech: true, // 语音播报
     live2dShow: false, // 显示 live2d 模型
     modelType: "Mao", // live2d 模型种类
     modelPath: "", // live2d 模型路径

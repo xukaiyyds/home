@@ -43,7 +43,7 @@ const openMusicShow = ref(false);
 // 一言数据
 const hitokotoData = reactive({
   text: "这里应该显示一句话",
-  from: "無名",
+  from: "一言",
 });
 
 // 获取一言数据
@@ -66,7 +66,7 @@ const getHitokotoData = async () => {
       }, 12000);
     }
     hitokotoData.text = "这里应该显示一句话";
-    hitokotoData.from = "無名";
+    hitokotoData.from = "一言";
   }
 };
 

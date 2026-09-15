@@ -74,6 +74,28 @@ const effectiveSongId = computed(() => {
 
 /* ==================== 歌单加载 ==================== */
 
+// 自动播放尝试逻辑，满足三个条件才尝试：开了自动播放 & 有歌单 & 当前未播放
+const tryAutoPlay = async () => {
+  if (!store.playerAutoplay) return;
+  if (store.playerState) return;
+  if (!playList.value.length) return;
+  const p = player.value;
+  if (!p) return;
+
+  try {
+    await p.play();
+  } catch {
+    // 用户没交互过，弹提示引导
+    if (!hasShownAutoplayTip) {
+      hasShownAutoplayTip = true;
+      ElMessage({
+        message: "点击页面任意处即可开始播放音乐",
+        grouping: true,
+      });
+    }
+  }
+};
+
 const loadPlaylist = async () => {
   try {
     // 先清空，强制 APlayer 重置内部状态
@@ -94,9 +116,7 @@ const loadPlaylist = async () => {
       const ap = player.value?.aplayer;
       if (!ap) return;
       ap.index = 0;
-      if (store.playerAutoplay) {
-        player.value.play().catch(() => {});
-      }
+      tryAutoPlay();
     });
   } catch (err) {
     console.error("播放列表加载失败：", err);
@@ -142,19 +162,13 @@ const parseLrc = (lrcText) => {
 // 加载当前歌曲的歌词（从 audio.src 提取 id，避免索引错位）
 let lrcRequestToken = 0;
 
-const loadCurrentLrc = async () => {
-  const token = ++lrcRequestToken; // 标记本次请求
+const loadCurrentLrc = async (songId) => {
+  const token = ++lrcRequestToken;
 
-  // 从正在播放的 audio 上直接取 src
-  const audio = player.value?.audioRef;
-  if (!audio?.src) return;
-
-  const m = audio.src.match(/[?&]id=(\d+)/);
-  if (!m) {
+  if (!songId) {
     if (token === lrcRequestToken) currentLrcLines = [];
     return;
   }
-  const songId = m[1];
 
   try {
     const url = `${import.meta.env.VITE_SONG_API}?server=${props.songServer}&type=lrc&id=${songId}`;
@@ -162,9 +176,7 @@ const loadCurrentLrc = async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
 
-    // 竞态保护：如果请求期间又切歌了，丢弃本次结果
     if (token !== lrcRequestToken) return;
-
     currentLrcLines = parseLrc(text);
   } catch (err) {
     if (token !== lrcRequestToken) return;
@@ -198,14 +210,42 @@ const syncLrc = () => {
   lrcRafId = requestAnimationFrame(syncLrc);
 };
 
+// 从正在播放的 audio.src 提取歌曲 id
+const getCurrentSongId = () => {
+  const audio = player.value?.audioRef;
+  if (!audio?.src) return null;
+  const m = audio.src.match(/[?&]id=(\d+)/);
+  return m ? m[1] : null;
+};
+
+// 根据 id 在 playList 里找到对应歌曲（兼容 s.id 和 s.url 两种）
+const findSongById = (songId) => {
+  if (!songId) return null;
+  return playList.value.find((s) => {
+    if (s.id && String(s.id) === songId) return true;
+    if (s.url) {
+      const m = s.url.match(/[?&]id=(\d+)/);
+      return m && m[1] === songId;
+    }
+    return false;
+  });
+};
+
 /* ==================== 播放事件 ==================== */
 
 const onPlay = async () => {
-  const ap = player.value?.aplayer;
-  if (!ap) return;
-  const index = ap.index;
-  const song = playList.value[index];
+  const songId = getCurrentSongId();
+  const song = findSongById(songId);
   if (!song) return;
+
+  const ap = player.value?.aplayer;
+
+  if (ap) {
+    const realIndex = playList.value.indexOf(song);
+    if (realIndex >= 0 && ap.index !== realIndex) {
+      ap.index = realIndex;
+    }
+  }
 
   store.setPlayerState(player.value.audioRef.paused);
   store.setPlayerData(song.name, song.artist, song.cover);
@@ -215,10 +255,9 @@ const onPlay = async () => {
     icon: h(MusicOne, { theme: "filled", fill: "#efefef" }),
   });
 
-  // 占位 + 异步加载（id 从 audio.src 取）
   store.setPlayerLrc("歌词加载中");
-  currentLrcLines = []; // 清空旧歌词，避免短暂显示上一首
-  await loadCurrentLrc();
+  currentLrcLines = [];
+  await loadCurrentLrc(songId);
   updateLrc();
 };
 
@@ -294,9 +333,12 @@ const changeSong = (type) => {
   nextTick(() => player.value?.play());
 };
 
-defineExpose({ playToggle, changeVolume, changeSong, toggleList, getAudioRef });
+defineExpose({ playToggle, changeVolume, changeSong, toggleList, getAudioRef, tryAutoPlay });
 
 /* ==================== 监听 ==================== */
+
+// 自动播放
+watch(() => store.playerAutoplay, tryAutoPlay);
 
 // 播放列表更新后，确保索引归零
 watch(playList, (newVal) => {
