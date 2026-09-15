@@ -8,14 +8,6 @@ import defaultSiteLinks from "@/assets/siteLinks.json";
 // 展平后的搜索引擎列表（避免 getter 每次调用都 flatMap）
 const ALL_ENGINES = searchEngineList.flatMap((group) => group.options);
 
-// 非优先级模式下各页面的固定层级
-const FIXED_Z_INDEX = { settings: 3, search: 2 };
-
-// 优先级模式下层级计算的基准值与步长
-const Z_INDEX_BASE = 1000;
-const Z_INDEX_STEP = 10;
-const Z_INDEX_OFFSET = 5;
-
 /* ==================== Store ==================== */
 
 export const mainStore = defineStore("main", {
@@ -48,8 +40,6 @@ export const mainStore = defineStore("main", {
     mobileFuncState: false, // 移动端功能区开启状态
     setOpenState: false, // 设置页面开启状态
     searchOpenState: false, // 搜索页面开启状态
-    prioritizeFirst: true, // 搜索和设置页面是否可同时打开
-    openTimes: {}, // 各浮层打开时间戳（用于层级排序）
 
     // ---- 搜索引擎 ----
     searchEngine: "Baidu", // 当前搜索引擎
@@ -91,7 +81,7 @@ export const mainStore = defineStore("main", {
     // ---- 底栏 ----
     footerBlur: true, // 底栏模糊
     playerLrcShow: true, // 显示底栏歌词
-    playerTrLrc: true,  // 显示歌词翻译
+    playerTrLrc: true, // 显示歌词翻译
     footerProgressBar: true, // 显示底栏进度条
     forceShowIcon: false, // 进度图标常驻
 
@@ -187,34 +177,6 @@ export const mainStore = defineStore("main", {
       this.shortcutData = value;
     },
 
-    /* ---------- 页面层级 ---------- */
-
-    registerPage(id) {
-      if (!this.openTimes[id]) {
-        this.openTimes[id] = Date.now();
-      }
-    },
-
-    unregisterPage(id) {
-      delete this.openTimes[id];
-    },
-
-    getZIndex(id) {
-      if (this.openTimes[id] === undefined) return 0;
-
-      // 非优先级模式：使用固定层级
-      if (!this.prioritizeFirst) return FIXED_Z_INDEX[id] || 0;
-
-      // 优先级模式：按打开时间升序分配层级
-      const sorted = Object.entries(this.openTimes).sort((a, b) => a[1] - b[1]);
-      const index = sorted.findIndex(([key]) => key === id);
-      return Z_INDEX_BASE + index * Z_INDEX_STEP + Z_INDEX_OFFSET;
-    },
-
-    togglePrioritizeFirst() {
-      this.prioritizeFirst = !this.prioritizeFirst;
-    },
-
     /* ---------- 数据恢复 ---------- */
 
     recoverSiteData(data) {
@@ -252,9 +214,6 @@ export const mainStore = defineStore("main", {
       "firefly",
       "snowflake",
       "bubble",
-
-      /* 页面层级 */
-      "prioritizeFirst",
 
       /* 搜索引擎 */
       "searchEngine",

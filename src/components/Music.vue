@@ -122,6 +122,8 @@ const volumeIcon = computed(() => {
 /* ==================== 播放列表控制 ==================== */
 
 const openMusicList = () => {
+  store.setOpenState = false;
+  store.searchOpenState = false;
   store.musicListShow = true;
   playerRef.value?.toggleList();
   if (store.webSpeech) SpeechLocal("好耶.mp3");

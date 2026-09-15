@@ -258,16 +258,16 @@ const changeMusicIndex = (type) => window.$playerChange?.(type);
 <style lang="scss" scoped>
 .floating-music {
   position: fixed;
-  left: 34px;
+  left: 32px;
   bottom: 0px;
   z-index: 1;
 
   .fab {
     position: absolute;
-    bottom: calc(23px - 34px / 2);
+    bottom: calc(23px - 32px / 2);
     right: -6px;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -287,8 +287,8 @@ const changeMusicIndex = (type) => window.$playerChange?.(type);
 
   .music-panel {
     position: absolute;
-    bottom: 63px;
-    left: calc(-34px / 2);
+    bottom: calc(46px + 32px / 2);
+    left: calc(-32px / 2);
     z-index: 2;
     width: 320px;
     border-radius: 16px;
@@ -298,7 +298,7 @@ const changeMusicIndex = (type) => window.$playerChange?.(type);
     gap: 16px;
     backdrop-filter: blur(20px);
     background: var(--main-panel-bg-color);
-    box-shadow: var(--main-big-box-shadow);
+    box-shadow: var(--main-small-box-shadow);
 
     .panel-header {
       display: flex;

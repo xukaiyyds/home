@@ -142,7 +142,7 @@
             @keyup.enter="submitForm"
           />
         </el-form-item>
-        <el-text type="info" size="small"
+        <el-text v-if="dialogType === 'add'" type="info" size="small"
           >批量添加操作：将浏览器的收藏夹导出，再将导出的收藏夹文件上传到这里。</el-text
         >
       </el-form>

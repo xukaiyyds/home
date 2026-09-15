@@ -77,15 +77,6 @@
             :inactive-icon="CloseSmall"
           />
         </div>
-        <div class="item">
-          <span class="text">搜索页和设置页可以同时打开</span>
-          <el-switch
-            v-model="prioritizeFirst"
-            inline-prompt
-            :active-icon="CheckSmall"
-            :inactive-icon="CloseSmall"
-          />
-        </div>
       </el-collapse-item>
 
       <el-collapse-item title="个性壁纸" name="3">
@@ -422,7 +413,6 @@ const {
   firefly,
   snowflake,
   bubble,
-  prioritizeFirst,
   focusSearch,
   clearContent,
   playerAutoplay,

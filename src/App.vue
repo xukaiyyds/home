@@ -16,7 +16,6 @@
         </section>
         <section
           class="more more-set"
-          :style="{ zIndex: settingsZIndex }"
           v-show="store.setOpenState"
           @click="store.setOpenState = false"
         >
@@ -24,7 +23,6 @@
         </section>
         <section
           class="more more-search"
-          :style="{ zIndex: searchZIndex }"
           v-show="store.searchOpenState"
           @click="store.searchOpenState = false"
         >
@@ -99,11 +97,6 @@ const LIVE2D_DEFAULT_MODEL = "Mao";
 // Live2D 显示控制的重试延迟（等待 DOM 渲染完成）
 const LIVE2D_DISPLAY_RETRY = [0, 300, 600];
 
-/* ==================== 计算属性 ==================== */
-
-const settingsZIndex = computed(() => store.getZIndex("settings"));
-const searchZIndex = computed(() => store.getZIndex("search"));
-
 /* ==================== 页面宽度 ==================== */
 
 const getWidth = () => store.setInnerWidth(window.innerWidth);
@@ -120,30 +113,20 @@ watch(
   },
 );
 
-/* ==================== 页面层级注册 ==================== */
-
-// 通用：注册/注销页面层级 + 打开时语音提示
-const registerPage = (key, speechFile) => {
-  store.registerPage(key);
-  if (store.webSpeech) SpeechLocal(speechFile);
-};
+/* ==================== 打开浮层时的语音提示 ==================== */
 
 watch(
   () => store.setOpenState,
   (val) => {
-    if (val) registerPage("settings", "果咩纳塞.mp3");
-    else store.unregisterPage("settings");
+    if (val && store.webSpeech) SpeechLocal("果咩纳塞.mp3");
   },
-  { immediate: true },
 );
 
 watch(
   () => store.searchOpenState,
   (val) => {
-    if (val) registerPage("search", "找东西.mp3");
-    else store.unregisterPage("search");
+    if (val && store.webSpeech) SpeechLocal("找东西.mp3");
   },
-  { immediate: true },
 );
 
 /* ==================== 页面加载完成 ==================== */
@@ -237,7 +220,7 @@ const handleThemeSwitch = (event) => {
 const handleSearchToggle = (event) => {
   if (!event.altKey || event.key.toLowerCase() !== "s") return;
   event.preventDefault();
-  if (!store.prioritizeFirst && store.setOpenState) store.setOpenState = false;
+  if (store.setOpenState) store.setOpenState = false;
   store.searchOpenState = !store.searchOpenState;
   showMessage(`已${store.searchOpenState ? "打开" : "关闭"}全网搜索`, Search);
 };
@@ -262,8 +245,7 @@ const handleContextMenu = (event) => {
     return false;
   }
 
-  // 非多页面模式下，打开设置前先关闭搜索
-  if (!store.prioritizeFirst && store.searchOpenState) store.searchOpenState = false;
+  if (store.searchOpenState) store.searchOpenState = false;
 
   store.setOpenState = !store.setOpenState;
   showMessage(`已${store.setOpenState ? "打开" : "关闭"}全局设置`, Setting);
