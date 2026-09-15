@@ -217,6 +217,17 @@ const updateLrc = () => {
   if (!audio) return;
 
   const t = audio.currentTime;
+
+  // 前奏阶段：还没到第一句歌词的时间，显示歌曲名
+  if (t < currentLrcLines[0].time) {
+    const title = store.playerTitle;
+    const artist = store.playerArtist;
+    const display = title ? (artist ? `${title} - ${artist}` : title) : "歌词加载中";
+    if (store.playerLrc !== display) store.setPlayerLrc(display);
+    return;
+  }
+
+  // 已进入歌词区域：按时间匹配
   let line = currentLrcLines[0];
   for (let i = currentLrcLines.length - 1; i >= 0; i--) {
     if (currentLrcLines[i].time <= t) {
@@ -274,13 +285,15 @@ const onPlay = async () => {
 
   store.setPlayerState(player.value.audioRef.paused);
   store.setPlayerData(song.name, song.artist, song.cover);
-  ElMessage({
-    message: `${song.name} - ${song.artist}`,
-    grouping: true,
-    icon: h(MusicOne, { theme: "filled", fill: "#efefef" }),
-  });
+  if (store.messageShow) {
+    ElMessage({
+      message: `${song.name} - ${song.artist}`,
+      grouping: true,
+      icon: h(MusicOne, { theme: "filled", fill: "#efefef" }),
+    });
+  }
 
-  store.setPlayerLrc("歌词加载中");
+  store.setPlayerLrc(song.artist ? `${song.name} - ${song.artist}` : song.name);
   currentLrcLines = [];
   await loadCurrentLrc(songId);
   updateLrc();
