@@ -26,6 +26,7 @@ import { MusicOne, PlayWrong } from "@icon-park/vue-next";
 import { getPlayerList } from "@/api";
 import { mainStore } from "@/store";
 import APlayer from "@worstone/vue-aplayer";
+import METAKEYWORDS from "@/assets/metadataKeywords.json";
 import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
@@ -49,6 +50,16 @@ const STATIC_SONG_IDS = {
   0: import.meta.env.VITE_SONG_ID,
   1: "5059661515",
   2: "2829816518",
+};
+
+// 判断一行歌词是否为元数据（去掉括号内容后是否含关键词）
+const isMetadataLine = (text) => {
+  if (!text) return false;
+  // 去掉所有括号内容（中英文括号都处理），避免"（作词）"这种
+  const pureText = text.replace(/[（(【\[].*?[）)】\]]/g, "").trim();
+  // 有纯文本时按纯文本判断；整行都是括号内容时按原文判断
+  const target = pureText || text;
+  return METAKEYWORDS.some((kw) => target.includes(kw));
 };
 
 /* ==================== 本地状态 ==================== */
@@ -142,12 +153,26 @@ const parseLrc = (lrcText) => {
   if (!lrcText || typeof lrcText !== "string") return [];
   const lines = [];
   const timeReg = /\[(\d+):(\d+)(?:[.:](\d+))?\]/g;
+  const sectionReg = /^\[[^\]]+\]$/;
 
   lrcText.split("\n").forEach((line) => {
     const matches = [...line.matchAll(timeReg)];
     if (!matches.length) return;
-    const text = line.replace(timeReg, "").trim();
+    // 先去掉时间戳
+    let text = line.replace(timeReg, "").trim();
     if (!text) return;
+
+    // 移除所有 【...】 及其内容
+    text = text.replace(/【[^】]*】/g, "").trim();
+    // 如果移除后为空，说明这行只有版权声明，跳过
+    if (!text) return;
+
+    // 整行只有方括号内容的，跳过
+    if (sectionReg.test(text)) return;
+
+    // 过滤元数据行
+    if (isMetadataLine(text)) return;
+
     matches.forEach((m) => {
       const min = parseInt(m[1]);
       const sec = parseInt(m[2]);
@@ -282,7 +307,6 @@ const onTimeUp = () => {
 };
 
 const onCanplay = () => {
-  store.setPlayerCanplay(true);
   if (player.value?.audioRef) store.audioRef = player.value.audioRef;
   updatePositionState();
 };

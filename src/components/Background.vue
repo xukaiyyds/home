@@ -216,10 +216,10 @@ onBeforeUnmount(() => {
 
   .bg {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    top: calc(var(--blur) * -1);
+    left: calc(var(--blur) * -1);
+    width: calc(100% + var(--blur) * 2);
+    height: calc(100% + var(--blur) * 2);
     object-fit: cover;
     backface-visibility: hidden;
     filter: blur(var(--blur)) brightness(0.3);

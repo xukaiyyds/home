@@ -87,7 +87,6 @@ export const mainStore = defineStore("main", {
     playerCurrentTime: 0, // 底栏进度条用：当前秒数
     playerDuration: 0, // 底栏进度条用：总秒数
     audioRef: null, // 音频元素引用
-    playerCanplay: false, // 音频是否已可播放
 
     // ---- 底栏 ----
     footerBlur: true, // 底栏模糊
@@ -157,10 +156,6 @@ export const mainStore = defineStore("main", {
 
     setPlayerLrc(value) {
       this.playerLrc = value;
-    },
-
-    setPlayerCanplay(value) {
-      this.playerCanplay = value;
     },
 
     setPlayerData(title, artist, cover) {

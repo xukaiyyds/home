@@ -14,20 +14,11 @@
         @mousedown="onDragStart"
         @touchstart.prevent="onDragStart"
       />
-      <Loading
-        v-if="!store.playerCanplay"
-        theme="filled"
-        size="20"
-        fill="#f7989e"
-        :spin="true"
-        class="loading-icon"
-      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { Loading } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { throttle } from "lodash";
 
@@ -187,16 +178,6 @@ onBeforeUnmount(() => {
 
     &.dragging {
       transition: none !important;
-    }
-
-    .loading-icon {
-      position: absolute;
-      user-select: none;
-      touch-action: none;
-      top: -20px;
-      right: -12px;
-      width: 24px;
-      height: 24px;
     }
 
     .progress-icon {
