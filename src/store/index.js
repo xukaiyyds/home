@@ -72,7 +72,7 @@ export const mainStore = defineStore("main", {
     playerState: false, // 当前是否正在播放
     playerAutoplay: false, // 是否自动播放
     playerLoop: "all", // 循环模式 "all" | "one" | "none"
-    playerOrder: "random", // 播放顺序 "list" | "random"
+    playerOrder: "list", // 播放顺序 "list" | "random"
     playerSwitchId: 0, // 切换歌单
     playerTypeId: "", // 歌单 ID
     playCustomSong: "", // 自定义歌单 ID
@@ -91,6 +91,7 @@ export const mainStore = defineStore("main", {
     // ---- 底栏 ----
     footerBlur: true, // 底栏模糊
     playerLrcShow: true, // 显示底栏歌词
+    playerTrLrc: true,  // 显示歌词翻译
     footerProgressBar: true, // 显示底栏进度条
     forceShowIcon: false, // 进度图标常驻
 
@@ -280,6 +281,7 @@ export const mainStore = defineStore("main", {
       /* 底栏 */
       "footerBlur",
       "playerLrcShow",
+      "playerTrLrc",
       "footerProgressBar",
       "forceShowIcon",
 

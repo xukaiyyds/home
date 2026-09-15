@@ -185,7 +185,14 @@
 
       <el-collapse-item title="主题与背景" name="4">
         <div class="item">
-          <span class="text">壁纸模糊程度</span>
+          <span class="text">主题模式</span>
+          <el-radio-group v-model="themeType" text-color="#FFFFFF">
+            <el-radio value="light" border>浅色模式</el-radio>
+            <el-radio value="dark" border>深色模式</el-radio>
+          </el-radio-group>
+        </div>
+        <div class="item">
+          <span class="text">背景模糊</span>
           <el-slider
             v-model="backgroundBlur"
             :min="0"
@@ -194,13 +201,6 @@
             show-stops
             :show-tooltip="false"
           />
-        </div>
-        <div class="item">
-          <span class="text">主题模式</span>
-          <el-radio-group v-model="themeType" text-color="#FFFFFF">
-            <el-radio value="light" border>浅色模式</el-radio>
-            <el-radio value="dark" border>深色模式</el-radio>
-          </el-radio-group>
         </div>
         <div class="item">
           <span class="text">背景遮罩</span>
@@ -271,6 +271,15 @@
           />
         </div>
         <div class="item" v-show="playerLrcShow">
+          <span class="text subitem">翻译</span>
+          <el-switch
+            v-model="playerTrLrc"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item" v-show="playerLrcShow">
           <span class="text subitem">进度条</span>
           <el-switch
             v-model="footerProgressBar"
@@ -280,7 +289,7 @@
           />
         </div>
         <div class="item" v-if="playerLrcShow" v-show="footerProgressBar">
-          <span class="text subsubitem">进度图标常驻</span>
+          <span class="text subsubitem">图标常驻</span>
           <el-switch
             v-model="forceShowIcon"
             inline-prompt
@@ -360,11 +369,13 @@
 
       <el-collapse-item title="备份与恢复" name="7">
         <div class="item">
-          <span class="text">重置站点为默认状态（若站点出现问题，可尝试此操作）</span>
+          <span class="text"
+            >重置站点为默认状态<span class="describe">（若站点出现问题，可尝试此操作）</span></span
+          >
           <el-button @click="resetSite" class="danger" size="small">重置</el-button>
         </div>
         <div class="item">
-          <span class="text">将站点数据进行备份（包含设置偏好、捷径数据、自定义配置等）</span>
+          <span class="text">将站点数据进行备份<span class="describe">（文件中包含你的捷径数据、设置偏好以及各种自定义配置）</span></span>
           <el-button @click="backupSite" class="success" size="small">备份</el-button>
         </div>
         <div class="item">
@@ -422,6 +433,7 @@ const {
   useFloatingPlayer,
   footerBlur,
   playerLrcShow,
+  playerTrLrc,
   footerProgressBar,
   forceShowIcon,
   shortcutHome,
@@ -785,6 +797,10 @@ onMounted(() => {
 
           .subsubitem {
             margin-left: 28px;
+          }
+
+          .describe {
+            font-size: 12px;
           }
 
           .el-switch__core {

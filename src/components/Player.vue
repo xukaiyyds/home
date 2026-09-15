@@ -147,6 +147,7 @@ const loadPlaylist = async () => {
 
 // 当前歌曲解析后的歌词行 [{ time, text }]
 let currentLrcLines = [];
+let rawLrcText = "";
 
 // 解析 LRC 文本为 [{ time, text }]
 const parseLrc = (lrcText) => {
@@ -154,6 +155,7 @@ const parseLrc = (lrcText) => {
   const lines = [];
   const timeReg = /\[(\d+):(\d+)(?:[.:](\d+))?\]/g;
   const sectionReg = /^\[[^\]]+\]$/;
+  const transReg = /\s*[（(][^（()）]*[\u4e00-\u9fa5][^（()）]*[）)]\s*$/;
 
   lrcText.split("\n").forEach((line) => {
     const matches = [...line.matchAll(timeReg)];
@@ -166,6 +168,12 @@ const parseLrc = (lrcText) => {
     text = text.replace(/【[^】]*】/g, "").trim();
     // 如果移除后为空，说明这行只有版权声明，跳过
     if (!text) return;
+
+    // 关闭翻译时，去掉行尾的翻译括号
+    if (!store.playerTrLrc) {
+      text = text.replace(transReg, "").trim();
+      if (!text) return;
+    }
 
     // 整行只有方括号内容的，跳过
     if (sectionReg.test(text)) return;
@@ -202,6 +210,7 @@ const loadCurrentLrc = async (songId) => {
     const text = await res.text();
 
     if (token !== lrcRequestToken) return;
+    rawLrcText = text;
     currentLrcLines = parseLrc(text);
   } catch (err) {
     if (token !== lrcRequestToken) return;
@@ -390,6 +399,16 @@ watch([() => store.playerOrder, () => store.playerLoop], ([order, loop]) => {
   ap.order = order;
   ap.loop = loop;
 });
+
+// 歌词翻译开关变化时，重新解析当前歌词（不重新请求）
+watch(
+  () => store.playerTrLrc,
+  () => {
+    if (!rawLrcText) return;
+    currentLrcLines = parseLrc(rawLrcText);
+    updateLrc();
+  },
+);
 
 // 切换歌单：立即加载
 watch(() => store.playerSwitchId, loadPlaylist);

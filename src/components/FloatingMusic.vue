@@ -233,14 +233,21 @@ const toggleMute = () => {
 
 // 打开/关闭全局音乐列表
 const toggleMusicList = () => {
+  // 关闭时光胶囊
+  store.boxOpenState = false;
+  // 关闭设置页和搜索页
+  if (store.setOpenState || store.searchOpenState) {
+    store.setOpenState = false;
+    store.searchOpenState = false;
+  }
+
   if (store.musicListShow) window.$closeList?.();
   else window.$openList?.();
 };
 
-// 关闭面板（同时收起音乐列表）
+// 关闭面板
 const closePanel = () => {
   store.floatingMusicOpenState = false;
-  if (store.musicListShow) window.$closeList?.();
 };
 
 // 播放控制（统一走全局实例方法）
