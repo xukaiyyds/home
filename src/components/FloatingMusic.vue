@@ -245,6 +245,16 @@ const toggleMusicList = () => {
   else window.$openList?.();
 };
 
+// 关闭悬浮播放器时，同步关闭音乐列表
+watch(
+  () => store.floatingMusicOpenState,
+  (isOpen) => {
+    if (!isOpen && store.musicListShow) {
+      window.$closeList?.();
+    }
+  },
+);
+
 // 关闭面板
 const closePanel = () => {
   store.floatingMusicOpenState = false;

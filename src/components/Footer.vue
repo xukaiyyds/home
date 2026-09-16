@@ -55,6 +55,12 @@
                 }"
                 >{{ word.text }}</span
               >
+              <!-- 翻译：紧跟在字后面 -->
+              <span
+                v-if="store.playerTrLrc && store.playerYrcCurrent.translation"
+                class="yrc-translation"
+                >（{{ store.playerYrcCurrent.translation }}）</span
+              >
             </span>
             <WavesRight theme="filled" size="18" fill="#efefef" />
           </div>
@@ -199,6 +205,11 @@ onBeforeUnmount(() => {
           transition:
             color 0.12s,
             text-shadow 0.12s;
+        }
+
+        .yrc-translation {
+          opacity: 0.6;
+          font-size: 0.9em;
         }
 
         .word-sung {

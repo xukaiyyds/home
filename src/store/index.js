@@ -83,7 +83,8 @@ export const mainStore = defineStore("main", {
     // ---- 底栏 ----
     footerBlur: true, // 底栏模糊
     playerLrcShow: true, // 显示底栏歌词
-    playerTrLrc: true, // 显示歌词翻译
+    playerTrLrc: false, // 显示歌词翻译
+    playerTransLines: [], // 翻译行 [{ ms, text }]，逐字模式用
     footerProgressBar: true, // 显示底栏进度条
     forceShowIcon: false, // 进度图标常驻
 
