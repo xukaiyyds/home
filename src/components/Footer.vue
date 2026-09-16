@@ -42,9 +42,27 @@
       <div v-else class="lrc" @dblclick="toggleForceIcon">
         <ProgressBar :footerHover="isFooterHover" />
         <Transition name="fade" mode="out-in">
-          <div class="lrc-all" :key="playerLrc">
+          <!-- 逐字模式 -->
+          <div v-if="store.playerYrcCurrent" :key="store.playerYrcCurrent.lineIdx" class="lrc-all">
             <WavesLeft theme="filled" size="18" fill="#efefef" />
-            <span class="lrc-text text-hidden" v-html="playerLrc" />
+            <span class="lrc-text lrc-yrc-words">
+              <span
+                v-for="(word, i) in store.playerYrcCurrent.words"
+                :key="i"
+                :class="{
+                  'word-sung': i < store.playerYrcCurrent.wordIdx,
+                  'word-current': i === store.playerYrcCurrent.wordIdx,
+                }"
+                >{{ word.text }}</span
+              >
+            </span>
+            <WavesRight theme="filled" size="18" fill="#efefef" />
+          </div>
+
+          <!-- 逐行模式（fallback） -->
+          <div v-else :key="store.getPlayerLrc" class="lrc-all">
+            <WavesLeft theme="filled" size="18" fill="#efefef" />
+            <span class="lrc-text text-hidden" v-html="store.getPlayerLrc" />
             <WavesRight theme="filled" size="18" fill="#efefef" />
           </div>
         </Transition>
@@ -98,9 +116,6 @@ let forceIconClickCount = 0;
 
 // 播放中且开启底栏歌词时显示歌词，否则显示版权
 const showCopyright = computed(() => !store.playerState || !store.playerLrcShow);
-
-// 歌词内容（避免模板里多次触发 getter）
-const playerLrc = computed(() => store.getPlayerLrc);
 
 /* ==================== 事件处理 ==================== */
 
@@ -177,6 +192,34 @@ onBeforeUnmount(() => {
       flex-direction: row;
       justify-content: center;
       align-items: center;
+
+      .lrc-yrc-words {
+        span {
+          opacity: 0.6;
+          transition:
+            color 0.12s,
+            text-shadow 0.12s;
+        }
+
+        .word-sung {
+          opacity: 1;
+          -webkit-transform: translateY(1px);
+          transform: translateY(1px);
+          transition:
+            color 0.5s linear,
+            opacity 0.3s linear,
+            transform 0.3s linear;
+        }
+
+        .word-current {
+          opacity: 1;
+          text-shadow:
+            0 0 6px rgba(0, 191, 255, 0.8),
+            0px 0px 2px rgba(176, 224, 230, 0.8),
+            0px 0px 2px rgba(230, 230, 250, 0.8);
+          font-weight: 500;
+        }
+      }
 
       .lrc-text {
         margin: 0 8px;

@@ -69,6 +69,8 @@ export const mainStore = defineStore("main", {
     playerTitle: null, // 当前播放歌曲名
     playerArtist: null, // 当前播放歌手名
     playerLrc: "歌词加载中", // 当前播放歌词
+    playerYrcLines: [], // 逐字歌词原始数据 [{ start, duration, words }]
+    playerYrcCurrent: null, // 当前正在显示的字 [{ text, isSung, isCurrent }]
     playerCover: null, // 当前播放歌曲封面
     useFloatingPlayer: false, // 启用悬浮播放器
     floatingMusicOpenState: false, // 悬浮播放器面板开启状态

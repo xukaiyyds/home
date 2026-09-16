@@ -26,6 +26,7 @@ import { MusicOne, PlayWrong } from "@icon-park/vue-next";
 import { getPlayerList } from "@/api";
 import { mainStore } from "@/store";
 import APlayer from "@worstone/vue-aplayer";
+import { parseYRC, findYrcLineIndex, findYrcWordIndex } from "@/utils/yrc";
 import METAKEYWORDS from "@/assets/metadataKeywords.json";
 import { SpeechLocal } from "@/utils/speech";
 
@@ -117,6 +118,8 @@ const loadPlaylist = async () => {
     store.playerTitle = null;
     store.playerArtist = null;
     store.playerCover = null;
+    store.playerYrcLines = [];
+    store.playerYrcCurrent = null;
 
     const res = await getPlayerList(props.songServer, props.songType, effectiveSongId.value);
     store.musicIsOk = true;
@@ -204,18 +207,32 @@ const loadCurrentLrc = async (songId) => {
   }
 
   try {
-    const url = `${import.meta.env.VITE_SONG_API}?server=${props.songServer}&type=lrc&id=${songId}`;
+    // 改用 api-enhanced 的歌词接口
+    const url = `${import.meta.env.VITE_SONG_API}/lyric/new?id=${songId}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
+    const data = await res.json();
 
     if (token !== lrcRequestToken) return;
-    rawLrcText = text;
-    currentLrcLines = parseLrc(text);
+
+    // 逐行歌词（fallback）
+    const lrcText = data.lrc?.lyric || "";
+    rawLrcText = lrcText;
+    currentLrcLines = parseLrc(lrcText);
+
+    // 逐字歌词（如果存在）
+    if (data.yrc?.lyric) {
+      store.playerYrcLines = parseYRC(data.yrc.lyric);
+      console.log(`[逐字] ${store.playerYrcLines.length} 行`);
+    } else {
+      store.playerYrcLines = [];
+      store.playerYrcCurrent = null;
+    }
   } catch (err) {
     if (token !== lrcRequestToken) return;
     console.error("[歌词] 加载失败:", err);
     currentLrcLines = [];
+    store.playerYrcLines = [];
   }
 };
 
@@ -251,46 +268,71 @@ const updateLrc = () => {
 
 // RAF 循环驱动
 const syncLrc = () => {
-  updateLrc();
+  const audio = player.value?.audioRef;
+  const yrcLines = store.playerYrcLines;
+
+  if (audio && yrcLines.length) {
+    const nowMs = audio.currentTime * 1000;
+    const lineIdx = findYrcLineIndex(yrcLines, nowMs);
+
+    if (lineIdx >= 0) {
+      const line = yrcLines[lineIdx];
+      const wordIdx = findYrcWordIndex(line.words, nowMs);
+
+      const current = store.playerYrcCurrent;
+
+      // 换行时：重置整个对象（触发 Transition）
+      if (!current || current.lineIdx !== lineIdx) {
+        store.playerYrcCurrent = {
+          lineIdx,
+          wordIdx,
+          words: line.words, // 原始字数组，含 { start, duration, text }
+        };
+      } else if (current.wordIdx !== wordIdx) {
+        // 同一行内：只改 wordIdx，不重建对象
+        store.playerYrcCurrent.wordIdx = wordIdx;
+      }
+    } else {
+      // 前奏阶段：清空
+      if (store.playerYrcCurrent) {
+        store.playerYrcCurrent = null;
+        updateLrc();
+      }
+    }
+  } else {
+    if (store.playerYrcCurrent) store.playerYrcCurrent = null;
+    updateLrc();
+  }
+
   lrcRafId = requestAnimationFrame(syncLrc);
 };
 
-// 从正在播放的 audio.src 提取歌曲 id
-const getCurrentSongId = () => {
+const getCurrentSong = () => {
   const audio = player.value?.audioRef;
-  if (!audio?.src) return null;
-  const m = audio.src.match(/[?&]id=(\d+)/);
-  return m ? m[1] : null;
-};
+  const ap = player.value?.aplayer;
 
-// 根据 id 在 playList 里找到对应歌曲（兼容 s.id 和 s.url 两种）
-const findSongById = (songId) => {
-  if (!songId) return null;
-  return playList.value.find((s) => {
-    if (s.id && String(s.id) === songId) return true;
-    if (s.url) {
-      const m = s.url.match(/[?&]id=(\d+)/);
-      return m && m[1] === songId;
+  // 优先用 audio.src 匹配（随机模式下 ap.index 可能不准）
+  if (audio?.src && playList.value.length) {
+    const srcFile = audio.src.split("/").pop()?.split("?")[0];
+    if (srcFile) {
+      const match = playList.value.find((s) => {
+        const sFile = s.url.split("/").pop()?.split("?")[0];
+        return sFile === srcFile;
+      });
+      if (match) return match;
     }
-    return false;
-  });
+  }
+
+  // 兜底：ap.index
+  if (!ap) return null;
+  return playList.value[ap.index] || null;
 };
 
 /* ==================== 播放事件 ==================== */
 
 const onPlay = async () => {
-  const songId = getCurrentSongId();
-  const song = findSongById(songId);
+  const song = getCurrentSong();
   if (!song) return;
-
-  const ap = player.value?.aplayer;
-
-  if (ap) {
-    const realIndex = playList.value.indexOf(song);
-    if (realIndex >= 0 && ap.index !== realIndex) {
-      ap.index = realIndex;
-    }
-  }
 
   store.setPlayerState(player.value.audioRef.paused);
   store.setPlayerData(song.name, song.artist, song.cover);
@@ -304,7 +346,7 @@ const onPlay = async () => {
 
   store.setPlayerLrc(song.artist ? `${song.name} - ${song.artist}` : song.name);
   currentLrcLines = [];
-  await loadCurrentLrc(songId);
+  await loadCurrentLrc(song.id);
   updateLrc();
 };
 

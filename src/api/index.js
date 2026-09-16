@@ -1,95 +1,63 @@
-// import axios from "axios";
-import fetchJsonp from "fetch-jsonp";
-
 /**
  * 音乐播放器
  */
-const memCache = new Map();
-const pending = new Map();
-const CACHE_TTL = Number(import.meta.env.VITE_PLAYER_CACHE_TTL || 21600000);
-const cacheKey = (server, type, id) => `${server}:${type}:${id}`;
-const readCache = (key) => {
-  const v = memCache.get(key);
-  if (v) return v;
-  try {
-    const raw = localStorage.getItem(`player_cache:${key}`);
-    if (!raw) return null;
-    const obj = JSON.parse(raw);
-    if (!obj || !obj.ts || !obj.data) return null;
-    if (Date.now() - obj.ts > CACHE_TTL) return null;
-    memCache.set(key, obj.data);
-    return obj.data;
-  } catch {
-    return null;
-  }
-};
-const writeCache = (key, data) => {
-  memCache.set(key, data);
-  try {
-    localStorage.setItem(`player_cache:${key}`, JSON.stringify({ ts: Date.now(), data }));
-  } catch {
-    void 0;
-  }
-};
-
-// 获取音乐播放列表
+// 获取音乐播放列表（api-enhanced 风格）
 export const getPlayerList = async (server, type, id) => {
-  const key = cacheKey(server, type, id);
-  const cached = readCache(key);
-  if (cached) return cached;
-  if (pending.has(key)) return pending.get(key);
+  const base = import.meta.env.VITE_SONG_API;
 
-  const p = (async () => {
-    const res = await fetch(
-      `${import.meta.env.VITE_SONG_API}?server=${server}&type=${type}&id=${id}`,
-    );
-    const data = await res.json();
-
-    let normalized;
-    if (data[0].url.startsWith("@")) {
-      const url = data[0].url.split("@").slice(1)[3];
-      const jsonpData = await fetchJsonp(url).then((res) => res.json());
-      const domain = (
-        jsonpData.req_0.data.sip.find((i) => !i.startsWith("http://ws")) ||
-        jsonpData.req_0.data.sip[0]
-      ).replace("http://", "https://");
-      normalized = data.map((v, i) => ({
-        id: v.id,
-        name: v.name || v.title,
-        artist: v.artist || v.author,
-        url: domain + jsonpData.req_0.data.midurlinfo[i].purl,
-        cover: v.cover || v.pic,
-        lrc: v.lrc,
-      }));
-    } else {
-      normalized = data.map((v) => ({
-        id: v.id,
-        name: v.name || v.title,
-        artist: v.artist || v.author,
-        url: v.url,
-        cover: v.cover || v.pic,
-        lrc: v.lrc,
-      }));
-    }
-    writeCache(key, normalized);
-    return normalized;
-  })();
-
-  pending.set(key, p);
-  try {
-    const result = await p;
-    return result;
-  } finally {
-    pending.delete(key);
+  if (server !== "netease" || type !== "playlist") {
+    throw new Error(`不支持的 server/type: ${server}/${type}`);
   }
-};
 
-export const preloadPlayerList = async (server, type, id) => {
-  try {
-    await getPlayerList(server, type, id);
-  } catch {
-    void 0;
+  // 1. 拿歌单全部歌曲
+  const trackRes = await fetch(`${base}/playlist/track/all?id=${id}`);
+  const trackData = await trackRes.json();
+  if (trackData.code !== 200) throw new Error(trackData.msg || "歌单加载失败");
+
+  const songs = trackData.songs || [];
+  if (!songs.length) throw new Error("歌单为空");
+
+  // 2. 分批拿播放 URL（每批 50 首，并行请求）
+  const chunkSize = 50;
+  const urlMap = {};
+  const chunks = [];
+  for (let i = 0; i < songs.length; i += chunkSize) {
+    chunks.push(songs.slice(i, i + chunkSize));
   }
+
+  const results = await Promise.all(
+    chunks.map((chunk) => {
+      const ids = chunk.map((s) => s.id).join(",");
+      return fetch(`${base}/song/url/v1?id=${ids}&level=exhigh`)
+        .then((r) => r.json())
+        .catch((e) => {
+          console.warn("[播放器] URL 批量请求失败", e);
+          return { data: [] };
+        });
+    }),
+  );
+
+  results.forEach((data) => {
+    (data.data || []).forEach((item) => {
+      if (item.url) urlMap[item.id] = item.url;
+    });
+  });
+
+  // 3. 组装（强制 https，避免混合内容拦截）
+  return songs
+    .map((song) => {
+      const rawUrl = urlMap[song.id] || "";
+      return {
+        id: song.id,
+        name: song.name,
+        artist: (song.ar || []).map((a) => a.name).join(" / "),
+        album: song.al?.name || import.meta.env.VITE_SITE_NAME,
+        cover: song.al?.picUrl || "",
+        url: rawUrl.replace(/^http:\/\//, "https://"),
+        lrc: "",
+      };
+    })
+    .filter((s) => s.url);
 };
 
 /**
