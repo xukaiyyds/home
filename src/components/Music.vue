@@ -449,10 +449,10 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    top: calc(50% - 300px);
-    left: calc(50% - 320px);
-    width: 640px;
-    height: 600px;
+    top: calc(50% - 277.5px);
+    left: calc(50% - 297px);
+    width: 595px;
+    height: 555px;
     background: var(--main-panel-bg-color);
     box-shadow: var(--main-big-box-shadow);
     border-radius: 6px;

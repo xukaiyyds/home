@@ -366,7 +366,11 @@
           <el-button @click="resetSite" class="danger" size="small">重置</el-button>
         </div>
         <div class="item">
-          <span class="text">将站点数据进行备份<span class="describe">（文件中包含你的捷径数据、设置偏好以及各种自定义配置）</span></span>
+          <span class="text"
+            >将站点数据进行备份<span class="describe"
+              >（备份文件中包含你的捷径数据、设置偏好以及自定义配置等）</span
+            ></span
+          >
           <el-button @click="backupSite" class="success" size="small">备份</el-button>
         </div>
         <div class="item">

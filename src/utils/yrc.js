@@ -30,7 +30,9 @@ export const parseYRC = (yrcText) => {
       words.push({
         start: parseInt(wm[1]),
         duration: parseInt(wm[2]),
-        text,
+        // 英文单词尾随空格换成两个不换行空格，视觉上加宽
+        text:
+          /[a-zA-Z]/.test(text) && text.endsWith(" ") ? text.slice(0, -1) + "\u00a0\u00a0" : text,
       });
     }
 

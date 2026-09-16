@@ -53,23 +53,35 @@ const STATIC_SONG_IDS = {
   2: "2829816518",
 };
 
-// 判断一行歌词是否为元数据（去掉括号内容后是否含关键词）
-const isMetadataLine = (text) => {
-  if (!text) return false;
-  // 去掉所有括号内容（中英文括号都处理），避免"（作词）"这种
-  const pureText = text.replace(/[（(【\[].*?[）)】\]]/g, "").trim();
-  // 有纯文本时按纯文本判断；整行都是括号内容时按原文判断
-  const target = pureText || text;
-  return METAKEYWORDS.some((kw) => target.includes(kw));
-};
+// 翻译行与原歌词行的最大时间容差（毫秒）
+const TRANS_TOLERANCE = 300;
+
+// 从 audio.src 提取文件名的通用正则
+const AUDIO_FILE_REGEX = /\/([^/?#]+)(?:[?#]|$)/;
+
+// 自动播放失败的提示（只弹一次）
+let hasShownAutoplayTip = false;
+
+// 播放错误提示时长
+const ERROR_MSG_DURATION = 2000;
 
 /* ==================== 本地状态 ==================== */
 
 const player = ref(null);
 const playList = ref([]);
 
-// 歌词同步的 RAF 句柄（提到 setup 作用域，供 onBeforeUnmount 访问）
+// 歌词同步的 RAF 句柄
 let lrcRafId = null;
+
+// 当前歌曲解析后的歌词行 [{ time, text }]
+let currentLrcLines = [];
+let rawLrcText = "";
+
+// 防抖加载定时器
+let customSongTimer = null;
+
+// 歌词请求 token（防止旧请求覆盖新请求）
+let lrcRequestToken = 0;
 
 /* ==================== 计算属性 ==================== */
 
@@ -77,16 +89,52 @@ const listHeight = computed(() => `${props.listMaxHeight}px`);
 
 // 当前生效的歌单 ID（动态读取自定义歌单）
 const effectiveSongId = computed(() => {
-  // 自定义模式：读 store.playCustomSong，为空则回退到默认歌单
   if (store.playerSwitchId === 3) {
     return store.playCustomSong || STATIC_SONG_IDS[0];
   }
   return STATIC_SONG_IDS[store.playerSwitchId] || STATIC_SONG_IDS[0];
 });
 
+/* ==================== 工具函数 ==================== */
+
+// 从 audio.src 中提取文件名（用于匹配歌曲）
+const getAudioFileName = () => {
+  const src = player.value?.audioRef?.src;
+  if (!src) return null;
+  return src.split("/").pop()?.split("?")[0] || null;
+};
+
+// 按文件名在 playList 中查找歌曲
+const findSongByAudioSrc = () => {
+  const fileName = getAudioFileName();
+  if (!fileName || !playList.value.length) return null;
+  return playList.value.find((s) => s.url.split("/").pop()?.split("?")[0] === fileName) || null;
+};
+
+// 清空逐字歌词状态
+const clearYrcState = () => {
+  store.playerYrcLines = [];
+  store.playerYrcCurrent = null;
+};
+
+// LRC 时间戳正则
+const LRC_TIME_REG = /^\[(\d+):(\d+)(?:[.:](\d+))?\]/;
+
+// 把 LRC 时间戳 match 转成毫秒
+const timeMatchToMs = (m) =>
+  parseInt(m[1]) * 60000 + parseInt(m[2]) * 1000 + parseInt((m[3] || "000").padEnd(3, "0"));
+
+// 判断一行歌词是否为元数据
+const isMetadataLine = (text) => {
+  if (!text) return false;
+  const pureText = text.replace(/[（(【\[].*?[）)】\]]/g, "").trim();
+  const target = pureText || text;
+  return METAKEYWORDS.some((kw) => target.includes(kw));
+};
+
 /* ==================== 歌单加载 ==================== */
 
-// 自动播放尝试逻辑，满足三个条件才尝试：开了自动播放 & 有歌单 & 当前未播放
+// 自动播放尝试逻辑
 const tryAutoPlay = async () => {
   if (!store.playerAutoplay) return;
   if (store.playerState) return;
@@ -97,7 +145,6 @@ const tryAutoPlay = async () => {
   try {
     await p.play();
   } catch {
-    // 用户没交互过，弹提示引导
     if (!hasShownAutoplayTip) {
       hasShownAutoplayTip = true;
       ElMessage({
@@ -108,18 +155,29 @@ const tryAutoPlay = async () => {
   }
 };
 
+// 从 audio.src 反查歌曲索引，同步给 APlayer
+const syncPlayerIndex = () => {
+  const ap = player.value?.aplayer;
+  if (!ap) return;
+  const realIndex = playList.value.findIndex(
+    (s) => s.url.split("/").pop()?.split("?")[0] === getAudioFileName(),
+  );
+  if (realIndex >= 0 && ap.index !== realIndex) {
+    ap.index = realIndex;
+  }
+};
+
 const loadPlaylist = async () => {
   try {
     // 先清空，强制 APlayer 重置内部状态
     playList.value = [];
-    // 重置播放器状态与歌词，避免残留上一个歌单的信息
+    // 重置播放器状态与歌词
     store.playerState = false;
     store.playerLrc = "歌词加载中";
     store.playerTitle = null;
     store.playerArtist = null;
     store.playerCover = null;
-    store.playerYrcLines = [];
-    store.playerYrcCurrent = null;
+    clearYrcState();
 
     const res = await getPlayerList(props.songServer, props.songType, effectiveSongId.value);
     store.musicIsOk = true;
@@ -132,11 +190,11 @@ const loadPlaylist = async () => {
       tryAutoPlay();
       setTimeout(syncPlayerIndex, 300);
 
-      // 切换歌单后，如果全局音乐列表是打开状态，确保列表重新展开
+      // 切换歌单后，若音乐列表打开，确保列表重新展开
       if (store.musicListShow) {
         setTimeout(() => {
           const list = document.querySelector(".music-list .aplayer-list");
-          if (list && list.classList.contains("aplayer-list-hide")) {
+          if (list?.classList.contains("aplayer-list-hide")) {
             player.value?.toggleList();
           }
         }, 500);
@@ -156,24 +214,17 @@ const loadPlaylist = async () => {
   }
 };
 
-/* ==================== 歌词同步 ==================== */
+/* ==================== 歌词解析 ==================== */
 
-// 当前歌曲解析后的歌词行 [{ time, text }]
-let currentLrcLines = [];
-let rawLrcText = "";
-
-// 把翻译 LRC 解析为 [{ ms, text }]，用于逐字模式查找
+// 把翻译 LRC 解析为 [{ ms, text }]
 const parseTranslation = (transText) => {
   if (!transText) return [];
-  const timeReg = /^\[(\d+):(\d+)(?:[.:](\d+))?\]/;
   const list = [];
   transText.split("\n").forEach((line) => {
-    const m = line.match(timeReg);
+    const m = line.match(LRC_TIME_REG);
     if (!m) return;
-    const ms =
-      parseInt(m[1]) * 60000 + parseInt(m[2]) * 1000 + parseInt((m[3] || "000").padEnd(3, "0"));
-    const text = line.replace(timeReg, "").trim();
-    if (text) list.push({ ms, text });
+    const text = line.replace(LRC_TIME_REG, "").trim();
+    if (text) list.push({ ms: timeMatchToMs(m), text });
   });
   return list;
 };
@@ -183,7 +234,7 @@ const findTranslation = (ms) => {
   const list = store.playerTransLines;
   if (!list.length) return "";
   let best = null;
-  let bestDist = 300;
+  let bestDist = TRANS_TOLERANCE;
   for (const item of list) {
     const dist = Math.abs(item.ms - ms);
     if (dist < bestDist) {
@@ -198,31 +249,20 @@ const findTranslation = (ms) => {
 const mergeTranslation = (lrcText, transText) => {
   if (!transText) return lrcText;
 
-  const timeReg = /^\[(\d+):(\d+)(?:[.:](\d+))?\]/;
-  const toMs = (m) =>
-    parseInt(m[1]) * 60000 + parseInt(m[2]) * 1000 + parseInt((m[3] || "000").padEnd(3, "0"));
-
   // 解析翻译为 [{ ms, text }]
-  const transList = [];
-  transText.split("\n").forEach((line) => {
-    const m = line.match(timeReg);
-    if (!m) return;
-    const text = line.replace(timeReg, "").trim();
-    if (text) transList.push({ ms: toMs(m), text });
-  });
-
+  const transList = parseTranslation(transText);
   if (!transList.length) return lrcText;
 
-  // 逐行匹配：在 ±300ms 容差内找最近的翻译
   return lrcText
     .split("\n")
     .map((line) => {
-      const m = line.match(timeReg);
+      const m = line.match(LRC_TIME_REG);
       if (!m) return line;
-      const lineMs = toMs(m);
+      const lineMs = timeMatchToMs(m);
 
+      // 容差内找最近的翻译
       let best = null;
-      let bestDist = 300; // 容差 300ms
+      let bestDist = TRANS_TOLERANCE;
       for (const item of transList) {
         const dist = Math.abs(item.ms - lineMs);
         if (dist < bestDist) {
@@ -231,8 +271,9 @@ const mergeTranslation = (lrcText, transText) => {
         }
       }
       if (!best) return line;
-      // 避免翻译和原文一样（有些歌翻译就是原文）
-      const originalText = line.replace(timeReg, "").trim();
+
+      // 翻译和原文相同时不加
+      const originalText = line.replace(LRC_TIME_REG, "").trim();
       if (best.text === originalText) return line;
       return `${line} (${best.text})`;
     })
@@ -250,13 +291,12 @@ const parseLrc = (lrcText) => {
   lrcText.split("\n").forEach((line) => {
     const matches = [...line.matchAll(timeReg)];
     if (!matches.length) return;
-    // 先去掉时间戳
+
     let text = line.replace(timeReg, "").trim();
     if (!text) return;
 
     // 移除所有 【...】 及其内容
     text = text.replace(/【[^】]*】/g, "").trim();
-    // 如果移除后为空，说明这行只有版权声明，跳过
     if (!text) return;
 
     // 关闭翻译时，去掉行尾的翻译括号
@@ -265,10 +305,7 @@ const parseLrc = (lrcText) => {
       if (!text) return;
     }
 
-    // 整行只有方括号内容的，跳过
     if (sectionReg.test(text)) return;
-
-    // 过滤元数据行
     if (isMetadataLine(text)) return;
 
     matches.forEach((m) => {
@@ -282,8 +319,7 @@ const parseLrc = (lrcText) => {
   return lines.sort((a, b) => a.time - b.time);
 };
 
-// 加载当前歌曲的歌词（从 audio.src 提取 id，避免索引错位）
-let lrcRequestToken = 0;
+/* ==================== 歌词加载 ==================== */
 
 const loadCurrentLrc = async (songId) => {
   const token = ++lrcRequestToken;
@@ -301,23 +337,16 @@ const loadCurrentLrc = async (songId) => {
 
     if (token !== lrcRequestToken) return;
 
-    // 原文
+    // 原文 & 翻译（逐字歌词翻译在 ytlrc，逐行歌词翻译在 tlyric）
     const rawLrc = data.lrc?.lyric || "";
-    // 翻译：逐字歌词在 ytlrc，逐行歌词在 tlyric
     const rawTrans = data.ytlrc?.lyric || data.tlyric?.lyric || "";
 
-    // 把翻译合并到原文：`[00:12.34]原文 (翻译)`
     rawLrcText = mergeTranslation(rawLrc, rawTrans);
-    // 保存翻译行给逐字模式用
     store.playerTransLines = parseTranslation(rawTrans);
     currentLrcLines = parseLrc(rawLrcText);
 
     // 逐字歌词
-    if (data.yrc?.lyric) {
-      store.playerYrcLines = parseYRC(data.yrc.lyric);
-    } else {
-      store.playerYrcLines = [];
-    }
+    store.playerYrcLines = data.yrc?.lyric ? parseYRC(data.yrc.lyric) : [];
   } catch (err) {
     if (token !== lrcRequestToken) return;
     console.error("[歌词] 加载失败:", err);
@@ -326,7 +355,9 @@ const loadCurrentLrc = async (songId) => {
   }
 };
 
-// 根据播放时间找当前歌词行，同步到底栏
+/* ==================== 歌词同步循环 ==================== */
+
+// 逐行模式：根据播放时间找当前行
 const updateLrc = () => {
   if (!currentLrcLines.length) return;
   const audio = player.value?.audioRef;
@@ -334,7 +365,7 @@ const updateLrc = () => {
 
   const t = audio.currentTime;
 
-  // 前奏阶段：还没到第一句歌词的时间，显示歌曲名
+  // 前奏阶段：显示歌名
   if (t < currentLrcLines[0].time) {
     const title = store.playerTitle;
     const artist = store.playerArtist;
@@ -356,39 +387,47 @@ const updateLrc = () => {
   }
 };
 
+// 逐字模式：更新 playerYrcCurrent
+const updateYrcCurrent = (audio) => {
+  const yrcLines = store.playerYrcLines;
+  const nowMs = audio.currentTime * 1000;
+  const lineIdx = findYrcLineIndex(yrcLines, nowMs);
+
+  if (lineIdx < 0) {
+    // 前奏阶段：清空
+    if (store.playerYrcCurrent) {
+      store.playerYrcCurrent = null;
+      updateLrc();
+    }
+    return;
+  }
+
+  const line = yrcLines[lineIdx];
+  const wordIdx = findYrcWordIndex(line.words, nowMs);
+  const translation = store.playerTrLrc ? findTranslation(line.start) : "";
+
+  const current = store.playerYrcCurrent;
+
+  // 换行或翻译变化 → 重建对象
+  if (!current || current.lineIdx !== lineIdx || current.translation !== translation) {
+    store.playerYrcCurrent = {
+      lineIdx,
+      wordIdx,
+      words: line.words,
+      translation,
+    };
+  } else if (current.wordIdx !== wordIdx) {
+    // 同一行内：只更新 wordIdx
+    current.wordIdx = wordIdx;
+  }
+};
+
+// RAF 驱动
 const syncLrc = () => {
   const audio = player.value?.audioRef;
-  const yrcLines = store.playerYrcLines;
 
-  if (audio && yrcLines.length) {
-    const nowMs = audio.currentTime * 1000;
-    const lineIdx = findYrcLineIndex(yrcLines, nowMs);
-
-    if (lineIdx >= 0) {
-      const line = yrcLines[lineIdx];
-      const wordIdx = findYrcWordIndex(line.words, nowMs);
-
-      // 查找当前行的翻译
-      const translation = store.playerTrLrc ? findTranslation(line.start) : "";
-
-      const current = store.playerYrcCurrent;
-
-      if (!current || current.lineIdx !== lineIdx || current.translation !== translation) {
-        store.playerYrcCurrent = {
-          lineIdx,
-          wordIdx,
-          words: line.words,
-          translation,
-        };
-      } else if (current.wordIdx !== wordIdx) {
-        store.playerYrcCurrent.wordIdx = wordIdx;
-      }
-    } else {
-      if (store.playerYrcCurrent) {
-        store.playerYrcCurrent = null;
-        updateLrc();
-      }
-    }
+  if (audio && store.playerYrcLines.length) {
+    updateYrcCurrent(audio);
   } else {
     if (store.playerYrcCurrent) store.playerYrcCurrent = null;
     updateLrc();
@@ -397,43 +436,14 @@ const syncLrc = () => {
   lrcRafId = requestAnimationFrame(syncLrc);
 };
 
-// 从 audio.src 反查歌曲在 playList 中的位置，同步给 APlayer
-const syncPlayerIndex = () => {
-  const ap = player.value?.aplayer;
-  const audio = player.value?.audioRef;
-  if (!ap || !audio?.src) return;
-  if (!playList.value.length) return;
+/* ==================== 当前歌曲 ==================== */
 
-  const srcFile = audio.src.split("/").pop()?.split("?")[0];
-  if (!srcFile) return;
-
-  const realIndex = playList.value.findIndex((s) => {
-    const sFile = s.url.split("/").pop()?.split("?")[0];
-    return sFile === srcFile;
-  });
-
-  if (realIndex >= 0 && ap.index !== realIndex) {
-    ap.index = realIndex;
-  }
-};
-
+// 优先用 audio.src 匹配（随机模式下 ap.index 可能不准）
 const getCurrentSong = () => {
-  const audio = player.value?.audioRef;
+  const match = findSongByAudioSrc();
+  if (match) return match;
+
   const ap = player.value?.aplayer;
-
-  // 优先用 audio.src 匹配（随机模式下 ap.index 可能不准）
-  if (audio?.src && playList.value.length) {
-    const srcFile = audio.src.split("/").pop()?.split("?")[0];
-    if (srcFile) {
-      const match = playList.value.find((s) => {
-        const sFile = s.url.split("/").pop()?.split("?")[0];
-        return sFile === srcFile;
-      });
-      if (match) return match;
-    }
-  }
-
-  // 兜底：ap.index
   if (!ap) return null;
   return playList.value[ap.index] || null;
 };
@@ -447,6 +457,7 @@ const onPlay = async () => {
   store.setPlayerState(player.value.audioRef.paused);
   store.setPlayerData(song.name, song.artist, song.cover);
   syncPlayerIndex();
+
   if (store.messageShow) {
     ElMessage({
       message: `${song.name} - ${song.artist}`,
@@ -493,24 +504,22 @@ const loadMusicError = () => {
     message: hasNext ? "播放歌曲出现错误，播放器将在 2s 后进行下一首" : "播放歌曲出现错误",
     grouping: true,
     icon: h(PlayWrong, { theme: "filled", fill: "#EFEFEF" }),
-    duration: 2000,
+    duration: ERROR_MSG_DURATION,
   });
+
   if (store.webSpeech) {
     SpeechLocal(hasNext ? "歌曲加载失败.mp3" : "播放器未知异常.mp3");
   }
-  // 添加空值保护，避免 player 状态异常时再次报错
-  const audioList = player.value?.aplayer?.audio;
-  const currentIndex = player.value?.aplayer?.index;
-  if (audioList && audioList[currentIndex]) {
-    console.error("播放歌曲错误: " + audioList[currentIndex].name);
-  }
+
+  const failed = player.value?.aplayer?.audio?.[player.value?.aplayer?.index];
+  if (failed) console.error("播放歌曲错误: " + failed.name);
 };
 
 // 媒体会话位置状态（部分浏览器支持）
 const updatePositionState = () => {
   if (!("mediaSession" in navigator)) return;
   const status = player.value?.audioStatus;
-  if (!status || !status.duration || status.duration <= 0) return; // ← 加 !duration 判断
+  if (!status || !status.duration || status.duration <= 0) return;
   try {
     navigator.mediaSession.setPositionState({
       duration: status.duration,
@@ -573,8 +582,7 @@ watch(
 // 切换歌单：立即加载
 watch(() => store.playerSwitchId, loadPlaylist);
 
-// 自定义歌单 ID 变化时：防抖加载（避免输入过程中频繁请求）
-let customSongTimer = null;
+// 自定义歌单 ID 变化时：防抖加载
 watch(
   () => store.playCustomSong,
   () => {
@@ -592,18 +600,16 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  // 修复：原 rafId 声明在 onMounted 内部，这里访问不到
   if (lrcRafId) cancelAnimationFrame(lrcRafId);
-  // 组件卸载时清理定时器
   if (customSongTimer) clearTimeout(customSongTimer);
   currentLrcLines = [];
-  lrcRequestToken++; // 让未完成的请求结果被丢弃
+  lrcRequestToken++;
 });
 </script>
 
 <style lang="scss" scoped>
 .aplayer {
-  width: 80%;
+  width: 86%;
   border-radius: 6px;
   font-family: "HarmonyOS_Regular", sans-serif !important;
   box-shadow: var(--main-small-box-shadow) !important;
@@ -617,9 +623,10 @@ onBeforeUnmount(() => {
     }
 
     .aplayer-info {
+      height: 45px;
       margin-left: 0;
-      background-color: var(--main-cards-header-bg-color);
       border-color: transparent !important;
+      background: var(--main-cards-header-bg-color);
 
       .aplayer-music {
         flex-grow: initial;

@@ -2,14 +2,15 @@
  * 音乐播放器
  */
 
-// 缓存机制
+/* ==================== 缓存机制 ==================== */
+
 const memCache = new Map();
 const pendingMap = new Map(); // 防止同一歌单同时发起多次请求
 
-// 缓存有效期：12 小时（毫秒）
-const CACHE_TTL = 12 * 60 * 60 * 1000;
+// 元信息缓存有效期：3 天（歌名、歌手、ID 这些不变）
+const META_CACHE_TTL = 3 * 24 * 60 * 60 * 1000;
 
-const readCache = (key) => {
+const readCache = (key, ttl) => {
   // 1. 内存缓存优先
   const mem = memCache.get(key);
   if (mem) return mem;
@@ -19,7 +20,7 @@ const readCache = (key) => {
     if (!raw) return null;
     const obj = JSON.parse(raw);
     if (!obj?.ts || !obj?.data) return null;
-    if (Date.now() - obj.ts > CACHE_TTL) return null;
+    if (Date.now() - obj.ts > ttl) return null;
     memCache.set(key, obj.data);
     return obj.data;
   } catch {
@@ -36,36 +37,37 @@ const writeCache = (key, data) => {
   }
 };
 
-// 获取音乐播放列表
+/* ==================== 获取音乐播放列表 ==================== */
+
 export const getPlayerList = async (server, type, id) => {
   const base = import.meta.env.VITE_SONG_API;
-  const cacheKey = `${server}:${type}:${id}`;
+  const metaKey = `meta:${server}:${type}:${id}`;
+  const reqKey = `${server}:${type}:${id}`; // 请求 key
 
   if (server !== "netease" || type !== "playlist") {
     throw new Error(`不支持的 server/type: ${server}/${type}`);
   }
 
-  // 1. 查缓存
-  const cached = readCache(cacheKey);
-  if (cached) {
-    console.log(`[播放器] 命中缓存: ${cacheKey}`);
-    return cached;
+  // 防并发：同一歌单正在请求中，复用
+  if (pendingMap.has(reqKey)) {
+    return pendingMap.get(reqKey);
   }
 
-  // 2. 检查是否已有相同请求在进行
-  if (pendingMap.has(cacheKey)) {
-    return pendingMap.get(cacheKey);
-  }
-
-  // 3. 发起请求
   const request = (async () => {
-    const trackRes = await fetch(`${base}/playlist/track/all?id=${id}`);
-    const trackData = await trackRes.json();
-    if (trackData.code !== 200) throw new Error(trackData.msg || "歌单加载失败");
+    // 1. 拿歌单元信息（可缓存）
+    let songs = readCache(metaKey, META_CACHE_TTL);
+    if (!songs) {
+      const trackRes = await fetch(`${base}/playlist/track/all?id=${id}`);
+      const trackData = await trackRes.json();
+      if (trackData.code !== 200) throw new Error(trackData.msg || "歌单加载失败");
+      songs = trackData.songs || [];
+      if (!songs.length) throw new Error("歌单为空");
+      writeCache(metaKey, songs);
+    } else {
+      // console.log(`[播放器] 命中元信息缓存: ${metaKey}`);
+    }
 
-    const songs = trackData.songs || [];
-    if (!songs.length) throw new Error("歌单为空");
-
+    // 2. 每次都重新拿 URL
     const chunkSize = 100;
     const urlMap = {};
     const chunks = [];
@@ -91,50 +93,43 @@ export const getPlayerList = async (server, type, id) => {
       });
     });
 
-    const result = songs
+    // 3. 组装
+    return songs
       .map((song) => {
         const rawUrl = urlMap[song.id] || "";
+        if (!rawUrl) return null;
+        const url = rawUrl.replace(/^http:\/\//, "https://");
+        if (!url.startsWith("https://")) return null;
         return {
           id: song.id,
           name: song.name,
           artist: (song.ar || []).map((a) => a.name).join(" / "),
           album: song.al?.name || import.meta.env.VITE_SITE_NAME,
           cover: song.al?.picUrl || "",
-          url: rawUrl.replace(/^http:\/\//, "https://"),
+          url,
           lrc: "",
         };
       })
-      .filter((s) => s.url);
-
-    // 4. 写入缓存
-    if (result.length) {
-      writeCache(cacheKey, result);
-    }
-    return result;
+      .filter(Boolean);
   })();
 
-  pendingMap.set(cacheKey, request);
+  pendingMap.set(reqKey, request);
   try {
     return await request;
   } finally {
-    pendingMap.delete(cacheKey);
+    pendingMap.delete(reqKey);
   }
 };
 
-/**
- * 一言
- */
+/* ==================== 一言 ==================== */
 
-// 获取一言数据
 export const getHitokoto = async (useFloatingPlayer = false) => {
   const url = useFloatingPlayer ? "https://v1.hitokoto.cn" : "https://v1.hitokoto.cn/?c=j";
   const res = await fetch(url);
   return await res.json();
 };
 
-/**
- * 天气
- */
+/* ==================== 天气 ==================== */
 
 // 使用代理地址
 const PROXY_BASE_URL = "https://weather.xukaiyyds.cn/api/proxy";
