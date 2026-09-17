@@ -262,6 +262,15 @@
           />
         </div>
         <div class="item" v-show="playerLrcShow">
+          <span class="text subitem">逐字</span>
+          <el-switch
+            v-model="playerYrcEnabled"
+            inline-prompt
+            :active-icon="CheckSmall"
+            :inactive-icon="CloseSmall"
+          />
+        </div>
+        <div class="item" v-show="playerLrcShow">
           <span class="text subitem">翻译</span>
           <el-switch
             v-model="playerTrLrc"
@@ -428,6 +437,7 @@ const {
   footerBlur,
   playerLrcShow,
   playerTrLrc,
+  playerYrcEnabled,
   footerProgressBar,
   forceShowIcon,
   shortcutHome,

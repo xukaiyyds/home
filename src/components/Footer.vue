@@ -15,19 +15,16 @@
           {{ fullYear }}
           <a :href="siteUrl">{{ siteAuthor }}</a>
         </span>
-        <!-- 以下信息请不要修改哦 -->
         <span class="hidden">
           &amp;&nbsp;Made&nbsp;by
           <a :href="config.github" target="_blank">{{ config.author }}</a>
         </span>
-        <!-- 站点备案 -->
         <span>
           &amp;
           <a v-if="siteIcp" href="https://icp.gov.moe/?keyword=20246633" target="_blank">
             {{ siteIcp }}
           </a>
         </span>
-        <!-- 查看帮助 -->
         <span class="hidden-key">
           &amp;
           <a @click="toggleHelp" style="position: relative; padding: 1px">
@@ -44,15 +41,28 @@
         <ProgressBar :footerHover="isFooterHover" />
         <Transition name="fade" mode="out-in">
           <!-- 逐字模式 -->
-          <div v-if="store.playerYrcCurrent" :key="store.playerYrcCurrent.lineIdx" class="lrc-all">
+          <div
+            v-if="store.playerYrcEnabled && store.playerYrcCurrent"
+            :key="store.playerYrcCurrent.lineIdx"
+            class="lrc-all"
+          >
             <WavesLeft theme="filled" size="18" fill="#efefef" />
             <span class="dwrc-box">
-              <!-- 底层：通过 width 展开的填充字 -->
+              <!-- 底层：通过 clip-path 展开的填充字 -->
               <span class="dwrc-2 lrc-text text-hidden" id="dwrc-2-wrap">
                 <span
                   v-for="(word, i) in store.playerYrcCurrent.words"
                   :key="`o-${i}`"
-                  :class="/[\u4e00-\u9fa5]/.test(word.text) ? 'dwrc-cn' : 'dwrc-en'"
+                  class="dwrc-2-char"
+                  :class="[
+                    i === store.playerYrcCurrent.wordIdx ? 'fade-in' : 'fade-in-start',
+                    i < store.playerYrcCurrent.wordIdx ? 'fade-out' : '',
+                    i === store.playerYrcCurrent.wordIdx && word.duration > 1019 ? 'long-tone' : '',
+                    i < store.playerYrcCurrent.wordIdx && word.duration > 1019
+                      ? 'long-tone-out'
+                      : '',
+                    /[\u4e00-\u9fa5]/.test(word.text) ? 'dwrc-cn' : 'dwrc-en',
+                  ]"
                   v-html="word.text"
                 />
               </span>
@@ -88,9 +98,15 @@
 
           <!-- 逐行模式（fallback） -->
           <div v-else :key="store.getPlayerLrc" class="lrc-all">
-            <WavesLeft theme="filled" size="18" fill="#efefef" />
-            <span class="lrc-char lrc-text text-hidden" v-html="store.getPlayerLrc" />
-            <WavesRight theme="filled" size="18" fill="#efefef" />
+            <MusicOne v-show="!store.playerYrcEnabled" theme="filled" size="18" fill="#efefef" />
+            <WavesLeft v-show="store.playerYrcEnabled" theme="filled" size="18" fill="#efefef" />
+            <span
+              class="lrc-text text-hidden"
+              :class="{ 'lrc-char': store.playerYrcEnabled }"
+              v-html="store.getPlayerLrc"
+            />
+            <WavesRight v-show="store.playerYrcEnabled" theme="filled" size="18" fill="#efefef" />
+            <MusicOne v-show="!store.playerYrcEnabled" theme="filled" size="18" fill="#efefef" />
           </div>
         </Transition>
       </div>
@@ -99,7 +115,7 @@
 </template>
 
 <script setup>
-import { WavesLeft, WavesRight, Cat } from "@icon-park/vue-next";
+import { MusicOne, WavesLeft, WavesRight, Cat } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
 import ProgressBar from "@/components/ProgressBar.vue";
@@ -112,7 +128,6 @@ const store = mainStore();
 
 const fullYear = new Date().getFullYear();
 
-// 环境变量集中读取（只读一次）
 const SITE_CONFIG = {
   start: import.meta.env.VITE_SITE_START,
   icp: import.meta.env.VITE_SITE_ICP,
@@ -124,7 +139,6 @@ const startYear = SITE_CONFIG.start?.length >= 4 ? SITE_CONFIG.start.substring(0
 const siteIcp = SITE_CONFIG.icp;
 const siteAuthor = SITE_CONFIG.author;
 
-// 站点 URL 规范化：缺省用默认值，无协议时补 //
 const siteUrl = computed(() => {
   const url = SITE_CONFIG.url;
   if (!url) return "https://www.xukaiyyds.cn";
@@ -136,17 +150,14 @@ const siteUrl = computed(() => {
 const isFooterHover = ref(false);
 const isAltPressed = ref(false);
 
-// 双击进度图标计数（用于触发"戳戳"音效）
 let forceIconClickCount = 0;
 
 /* ==================== 计算属性 ==================== */
 
-// 播放中且开启底栏歌词时显示歌词，否则显示版权
 const showCopyright = computed(() => !store.playerState || !store.playerLrcShow);
 
 /* ==================== 事件处理 ==================== */
 
-// 双击进度图标：切换"进度图标常驻"
 const toggleForceIcon = () => {
   store.forceShowIcon = !store.forceShowIcon;
   if (store.messageShow) {
@@ -158,7 +169,6 @@ const toggleForceIcon = () => {
   }
   if (store.webSpeech) {
     SpeechLocal(store.forceShowIcon ? "启用进度图标常驻.mp3" : "禁用进度图标常驻.mp3");
-    // 连续点击超过 3 次时触发"戳戳"提示
     forceIconClickCount += 1;
     if (forceIconClickCount > 3) {
       SpeechLocal("戳戳.mp3");
@@ -167,104 +177,72 @@ const toggleForceIcon = () => {
   }
 };
 
-// Alt 键按下状态（用于显示快捷键提示）
 const handleAltKey = (event) => {
   if (event.key !== "Alt") return;
   isAltPressed.value = event.type === "keydown";
   event.preventDefault();
 };
 
-/* ==================== 逐字歌词动画 ==================== */
+/* ==================== 逐字 clip-path 动画 ==================== */
 
-const animatedChars = new Set();
+let clipRAFId = null;
+
+const clipLoop = () => {
+  const line = store.playerYrcCurrent;
+
+  if (store.playerYrcEnabled && line?.words?.length) {
+    const box = document.querySelector(".dwrc-box");
+    if (box) {
+      const outputDom = box.querySelectorAll("#dwrc-2-wrap > span");
+      if (outputDom.length === line.words.length) {
+        const audio = store.audioRef || document.querySelector("audio");
+        const nowMs = audio ? audio.currentTime * 1000 : 0;
+
+        line.words.forEach((word, i) => {
+          const el = outputDom[i];
+          if (!el) return;
+
+          const start = word.start;
+          const duration = word.duration;
+          const end = start + duration;
+
+          if (duration === 0) {
+            el.style.clipPath = "inset(0 100% 0 0)";
+          } else if (nowMs >= end) {
+            el.style.clipPath = "inset(0 0% 0 0)";
+          } else if (nowMs >= start) {
+            const progress = (nowMs - start) / duration;
+            const clipRight = Math.max(0, Math.min(100, (1 - progress) * 100));
+            el.style.clipPath = `inset(0 ${clipRight}% 0 0)`;
+          } else {
+            el.style.clipPath = "inset(0 100% 0 0)";
+          }
+        });
+      }
+    }
+  }
+
+  clipRAFId = requestAnimationFrame(clipLoop);
+};
+
+const startClipLoop = () => {
+  if (clipRAFId !== null) return;
+  clipRAFId = requestAnimationFrame(clipLoop);
+};
+
+const stopClipLoop = () => {
+  if (clipRAFId !== null) {
+    cancelAnimationFrame(clipRAFId);
+    clipRAFId = null;
+  }
+};
 
 watch(
-  () => store.playerYrcCurrent?.lineIdx,
-  async (newIdx) => {
-    if (newIdx === undefined || newIdx === null) return;
-
-    animatedChars.clear();
-
-    await nextTick();
-    await new Promise((r) => requestAnimationFrame(r));
-
-    const box = document.querySelector(".dwrc-box");
-    if (!box) return;
-
-    const outputDom = box.querySelectorAll("#dwrc-2-wrap span");
-    const inputDom = box.querySelectorAll("#dwrc-1-wrap span");
-    if (!outputDom.length || !inputDom.length) return;
-
-    const line = store.playerYrcCurrent;
-    const audio = store.audioRef || document.querySelector("audio");
-    if (!audio || !line) return;
-
-    const nowMs = audio.currentTime * 1000;
-
-    line.words.forEach((word, i) => {
-      const inputItem = inputDom[i];
-      const outputItem = outputDom[i];
-      if (!inputItem || !outputItem) return;
-
-      const width = inputItem.getBoundingClientRect().width;
-      if (width === 0) return;
-
-      const wordEnd = word.start + word.duration;
-
-      // 已唱完 → 直接铺满
-      if (wordEnd <= nowMs) {
-        outputItem.style.width = `${width}px`;
-        animatedChars.add(i);
-        return;
-      }
-
-      // 正在唱 → 从中途接上
-      if (word.start <= nowMs && !animatedChars.has(i)) {
-        const elapsed = nowMs - word.start;
-        const remaining = word.duration - elapsed;
-        const startWidth = (elapsed / word.duration) * width;
-        outputItem.style.width = `${startWidth}px`;
-        outputItem.style.transform = "translateY(-1px)";
-
-        const anim = outputItem.animate([{ width: `${startWidth}px` }, { width: `${width}px` }], {
-          duration: remaining,
-          fill: "forwards",
-          easing: "linear",
-        });
-        anim.onfinish = () => {
-          outputItem.style.transform = "translateY(1px)";
-          outputItem.animate(
-            [{ transform: "translateY(-1px)" }, { transform: "translateY(1px)" }],
-            { duration: 300, fill: "forwards", easing: "linear" },
-          );
-        };
-        animatedChars.add(i);
-        return;
-      }
-
-      // 还没唱 → delay 后展开
-      if (word.start > nowMs && !animatedChars.has(i)) {
-        outputItem.style.width = "0px";
-        outputItem.style.transform = "translateY(-1px)";
-
-        const anim = outputItem.animate([{ width: "0px" }, { width: `${width}px` }], {
-          delay: word.start - nowMs,
-          duration: Math.max(80, word.duration),
-          fill: "forwards",
-          easing: "linear",
-        });
-        anim.onfinish = () => {
-          outputItem.style.transform = "translateY(1px)";
-          outputItem.animate(
-            [{ transform: "translateY(-1px)" }, { transform: "translateY(1px)" }],
-            { duration: 300, fill: "forwards", easing: "linear" },
-          );
-        };
-        animatedChars.add(i);
-      }
-    });
+  () => store.playerYrcEnabled,
+  (enabled) => {
+    if (enabled) startClipLoop();
+    else stopClipLoop();
   },
-  { flush: "post" },
 );
 
 /* ==================== 生命周期 ==================== */
@@ -272,23 +250,26 @@ watch(
 onMounted(() => {
   document.addEventListener("keydown", handleAltKey);
   document.addEventListener("keyup", handleAltKey);
+  if (store.playerYrcEnabled) startClipLoop();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("keydown", handleAltKey);
   document.removeEventListener("keyup", handleAltKey);
+  stopClipLoop();
 });
 </script>
 
 <style lang="scss" scoped>
-/* ==================== 逐字字块 ==================== */
+/* ==================== 逐字字块（顶层） ==================== */
 .dwrc-char {
   display: inline-block;
   white-space: pre;
   opacity: 1;
+  -webkit-transform: translateY(1px);
   transform: translateY(1px);
-  background-clip: text;
   -webkit-background-clip: text;
+  background-clip: text;
   font-weight: 520;
   font-size: 1.05rem;
   transition:
@@ -296,41 +277,75 @@ onBeforeUnmount(() => {
     transform 0.3s linear;
 
   &.fade-in-start {
-    text-shadow: 0 0 2px rgba(176, 224, 230, 0.9);
+    text-shadow: 0 0 2px rgba(255, 240, 245, 0.9);
     opacity: 0.6;
+    -webkit-transform: translateY(1px);
     transform: translateY(1px);
+    transition:
+      color 0.5s linear,
+      opacity 0.3s linear,
+      transform 0.3s linear;
   }
 
   &.fade-in {
     opacity: 1;
+    -webkit-transform: translateY(-1px);
     transform: translateY(-1px);
     animation: colorFade 0.7s ease-in-out forwards;
+    transition:
+      color 0.5s linear,
+      opacity 0.3s linear,
+      transform 0.3s linear;
   }
 
   &.fade-out {
     opacity: 1 !important;
+    -webkit-transform: translateY(-1px);
     transform: translateY(-1px);
     text-shadow:
-      0 0 6px rgba(176, 224, 230, 0.9),
+      0 0 6px rgba(255, 240, 245, 0.9),
       0 0 2px rgba(176, 224, 230, 1),
       0 0 2px rgba(230, 230, 250, 1);
+    transition:
+      color 0.5s linear,
+      opacity 0.3s linear,
+      transform 0.3s linear;
+  }
+
+  &.fade-enter-active {
+    animation: float-up 0.3s linear forwards;
   }
 
   &.long-tone {
     opacity: 1;
+    -webkit-transform: translateY(-1px);
     transform: translateY(-1px);
     animation: pulse 1.2s ease-in-out forwards !important;
+    transition:
+      color 0.5s linear,
+      opacity 0.3s linear,
+      transform 0.3s linear;
   }
 
   &.long-tone-out {
     opacity: 1 !important;
+    -webkit-transform: translateY(1px);
     transform: translateY(1px);
     animation: pulse-out 0.7s ease-in-out forwards !important;
+    animation-iteration-count: 1;
+    transition:
+      color 0.5s linear,
+      opacity 0.3s linear,
+      transform 0.3s linear;
   }
 
   &.dwrc-style-s1 {
     opacity: 0.6;
     color: rgba(220, 220, 220, 0.7);
+    transition:
+      color 0.5s linear,
+      opacity 0.3s linear,
+      transform 0.3s linear;
   }
 
   &.dwrc-style-s2 {
@@ -355,9 +370,20 @@ onBeforeUnmount(() => {
     color: rgba(255, 240, 245, 1);
     opacity: 1;
     text-shadow:
-      0 0 6px rgba(176, 224, 230, 0.9),
-      0 0 2px rgba(176, 224, 230, 1),
-      0 0 2px rgba(230, 230, 250, 1);
+      0 0 6px rgba(0, 191, 255, 0.8),
+      0 0 2px rgba(176, 224, 230, 0.8),
+      0 0 2px rgba(230, 230, 250, 0.8);
+  }
+}
+
+@keyframes float-up {
+  from {
+    -webkit-transform: translateY(1px);
+    transform: translateY(1px);
+  }
+  to {
+    -webkit-transform: translateY(-1px);
+    transform: translateY(-1px);
   }
 }
 
@@ -423,40 +449,55 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 底层填充字 */
-#dwrc-2-wrap > span {
+/* ==================== 逐字字块（底层，clip-path） ==================== */
+.dwrc-2-char {
   display: inline-block;
   transform: translateY(1px);
   white-space: pre;
-  overflow: hidden;
-  width: 0;
+  font-size: 1.05rem;
+  font-weight: 520;
+  clip-path: inset(0 100% 0 0);
+  will-change: clip-path;
   opacity: 0.8;
   transition:
     opacity 0.3s linear,
     color 0.5s linear,
-    transform 0.3s linear,
-    width 0.3s linear;
+    transform 0.3s linear;
+  &.fade-in-start {
+    transform: translateY(1px);
+  }
+  &.fade-in {
+    transform: translateY(-1px);
+  }
+  &.fade-out {
+    transform: translateY(-1px);
+  }
+  &.long-tone {
+    transform: translateY(-1px);
+  }
+  &.long-tone-out {
+    transform: translateY(1px);
+  }
 }
 
 #dwrc-2-wrap {
   display: inline-block;
   position: absolute;
-  width: auto;
+  top: 0;
+  left: 0;
   opacity: 0.8;
   color: rgba(255, 240, 245, 0.9);
   text-shadow:
     0 0 6px rgba(0, 191, 255, 0.8),
-    0 0 2px rgba(176, 224, 230, 0.8),
-    0 0 2px rgba(230, 230, 250, 0.8);
+    0px 0px 2px rgba(176, 224, 230, 0.8),
+    0px 0px 2px rgba(230, 230, 250, 0.8);
   font-weight: 520;
   font-size: 1.05rem;
-  overflow: hidden;
   white-space: nowrap;
 }
 
 /* 逐行字块 */
 .lrc-char {
-  display: inline;
   opacity: 1;
   background-clip: text;
   -webkit-background-clip: text;
@@ -466,7 +507,6 @@ onBeforeUnmount(() => {
     0 0 2px rgba(255, 165, 0, 1),
     0 0 2px rgba(255, 179, 71, 1);
   font-weight: 520;
-  font-size: 1.05rem;
   transition:
     opacity 0.3s linear,
     color 0.5s linear;
@@ -543,6 +583,7 @@ onBeforeUnmount(() => {
         }
 
         .dwrc-1 {
+          position: relative;
           z-index: 1;
         }
 

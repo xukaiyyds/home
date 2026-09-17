@@ -67,31 +67,58 @@ export const getPlayerList = async (server, type, id) => {
       // console.log(`[播放器] 命中元信息缓存: ${metaKey}`);
     }
 
-    // 2. 每次都重新拿 URL
-    const chunkSize = 100;
+    // 2. 每次都重新拿 URL（URL 有时效，必须新鲜）
     const urlMap = {};
+
+    // 每批 30 首，URL 长度可控
+    const chunkSize = 30;
     const chunks = [];
     for (let i = 0; i < songs.length; i += chunkSize) {
       chunks.push(songs.slice(i, i + chunkSize));
     }
 
-    const results = await Promise.all(
-      chunks.map((chunk) => {
-        const ids = chunk.map((s) => s.id).join(",");
-        return fetch(`${base}/song/url/v1?id=${ids}&level=exhigh`)
-          .then((r) => r.json())
-          .catch((e) => {
-            console.warn("[播放器] URL 批量请求失败", e);
-            return { data: [] };
-          });
-      }),
-    );
+    // 单批请求，失败时自动拆成两半重试
+    const fetchChunk = async (chunk) => {
+      if (!chunk.length) return;
 
-    results.forEach((data) => {
-      (data.data || []).forEach((item) => {
-        if (item.url) urlMap[item.id] = item.url;
-      });
-    });
+      const ids = chunk.map((s) => s.id).join(",");
+      try {
+        const res = await fetch(`${base}/song/url/v1?id=${ids}&level=exhigh`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        // 检查返回数量是否合理
+        const list = data.data || [];
+        const successCount = list.filter((d) => d.url).length;
+
+        // 返回数量明显不对（少于一半），抛错触发拆分
+        if (chunk.length > 1 && successCount < chunk.length / 2) {
+          throw new Error(`返回 ${successCount}/${chunk.length}，疑似限流`);
+        }
+
+        list.forEach((item) => {
+          if (item.url) urlMap[item.id] = item.url;
+        });
+      } catch (e) {
+        console.warn(`[播放器] 批次失败（${chunk.length} 首），尝试拆分`, e);
+        if (chunk.length === 1) {
+          console.warn(`[播放器] 单曲请求失败，跳过: ${chunk[0].name} (${chunk[0].id})`);
+          return;
+        }
+        const mid = Math.ceil(chunk.length / 2);
+        await fetchChunk(chunk.slice(0, mid));
+        await fetchChunk(chunk.slice(mid));
+      }
+    };
+
+    // 分批串行（避免并发过多触发限流）
+    for (let i = 0; i < chunks.length; i++) {
+      await fetchChunk(chunks[i]);
+      // 最后一批不用等
+      if (i < chunks.length - 1) {
+        await new Promise((r) => setTimeout(r, 150));
+      }
+    }
 
     // 3. 组装
     return songs

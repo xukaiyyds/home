@@ -31,7 +31,7 @@ import METAKEYWORDS from "@/assets/metadataKeywords.json";
 import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
-
+const retryMap = new Set();
 /* ==================== Props ==================== */
 
 const props = defineProps({
@@ -55,9 +55,6 @@ const STATIC_SONG_IDS = {
 
 // 翻译行与原歌词行的最大时间容差（毫秒）
 const TRANS_TOLERANCE = 300;
-
-// 从 audio.src 提取文件名的通用正则
-const AUDIO_FILE_REGEX = /\/([^/?#]+)(?:[?#]|$)/;
 
 // 自动播放失败的提示（只弹一次）
 let hasShownAutoplayTip = false;
@@ -247,20 +244,18 @@ const findTranslation = (ms) => {
 
 // 把翻译按时间轴合并到原歌词行末
 const mergeTranslation = (lrcText, transText) => {
-  if (!transText) return lrcText;
+  if (!transText) return { text: lrcText, list: [] };
 
-  // 解析翻译为 [{ ms, text }]
   const transList = parseTranslation(transText);
-  if (!transList.length) return lrcText;
+  if (!transList.length) return { text: lrcText, list: [] };
 
-  return lrcText
+  const text = lrcText
     .split("\n")
     .map((line) => {
       const m = line.match(LRC_TIME_REG);
       if (!m) return line;
       const lineMs = timeMatchToMs(m);
 
-      // 容差内找最近的翻译
       let best = null;
       let bestDist = TRANS_TOLERANCE;
       for (const item of transList) {
@@ -272,12 +267,13 @@ const mergeTranslation = (lrcText, transText) => {
       }
       if (!best) return line;
 
-      // 翻译和原文相同时不加
       const originalText = line.replace(LRC_TIME_REG, "").trim();
       if (best.text === originalText) return line;
       return `${line} (${best.text})`;
     })
     .join("\n");
+
+  return { text, list: transList };
 };
 
 // 解析 LRC 文本为 [{ time, text }]
@@ -341,8 +337,9 @@ const loadCurrentLrc = async (songId) => {
     const rawLrc = data.lrc?.lyric || "";
     const rawTrans = data.ytlrc?.lyric || data.tlyric?.lyric || "";
 
-    rawLrcText = mergeTranslation(rawLrc, rawTrans);
-    store.playerTransLines = parseTranslation(rawTrans);
+    const merged = mergeTranslation(rawLrc, rawTrans);
+    rawLrcText = merged.text;
+    store.playerTransLines = merged.list;
     currentLrcLines = parseLrc(rawLrcText);
 
     // 逐字歌词
@@ -352,6 +349,7 @@ const loadCurrentLrc = async (songId) => {
     console.error("[歌词] 加载失败:", err);
     currentLrcLines = [];
     store.playerYrcLines = [];
+    store.playerYrcCurrent = null;
   }
 };
 
@@ -426,7 +424,8 @@ const updateYrcCurrent = (audio) => {
 const syncLrc = () => {
   const audio = player.value?.audioRef;
 
-  if (audio && store.playerYrcLines.length) {
+  // 只有"开了开关 + 有逐字数据 + 有音频"时才走逐字
+  if (audio && store.playerYrcEnabled && store.playerYrcLines.length) {
     updateYrcCurrent(audio);
   } else {
     if (store.playerYrcCurrent) store.playerYrcCurrent = null;
@@ -453,6 +452,9 @@ const getCurrentSong = () => {
 const onPlay = async () => {
   const song = getCurrentSong();
   if (!song) return;
+
+  // 每次真正开始播一首歌，清掉它的重试标记
+  retryMap.delete(song.id);
 
   store.setPlayerState(player.value.audioRef.paused);
   store.setPlayerData(song.name, song.artist, song.cover);
@@ -498,21 +500,75 @@ const onCanplay = () => {
   syncPlayerIndex();
 };
 
-const loadMusicError = () => {
-  const hasNext = playList.value.length > 1;
-  ElMessage({
-    message: hasNext ? "播放歌曲出现错误，播放器将在 2s 后进行下一首" : "播放歌曲出现错误",
-    grouping: true,
-    icon: h(PlayWrong, { theme: "filled", fill: "#EFEFEF" }),
-    duration: ERROR_MSG_DURATION,
-  });
+const loadMusicError = async () => {
+  const ap = player.value?.aplayer;
+  const audio = player.value?.audioRef;
+  if (!ap || !audio?.src) return;
 
-  if (store.webSpeech) {
-    SpeechLocal(hasNext ? "歌曲加载失败.mp3" : "播放器未知异常.mp3");
+  // 反查当前歌曲
+  const currentFile = audio.src.split("/").pop()?.split("?")[0];
+  const index = playList.value.findIndex(
+    (s) => s.url.split("/").pop()?.split("?")[0] === currentFile,
+  );
+  if (index < 0) return;
+
+  const song = playList.value[index];
+
+  // 已经重试过一次还是失败 → 放弃，让 APlayer 切下一首
+  if (retryMap.has(song.id)) {
+    retryMap.delete(song.id);
+    console.error("播放失败（已重试过）: " + song.name);
+    ElMessage({
+      message: `歌曲《${song.name}》无法播放，已跳过`,
+      grouping: true,
+      icon: h(PlayWrong, { theme: "filled", fill: "#EFEFEF" }),
+      duration: ERROR_MSG_DURATION,
+    });
+    return;
   }
 
-  const failed = player.value?.aplayer?.audio?.[player.value?.aplayer?.index];
-  if (failed) console.error("播放歌曲错误: " + failed.name);
+  retryMap.add(song.id);
+  console.log(`[播放器] URL 过期，重新获取: ${song.name}`);
+
+  try {
+    const base = import.meta.env.VITE_SONG_API;
+    const res = await fetch(`${base}/song/url/v1?id=${song.id}&level=exhigh`);
+    const data = await res.json();
+
+    // 请求期间用户切歌了 → 放弃重试
+    if (getAudioFileName() !== currentFile) {
+      console.log("[播放器] 重试期间已切歌，放弃");
+      retryMap.delete(song.id);
+      return;
+    }
+
+    const newUrl = data.data?.[0]?.url?.replace(/^http:\/\//, "https://");
+
+    if (!newUrl) {
+      console.error("重试失败，无新 URL:", song.name);
+      retryMap.delete(song.id);
+      return;
+    }
+
+    console.log(`[播放器] 新 URL 已获取，重新播放: ${song.name}`);
+
+    // 更新列表 + APlayer 内部
+    playList.value[index].url = newUrl;
+    if (ap.list?.audios?.[index]) {
+      ap.list.audios[index].url = newUrl;
+    }
+
+    // 强制重新加载
+    audio.src = newUrl;
+    audio.load();
+    await audio.play().catch(() => {});
+
+    // 10 秒后清标记，允许将来再次重试
+    setTimeout(() => retryMap.delete(song.id), 10000);
+  } catch (e) {
+    console.error("刷新 URL 失败:", e);
+    retryMap.delete(song.id);
+  }
 };
 
 // 媒体会话位置状态（部分浏览器支持）
@@ -562,6 +618,23 @@ watch([() => store.playerOrder, () => store.playerLoop], ([order, loop]) => {
   ap.order = order;
   ap.loop = loop;
 });
+
+// 逐字开关变化时，立即刷新显示
+watch(
+  () => store.playerYrcEnabled,
+  (enabled) => {
+    if (enabled) {
+      const audio = player.value?.audioRef;
+      if (audio && store.playerYrcLines.length) {
+        updateYrcCurrent(audio);
+      }
+    } else {
+      // 关闭：清空逐字状态 + 立即回退到逐行
+      store.playerYrcCurrent = null;
+      updateLrc();
+    }
+  },
+);
 
 // 歌词翻译开关变化时，重新解析当前歌词（不重新请求）
 watch(
