@@ -33,6 +33,7 @@ export const mainStore = defineStore("main", {
     firefly: false, // 萤火虫特效
     snowflake: false, // 雪花特效
     bubble: false, // 气泡特效
+    sakura: false, // 樱花特效
 
     // ---- 页面浮层状态 ----
     boxOpenState: false, // 盒子开启状态
@@ -218,6 +219,7 @@ export const mainStore = defineStore("main", {
       "firefly",
       "snowflake",
       "bubble",
+      "sakura",
 
       /* 搜索引擎 */
       "searchEngine",

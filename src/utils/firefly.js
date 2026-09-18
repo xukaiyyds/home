@@ -1,7 +1,7 @@
 /* ==================== 静态配置 ==================== */
 
 // 萤火虫数量
-const FIREFLY_COUNT = 25;
+const FIREFLY_COUNT = 30;
 
 // 速度范围（正负对称）
 const MAX_SPEED = 0.75;

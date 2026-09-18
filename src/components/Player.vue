@@ -682,7 +682,7 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .aplayer {
-  width: 86%;
+  width: 90%;
   border-radius: 6px;
   font-family: "HarmonyOS_Regular", sans-serif !important;
   box-shadow: var(--main-small-box-shadow) !important;

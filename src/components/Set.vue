@@ -426,6 +426,7 @@ const {
   firefly,
   snowflake,
   bubble,
+  sakura,
   focusSearch,
   clearContent,
   playerAutoplay,
@@ -459,6 +460,7 @@ const PARTICLE_LABELS = {
   snow: "雪花",
   firefly: "萤火虫",
   bubble: "气泡",
+  sakura: "樱花",
 };
 
 // 粒子类型 → 对应的 store ref
@@ -467,11 +469,12 @@ const PARTICLE_REFS = {
   snow: snowflake,
   firefly,
   bubble,
+  sakura,
 };
 
 // 主题 → 可用粒子类型
 const PARTICLE_BY_THEME = {
-  light: ["snow", "bubble"],
+  light: ["snow", "bubble", "sakura"],
   dark: ["star", "firefly"],
 };
 

@@ -31,6 +31,7 @@ import initUniverse from "@/utils/dark";
 import initFirefly from "@/utils/firefly";
 import initSnowfall from "@/utils/snow";
 import initBubble from "@/utils/bubbles";
+import initSakura from "@/utils/sakura";
 import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
@@ -51,6 +52,7 @@ const PARTICLE_MAP = {
   snow: { key: "snowfall", init: initSnowfall },
   firefly: { key: "firefly", init: initFirefly },
   bubble: { key: "bubble", init: initBubble },
+  sakura: { key: "sakura", init: initSakura },
 };
 
 /* ==================== 本地状态 ==================== */
@@ -64,6 +66,7 @@ const cleanupFns = {
   firefly: null,
   snowfall: null,
   bubble: null,
+  sakura: null,
 };
 
 /* ==================== 壁纸逻辑 ==================== */

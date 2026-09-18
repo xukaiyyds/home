@@ -478,6 +478,10 @@ onBeforeUnmount(() => {
   &.long-tone-out {
     transform: translateY(1px);
   }
+  &.long-tone,
+  &.long-tone-out {
+    opacity: 0;
+  }
 }
 
 #dwrc-2-wrap {
