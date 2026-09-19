@@ -270,8 +270,8 @@
             :inactive-icon="CloseSmall"
           />
         </div>
-        <div class="item" v-show="playerLrcShow">
-          <span class="text subitem">翻译</span>
+        <div class="item" v-if="playerLrcShow" v-show="playerYrcEnabled">
+          <span class="text subsubitem">翻译</span>
           <el-switch
             v-model="playerTrLrc"
             inline-prompt

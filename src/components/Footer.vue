@@ -120,7 +120,7 @@ import { mainStore } from "@/store";
 import config from "@/../package.json";
 import ProgressBar from "@/components/ProgressBar.vue";
 import { SpeechLocal } from "@/utils/speech";
-import { toggleHelp } from "@/utils/help";
+import { toggleHelp, closeHelp } from "@/utils/help";
 
 const store = mainStore();
 
@@ -242,6 +242,14 @@ watch(
   (enabled) => {
     if (enabled) startClipLoop();
     else stopClipLoop();
+  },
+);
+
+// 启用壁纸预览时，一并关闭查看快捷键弹窗
+watch(
+  () => store.backgroundShow,
+  (show) => {
+    if (show) closeHelp();
   },
 );
 
@@ -511,6 +519,7 @@ onBeforeUnmount(() => {
     0 0 2px rgba(255, 165, 0, 1),
     0 0 2px rgba(255, 179, 71, 1);
   font-weight: 520;
+  font-size: 1.05rem;
   transition:
     opacity 0.3s linear,
     color 0.5s linear;

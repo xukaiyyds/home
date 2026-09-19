@@ -379,6 +379,16 @@ const confirmDelete = (item) => {
     .catch(() => {});
 };
 
+/* ==================== 监听 ==================== */
+
+// 启用壁纸预览时，关闭右键菜单
+watch(
+  () => store.backgroundShow,
+  (show) => {
+    if (show) closeContextMenu();
+  },
+);
+
 /* ==================== 生命周期 ==================== */
 
 onMounted(() => {

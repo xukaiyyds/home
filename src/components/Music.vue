@@ -122,11 +122,17 @@ const volumeIcon = computed(() => {
 /* ==================== 播放列表控制 ==================== */
 
 const openMusicList = () => {
+  // 音乐数据未加载完成，不弹出列表
+  if (!store.musicIsOk) {
+    showMessage("音乐数据加载中，请稍候", MusicList);
+    return false;
+  }
   store.setOpenState = false;
   store.searchOpenState = false;
   store.musicListShow = true;
   playerRef.value?.toggleList();
   if (store.webSpeech) SpeechLocal("好耶.mp3");
+  return true;
 };
 
 const closeMusicList = () => {
@@ -230,8 +236,7 @@ const handleAltMKey = (event) => {
     closeMusicList();
     showMessage(`已关闭音乐列表`, MusicList);
   } else {
-    openMusicList();
-    showMessage(`已打开音乐列表`, MusicList);
+    if (openMusicList()) showMessage(`已打开音乐列表`, MusicList);
   }
 };
 

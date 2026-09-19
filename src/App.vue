@@ -4,7 +4,7 @@
   <!-- 壁纸 -->
   <Background @loadComplete="loadComplete" />
   <!-- 悬浮音乐 -->
-  <FloatingMusic v-if="store.useFloatingPlayer" />
+  <FloatingMusic v-show="store.useFloatingPlayer && !store.backgroundShow" />
   <!-- 主界面 -->
   <Transition name="fade" mode="out-in">
     <main id="main" v-if="store.imgLoadStatus">
@@ -165,7 +165,10 @@ const toggleLive2dDisplay = (show) => {
   });
 };
 
-watch(() => store.live2dShow, toggleLive2dDisplay, { immediate: true });
+// 是否显示 Live2D：用户开关开启 且 未处于壁纸预览
+const shouldShowLive2d = computed(() => store.live2dShow && !store.backgroundShow);
+
+watch(shouldShowLive2d, (show) => toggleLive2dDisplay(show), { immediate: true });
 
 // 初始化 Live2D
 const initLive2D = async (type) => {
@@ -178,7 +181,7 @@ const initLive2D = async (type) => {
     ShowToolBox: true,
     LoadFromCache: true,
   });
-  toggleLive2dDisplay(store.live2dShow);
+  toggleLive2dDisplay(store.live2dShow && !store.backgroundShow);
 };
 
 /* ==================== 键盘事件处理 ==================== */
@@ -229,11 +232,7 @@ const handleSearchToggle = (event) => {
 const handleContextMenu = (event) => {
   // 捷径项上的右键放行（交给 ShortCut 组件处理）
   const target = event.target;
-  if (
-    target.closest?.(".item") ||
-    target.closest?.(".shortcut-item-wrapper") ||
-    target.closest?.(".shortcut-item")
-  ) {
+  if (target.closest?.(".shortcut-item-wrapper") || target.closest?.(".shortcut-item")) {
     return true;
   }
 

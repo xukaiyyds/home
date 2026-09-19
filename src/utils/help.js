@@ -64,8 +64,7 @@ const ALERT_OPTIONS = {
 export const toggleHelp = () => {
   // 已打开则关闭
   if (isHelpOpen) {
-    ElMessageBox.close();
-    isHelpOpen = false;
+    closeHelp();
     return;
   }
 
@@ -76,4 +75,10 @@ export const toggleHelp = () => {
       isHelpOpen = false;
     });
   isHelpOpen = true;
+};
+
+export const closeHelp = () => {
+  if (!isHelpOpen) return;
+  ElMessageBox.close();
+  isHelpOpen = false;
 };

@@ -63,7 +63,7 @@ const getHitokotoData = async () => {
     if (store.webSpeech) {
       setTimeout(() => {
         SpeechLocal("一言加载失败.mp3");
-      }, 12000);
+      }, 14000);
     }
     hitokotoData.text = "这里应该显示一句话";
     hitokotoData.from = "一言";
