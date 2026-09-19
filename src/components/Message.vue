@@ -16,12 +16,10 @@
     <div class="description cards" @click="changeBox">
       <div class="content">
         <Icon size="16"><QuoteLeft /></Icon>
-        <Transition name="fade" mode="out-in">
-          <div :key="descriptionText.hello + descriptionText.text" class="text">
-            <p>{{ descriptionText.hello }}</p>
-            <p>{{ descriptionText.text }}</p>
-          </div>
-        </Transition>
+        <div class="text">
+          <p>{{ descriptionText.hello }}</p>
+          <p ref="textRef"></p>
+        </div>
         <Icon size="16"><QuoteRight /></Icon>
       </div>
     </div>
@@ -34,6 +32,7 @@ import { QuoteLeft, QuoteRight } from "@vicons/fa";
 import { Error } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
+import TypeIt from "typeit";
 import { SpeechLocal } from "@/utils/speech";
 
 const store = mainStore();
@@ -63,6 +62,48 @@ const DESC_OTHER = {
 
 // 简介区域文字（响应式，随盒子状态切换）
 const descriptionText = reactive({ ...DESC_DEFAULT });
+const textRef = ref(null);
+let typeitInstance = null;
+const typedSet = new Set();
+
+/* ==================== 打字机 ==================== */
+
+// 直接显示文字（无打字效果）
+const showTextDirectly = (text) => {
+  nextTick(() => {
+    typeitInstance?.destroy();
+    typeitInstance = null;
+    if (textRef.value) textRef.value.textContent = text;
+  });
+};
+
+// 播放文字：该文案首次出现时打字，之后直接显示
+const playText = (text) => {
+  // 窄屏不做打字效果，直接显示（不标记 typedSet，拉宽后首次出现仍会打字）
+  if (window.innerWidth < MOBILE_WIDTH) {
+    showTextDirectly(text);
+    return;
+  }
+
+  if (typedSet.has(text)) {
+    showTextDirectly(text);
+    return;
+  }
+  typedSet.add(text);
+
+  nextTick(() => {
+    if (!textRef.value) return;
+    typeitInstance?.destroy();
+    typeitInstance = null;
+    textRef.value.textContent = "";
+    typeitInstance = new TypeIt(textRef.value, {
+      speed: 90,
+      lifeLike: true,
+      cursor: true,
+    });
+    typeitInstance.type(text).go();
+  });
+};
 
 /* ==================== 事件处理 ==================== */
 
@@ -97,10 +138,22 @@ watch(
     const target = isOpen ? DESC_OTHER : DESC_DEFAULT;
     descriptionText.hello = target.hello;
     descriptionText.text = target.text;
+    playText(target.text); // ← 统一入口
 
     if (isOpen && store.webSpeech) SpeechLocal("惊讶.mp3");
   },
 );
+
+/* ==================== 生命周期 ==================== */
+
+onMounted(() => {
+  playText(descriptionText.text);
+});
+
+onBeforeUnmount(() => {
+  typeitInstance?.destroy();
+  typeitInstance = null;
+});
 </script>
 
 <style lang="scss" scoped>

@@ -331,7 +331,9 @@ const buildSearchUrl = (text) => {
 
 // 下拉关闭后聚焦到搜索输入框
 const handleSelectVisibleChange = (visible) => {
-  if (!visible) focusSearchInput(FOCUS_DELAY);
+  if (!visible && !customDialogVisible.value) {
+    focusSearchInput(FOCUS_DELAY);
+  }
 };
 
 // 打开自定义引擎对话框
